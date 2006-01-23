@@ -1,0 +1,45 @@
+rcov README
+============
+
+  rcov is a code coverage tool for Ruby.
+
+Requirements
+------------
+
+  * Ruby 1.8
+  * (recommended) C compiler: if for some reason you don't want to use the 
+    rubyrt extension, just rm -rf ext/ and install normally (rcov will be
+    two orders of magnitude slower, though).
+
+
+Install
+-------
+
+  De-compress archive and enter its top directory.
+  Then type:
+
+   ($ su)
+    # ruby setup.rb
+
+  These simple step installs this program under the default
+  location of Ruby libraries.  You can also install files into
+  your favorite directory by supplying setup.rb some options.
+  Try "ruby setup.rb --help".
+
+
+Usage
+-----
+
+  Just run your scripts as in
+    rcov myscript.rb
+  to generate code coverage information in HTML format under coverage/.
+  See rcov --help for a description of the available options.
+
+
+License
+-------
+
+  Released under the same terms as Ruby. See LICENSE.txt.
+
+
+Mauricio Fernandez <mfp@acm.org>

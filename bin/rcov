@@ -1,0 +1,646 @@
+#!/usr/bin/env ruby
+# Originally based on 
+# module COVERAGE__ originally (c) NAKAMURA Hiroshi
+# module PrettyCoverage originally (c) Simon Strandgaard
+#
+# rewritten & extended by Mauricio Julio Fernández Pradier
+#
+# See LICENSE.txt for additional licensing information.
+#
+
+require 'cgi'
+require 'rbconfig'
+require 'optparse'
+require 'ostruct'
+include Config
+
+SCRIPT_LINES__ = {} unless defined? SCRIPT_LINES__
+
+module Rcov
+
+VERSION = "0.1.0"
+RELEASE_DATE = "2006-01-23"
+    
+class CoverageInfo
+    def initialize(coverage_array)
+        @cover = coverage_array
+    end
+
+    def [](idx)
+        @cover[idx]
+    end
+
+    def []=(idx, val)
+        unless [true, false].include? val
+            raise RuntimeError, "What does #{val} mean?" 
+        end
+        return if idx < 0 || idx >= @cover.size
+        if val
+            @cover[idx] = :inferred
+        else
+            @cover[idx] = false
+        end
+    end
+
+    def method_missing(meth, *a, &b)
+        @cover.send(meth, *a, &b)
+    end
+end
+
+class SourceFile
+    attr_reader :name, :lines, :coverage, :counts
+    def initialize(name, lines, initial_coverage, counts)
+        @name = name
+        @lines = lines
+        @coverage = CoverageInfo.new initial_coverage
+        @counts = counts
+        precompute_coverage false
+    end
+
+    def precompute_coverage(comments_run_by_default = true)
+        changed = false
+        (0...lines.size).each do |i|
+            next if @coverage[i]
+            line = @lines[i]
+            if /^\s*(?:begin\s*(?:#.*)?|ensure\s*(?:#.*)?|else\s*(?:#.*)?)$/ =~line &&
+                next_expr_marked?(i) or
+                /^\s*(?:end|\})\s*(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
+                prev_expr_continued?(i) && prev_expr_marked?(i) or
+                comments_run_by_default && /^\s*(#|$)/ =~ line or 
+                  /^\s*(?:rescue)/ =~ line && next_expr_marked?(i) or
+                  /^\s*case\s*(?:#.*)?$/ =~ line && next_expr_marked?(i) or
+                  /^\s*(\)|\]|\})(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
+                 prev_expr_continued?(i+1) && next_expr_marked?(i)
+                 @coverage[i] = true
+                 changed = true
+            end
+        end
+        (@lines.size-1).downto(0) do |i|
+            next if @coverage[i]
+            if @lines[i] =~ /^\s*(#|$)/ and @coverage[i+1] 
+                @coverage[i] = true
+                changed = true
+            end
+        end
+        # if there was any change, we have to recompute; we'll eventually
+        # reach a fixed point and stop there
+        precompute_coverage(comments_run_by_default) if changed
+    end
+
+    def total_coverage
+        return 0 if @coverage.size == 0
+        @coverage.inject(0.0) {|s,a| s + (a ? 1:0) } / @coverage.size
+    end
+
+    def code_coverage
+        indices = (0...@lines.size).select{|i| is_code? i }
+        return 0 if indices.size == 0
+        count = 0
+        indices.each {|i| count += 1 if @coverage[i] }
+        1.0 * count / indices.size
+    end
+
+    def num_code_lines
+        (0...@lines.size).select{|i| is_code? i}.size
+    end
+
+    def num_lines
+        @lines.size
+    end
+
+    def is_code?(lineno)
+        #TODO: handle here docs?
+        @lines[lineno] && @lines[lineno] !~ /^\s*(#|$)/ 
+    end
+
+    private
+    def next_expr_marked?(lineno)
+        return false if lineno >= @lines.size
+        found = false
+        idx = (lineno+1).upto(@lines.size-1) do |i|
+            next unless is_code? i
+            found = true
+            break i
+        end
+        return false unless found
+        @coverage[idx]
+    end
+
+    def prev_expr_marked?(lineno)
+        return false if lineno <= 0
+        found = false
+        idx = (lineno-1).downto(0) do |i|
+            next unless is_code? i
+            found = true
+            break i
+        end
+        return false unless found
+        @coverage[idx]
+    end
+
+    def prev_expr_continued?(lineno)
+        return false if lineno <= 0
+        found = false
+        idx = (lineno-1).downto(0) do |i|
+            next unless is_code? i
+            found = true
+            break i
+        end
+        return false unless found
+        #TODO: write a comprehensive list
+        #TODO: handle here docs?
+        #FIXME: / matches regexps too
+        r = /(,|\.|\+|-|\*|\/|<|>|%|&&|\|\||<<|\(|\[|\{|=)\s*(?:#.*)?$/.match @lines[idx]
+        if /(do|\{)\s*\|.*\|\s*(?:#.*)?$/.match @lines[idx]
+            return false
+        end
+        r
+    end
+end
+
+class Formatter
+    class << self; attr_accessor :ignore_files end 
+    @ignore_files = [/\A#{Regexp.escape(CONFIG["libdir"])}/, /tc_/, 
+                     /\A#{Regexp.escape(__FILE__)}\z/]
+    def initialize
+        @files = {}
+    end
+
+    def add_file(filename, lines, coverage, counts)
+        return nil if Formatter.ignore_files.any?{|x| x === filename}
+        @files[filename] = SourceFile.new filename, lines, coverage, counts
+    end
+
+    def total_coverage
+        lines = 0
+        total = 0.0
+        @files.each do |k,f| 
+            total += f.num_lines * f.total_coverage 
+            lines += f.num_lines 
+        end
+        return 0 if lines == 0
+        total / lines
+    end
+
+    def code_coverage
+        lines = 0
+        total = 0.0
+        @files.each do |k,f| 
+            total += f.num_code_lines * f.code_coverage 
+            lines += f.num_code_lines 
+        end
+        return 0 if lines == 0
+        total / lines
+    end
+end
+
+class HTMLCoverage < Formatter
+    require 'fileutils'
+    def initialize(dest_dir = ".", color = true, fsr = 30)
+        super()
+        @dest = dest_dir
+        @color = color
+        @fsr = fsr
+    end
+
+    def execute
+        return if @files.size == 0
+        FileUtils.mkdir_p @dest 
+        create_index(File.join(@dest, "index.html"))
+        @files.each do |filename, fileinfo|
+            create_file(File.join(@dest, file_name(filename)), fileinfo)
+        end
+    end
+
+    def file_name(base)
+        base.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/\//, "-") + ".html"
+    end
+
+    private
+
+    def default_color
+        "rgb(180, 180, 180)"
+    end
+
+    def create_index(destname)
+        rows = []
+        files = @files.keys.sort.map{|k| @files[k]}
+        tot_lines = tot_code_lines = 0
+        files.each do |f|
+            rows << "<tr>"
+            rows << "<td><a href=\"#{file_name(f.name)}\">#{f.name}</a></td>"
+            rows << "<td><tt>#{f.num_lines}</tt></td>"
+            rows << "<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>"
+            rows << "<td><tt>#{f.num_code_lines}</tt></td>"
+            rows << "<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>"
+            rows << ("<td><tt>%02.1f%%</tt></td>" % (f.total_coverage * 100))
+            rows << "<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>"
+            rows << ("<td><tt>%02.1f%%</tt></td>" % (f.code_coverage * 100))
+            rows << "</tr>"
+            tot_lines += f.num_lines
+            tot_code_lines += f.num_code_lines
+        end
+        rows << "<tr><td>TOTAL</td>"
+        rows << "<td><tt>#{tot_lines}</tt></td>"
+        rows << "<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>"
+        rows << "<td><tt>#{tot_code_lines}</tt></td>"
+        rows << "<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>"
+        rows << ("<td><tt>%02.1f%%</tt></td>" % (total_coverage * 100))
+        rows << "<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>"
+        rows << ("<td><tt>%02.1f%%</tt></td>" % (code_coverage * 100))
+        rows << "</tr>"
+        result = rows.join("\n")
+        body = "<h3><tt>#{Time.new.to_s}</tt></h3>"
+        body << "<h1>Average (code only): %02.1f%%</h1>" % 
+            (code_coverage*100)
+        body << "<h2>Average (with comments): %02.1f%%</h2>" %
+            (total_coverage*100)
+        body << "<table>#{result}</table>"
+        title = "coverage"
+        css = <<EOCSS
+body {
+  background-color: #{default_color});
+}
+span.marked {
+  background-color: rgb(185, 200, 200);
+  display: block;
+}
+span.inferred {
+  background-color: rgb(180, 195, 195);
+  display: block;
+}
+span.overview {
+  border-bottom: 8px solid black;
+}
+EOCSS
+            html = <<EOHTML 
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+            "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>#{title}</title>
+<style type="text/css">#{css}</style></head>
+<body>#{body}
+<hr />
+<p>
+  <a href="http://validator.w3.org/check/referer">
+    <img src="http://www.w3.org/Icons/valid-xhtml11" 
+     alt="Valid XHTML 1.1!" height="31" width="88" />
+  </a>
+ <a href="http://jigsaw.w3.org/css-validator/">
+  <img style="border:0;width:88px;height:31px"
+       src="http://jigsaw.w3.org/css-validator/images/vcss" 
+       alt="Valid CSS!" />
+ </a>
+</p>
+</body>
+</html> 
+EOHTML
+        File.open(destname, "w") do |f|
+            f.puts html
+        end
+    end
+
+    def format_overview(file)
+        percent = "%02.1f" % (file.total_coverage * 100)
+        percent2 = "%02.1f" % (file.code_coverage * 100)
+        html = <<EOHTML
+<div class="overview">
+<table>
+<tr><td>filename</td><td><tt>#{file.name}</tt></td></tr>
+<tr><td>total coverage</td><td>#{percent}</td></tr>
+<tr><td>code coverage</td><td>#{percent2}</td></tr>
+</table>
+</div>
+EOHTML
+        html
+    end
+
+    def format_lines(file)
+        result = ""
+        last = nil
+        end_of_span = ""
+        format_line = "%#{file.num_lines.to_s.size}d"
+        file.num_lines.times do |i|
+            line = file.lines[i]
+            marked = file.coverage[i]
+            count = file.counts[i]
+            spanclass = span_class(file, marked, count)
+            if spanclass != last
+                result += end_of_span
+                case spanclass
+                when nil
+                    end_of_span = ""
+                else
+                    result += "<span class=\"#{spanclass}\">"
+                    end_of_span = "</span>"
+                end
+            end
+            result += (format_line % (i+1)) + " " + CGI.escapeHTML(line) + "\n"
+            last = spanclass
+        end
+        result += end_of_span
+        "<pre>#{result}</pre>"
+    end
+
+    def span_class(sourceinfo, marked, count)
+        case marked
+        when true
+            "marked"
+        when :inferred
+            "inferred"
+        else 
+            false
+        end
+    end
+
+    def create_file(destfile, fileinfo)
+        puts "outputting #{destfile.inspect}"
+        #fileinfo.counts.each_with_index {|x,i| puts "%03d %d" % [i+1,x]}
+        body = format_overview(fileinfo) + format_lines(fileinfo)
+        title = fileinfo.name + " - coverage"
+        css = <<EOCSS
+body {
+  background-color: #{default_color};
+}
+span.marked {
+  background-color: rgb(185, 200, 200);
+  display: block;
+}
+span.inferred {
+  background-color: rgb(180, 195, 195);
+  display: block;
+}
+#{colorscale}
+div.overview {
+  border-bottom: 8px solid black;
+}
+EOCSS
+        html = <<EOHTML 
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+            "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>#{title}</title>
+<style type="text/css">#{css}</style></head>
+<body>#{body}
+<hr />
+<p>
+  <a href="http://validator.w3.org/check/referer">
+    <img src="http://www.w3.org/Icons/valid-xhtml11" 
+     alt="Valid XHTML 1.1!" height="31" width="88" />
+  </a>
+ <a href="http://jigsaw.w3.org/css-validator/">
+  <img style="border:0;width:88px;height:31px"
+       src="http://jigsaw.w3.org/css-validator/images/vcss" 
+       alt="Valid CSS!" />
+ </a>
+</p>
+</body></html> 
+EOHTML
+        File.open(destfile, "w") do |f|
+            f.puts html
+        end
+    end
+
+    def colorscale
+        colorscalebase =<<EOF
+span.run%d {
+  background-color: rgb(%d, %d, %d);
+  display: block;
+}
+EOF
+        cscale = ""
+        100.times do |i|
+            if @color
+                r, g, b = hsv2rgb(220-(2.2*i).to_i, 0.3, 1)
+                r = (r * 255).to_i
+                g = (g * 255).to_i
+                b = (b * 255).to_i
+            else
+                r = g = b = 255 - i 
+            end
+            cscale << colorscalebase % [i, r, g, b]
+        end
+        cscale
+    end
+
+    # thanks to kig @ #ruby-lang for this one
+    def hsv2rgb(h,s,v)
+        return [v,v,v] if s == 0
+        h = h/60.0
+        i = h.floor
+        f = h-i
+        p = v * (1-s)
+        q = v * (1-s*f)
+        t = v * (1-s*(1-f))
+        case i
+        when 0
+            r = v
+            g = t
+            b = p
+        when 1
+            r = q
+            g = v
+            b = p
+        when 2
+            r = p
+            g = v
+            b = t
+        when 3
+            r = p
+            g = q
+            b = v
+        when 4
+            r = t
+            g = p
+            b = v
+        when 5
+            r = v
+            g = p
+            b = q
+        end
+        [r,g,b]
+    end
+end
+
+class HTMLProfiling < HTMLCoverage
+
+    def initialize(*a)
+        super
+        @max_cache = {}
+        @median_cache = {}
+    end
+    
+    def default_color
+        if @color
+            "rgb(179,205,255)"
+        else
+            "rgb(255, 255, 255)"
+        end
+    end
+
+    def span_class(sourceinfo, marked, count)
+        full_scale_range = @fsr # dB
+        nz_count = sourceinfo.counts.select{|x| x && x != 0}
+        nz_count << 1 # avoid div by 0
+        max = @max_cache[sourceinfo] ||= nz_count.max
+        #avg = @median_cache[sourceinfo] ||= 1.0 * 
+        #    nz_count.inject{|a,b| a+b} / nz_count.size
+        median = @median_cache[sourceinfo] ||= 1.0 * nz_count.sort[nz_count.size/2]
+        max ||= 2
+        max = 2 if max == 1
+        if marked == true
+            count = 1 if !count || count == 0
+            idx = 50 + 1.0 * (500/full_scale_range) * Math.log(count/median) /
+                Math.log(10)
+            idx = idx.to_i
+            idx = 0 if idx < 0
+            idx = 100 if idx > 100
+            "run#{idx}"
+        else 
+            nil
+        end
+    end
+end
+
+
+module COVERAGE__
+    COVER = {}
+    class << self; attr_accessor :formatter end
+    
+    @formatter = Rcov::HTMLCoverage.new "coverage"
+    #@formatter = Rcov::HTMLProfiling.new "profiling", true, 10
+    # the range has to be adjusted depending on what we want to see
+    # and the app. (+-10--40dB are not bad)
+    
+    begin
+        require 'rcovrt'
+    rescue LoadError
+        def self.install_hook
+            set_trace_func lambda {|event, file, line, id, binding, klass|
+                case event
+                when 'c-call', 'c-return', 'class'
+                    return
+                end
+                COVER[file] ||= []
+                COVER[file][line - 1] ||= 0
+                COVER[file][line - 1] += 1
+            }
+        end
+
+        def self.remove_hook
+            set_trace_func(nil)
+        end
+    end
+
+    def self.reset
+        COVER.replace {}
+    end
+
+    END {
+        remove_hook
+#Rcov::COVERAGE__::COVER.each_pair do |name, counts|
+#    next unless SCRIPT_LINES__[name]
+#    puts "=" * 80
+#    puts name
+#    puts "=" * 80
+#    SCRIPT_LINES__[name].each_with_index do |line, i|
+#        puts "%-70s: %5d" % [line.chomp, counts[i]]
+#    end
+#end
+        COVER.each do |file, lines|
+            next if SCRIPT_LINES__.has_key?(file) == false
+            lines = SCRIPT_LINES__[file]
+            covers = COVER[file]
+            line_info = []
+            marked_info = []
+            cover_info = []
+            0.upto(lines.size - 1) do |c|
+                line = lines[c].chomp
+                marked = false
+                marked = true if covers[c] && covers[c] > 0
+                line_info << line
+                marked_info << marked
+                cover_info << (covers[c+1] || 0)
+            end
+            COVERAGE__.formatter.add_file(file, line_info, marked_info,
+                                          cover_info)
+        end
+        COVERAGE__.formatter.execute
+    }
+end
+
+end # Rcov
+
+
+options = OpenStruct.new
+options.color = true
+options.range = 30.0
+options.profiling = false
+options.destdir = nil
+options.loadpaths = []
+options.skip = Rcov::Formatter.ignore_files
+
+opts = OptionParser.new do |opts|
+    opts.banner = <<-EOF
+rcov #{Rcov::VERSION} #{Rcov::RELEASE_DATE}
+Usage: rcov [options] <script.rb>
+EOF
+    opts.separator ""
+    opts.separator "Options:"
+    opts.on("-o", "--output PATH", "Destination directory.") do |dir|
+        options.destdir = dir
+    end
+    opts.on("-I", "--include PATHS", 
+            "Prepend PATHS to $: (colon separated list)") do |paths|
+                options.loadpaths = paths.split(/:/)
+            end
+    opts.on("-n", "--no-color", "Create colorblind-safe output.") do
+        options.color = false
+    end
+    opts.on("-x", "--exclude PATTERNS", 
+            "Don't generate info for the files matching any",
+            "of the given patterns (comma-separated regexp list)") do |list|
+                regexps = list.split(/,/).map{|x| Regexp.new x}
+                options.skip += regexps
+            end
+    opts.on("-p", "--profile", "Generate bogo-profiling info.") do
+        options.profiling = true
+        options.destdir ||= "profiling"
+    end
+    opts.on("-r", "--range", Float, 
+            "Color scale range for profiling info (dB).") do |val|
+        options.range = val
+    end
+    opts.separator ""
+    opts.on_tail("-h", "--help", "Show this message") do
+        puts opts
+        exit
+    end
+    opts.on_tail("--version", "Show version") do
+        puts "rcov " + Rcov::VERSION + " " + Rcov::RELEASE_DATE
+        exit
+    end
+end
+
+opts.parse! ARGV
+options.destdir ||= "coverage"
+unless ARGV[0]
+    puts opts
+    exit
+end
+if options.profiling
+    klass = Rcov::HTMLProfiling
+else
+    klass = Rcov::HTMLCoverage
+end
+Rcov::COVERAGE__.formatter = klass.new options.destdir, options.color, options.range
+
+Rcov::Formatter.ignore_files = options.skip
+
+Rcov::COVERAGE__.install_hook
+prog = ARGV.shift
+$0 = prog
+options.loadpaths.reverse_each{|x| $:.unshift x}
+load prog
