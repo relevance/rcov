@@ -214,11 +214,14 @@ class HTMLCoverage < Formatter
 
     CSS_PROLOG = DATA.read
     
-    def initialize(dest_dir = ".", color = true, fsr = 30)
+    DEFAULT_OPTS = {:color, false, :fsr, 30, :textmode, false}
+    def initialize(dest_dir = ".", opts = {})
         super()
         @dest = dest_dir
-        @color = color
-        @fsr = fsr
+        options = DEFAULT_OPTS.clone.update(opts)
+        @color = options[:color]
+        @fsr = options[:fsr]
+        @textmode = options[:textmode]
     end
 
     def execute
@@ -227,6 +230,19 @@ class HTMLCoverage < Formatter
         create_index(File.join(@dest, "index.html"))
         @files.each do |filename, fileinfo|
             create_file(File.join(@dest, file_name(filename)), fileinfo)
+            next unless @textmode
+            puts "=" * 80
+            puts filename
+            puts "=" * 80
+            SCRIPT_LINES__[filename].each_with_index do |line, i|
+                case @textmode
+                when :plain
+                    puts "%-70s| %6d" % [line.chomp, fileinfo.counts[[i-1,0].max]]
+                when :rich
+                    color = fileinfo.coverage[i] ? "\e[32;40m" : "\e[31;40m"
+                    puts "#{color}%s\e[37;40m" % line.chomp
+                end
+            end
         end
     end
 
@@ -380,7 +396,7 @@ class HTMLCoverage < Formatter
     end
 
     def create_file(destfile, fileinfo)
-        puts "Generating #{destfile.inspect}"
+        $stderr.puts "Generating #{destfile.inspect}"
         body = format_overview(fileinfo) + format_lines(fileinfo)
         title = fileinfo.name + " - #{default_title}"
         do_ctable = output_color_table?
@@ -522,7 +538,6 @@ class HTMLProfiling < HTMLCoverage
         false
     end
 
-
     def span_class(sourceinfo, marked, count)
         full_scale_range = @fsr # dB
         nz_count = sourceinfo.counts.select{|x| x && x != 0}
@@ -623,6 +638,7 @@ options.range = 30.0
 options.profiling = false
 options.destdir = nil
 options.loadpaths = []
+options.textmode = false
 options.skip = Rcov::Formatter.ignore_files
 
 opts = OptionParser.new do |opts|
@@ -656,6 +672,12 @@ EOF
             "Color scale range for profiling info (dB).") do |val|
         options.range = val
     end
+    opts.on("-t", "--text", "Output coverage info in plaintext to stdout.") do
+        options.textmode = :plain
+    end
+    opts.on("-T", "--rich-text", "Output coverage info with ANSI sequences to stdout.") do
+        options.textmode = :rich
+    end
     opts.separator ""
     opts.on_tail("-h", "--help", "Show this message") do
         puts opts
@@ -678,7 +700,8 @@ if options.profiling
 else
     klass = Rcov::HTMLCoverage
 end
-Rcov::COVERAGE__.formatter = klass.new options.destdir, options.color, options.range
+Rcov::COVERAGE__.formatter = klass.new options.destdir, :color => options.color, 
+                                       :fsr => options.range, :textmode => options.textmode
 
 Rcov::Formatter.ignore_files = options.skip
 
