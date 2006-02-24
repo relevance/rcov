@@ -349,7 +349,7 @@ class HTMLCoverage < Formatter
         file.num_lines.times do |i|
             line = file.lines[i]
             marked = file.coverage[i]
-            count = file.counts[i]
+            count = file.counts[[i-1,0].max]
             spanclass = span_class(file, marked, count)
             if spanclass != last
                 result += end_of_span
@@ -445,7 +445,7 @@ span.run%d {
 }
 EOF
         cscale = ""
-        100.times do |i|
+        101.times do |i|
             if @color
                 r, g, b = hsv2rgb(220-(2.2*i).to_i, 0.3, 1)
                 r = (r * 255).to_i
