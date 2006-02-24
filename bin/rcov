@@ -418,7 +418,7 @@ This line is also marked as covered.
                         EOS
                         } }
                         span_(:class => "inferred") { t_ { <<-EOS
-Lines that were considered as run by rcov, but not reported by Ruby, look like this.
+Lines considered as run by rcov, but not reported by Ruby, look like this.
                         EOS
 #Ruby doesn't signal all the events it could in multi-line statements: for 
 #instance, an 'end' block/class/module/method terminator will not be reported
@@ -641,10 +641,24 @@ options.loadpaths = []
 options.textmode = false
 options.skip = Rcov::Formatter.ignore_files
 
+EXTRA_HELP = <<-EOF
+
+You can run several programs at once:
+  rcov something.rb somethingelse.rb
+
+The parameters to be passed to the program under inspection can be specified
+after --:
+
+  rcov -Ilib -t something.rb -- --theseopts --are --given --to --something.rb
+
+If you run several programs, they will all be passed the same command-line
+arguments.
+EOF
+
 opts = OptionParser.new do |opts|
     opts.banner = <<-EOF
 rcov #{Rcov::VERSION} #{Rcov::RELEASE_DATE}
-Usage: rcov [options] <script.rb>
+Usage: rcov [options] <script1.rb> [script2.rb] [-- --extra-options]
 EOF
     opts.separator ""
     opts.separator "Options:"
@@ -681,12 +695,20 @@ EOF
     opts.separator ""
     opts.on_tail("-h", "--help", "Show this message") do
         puts opts
+        puts EXTRA_HELP
         exit
     end
     opts.on_tail("--version", "Show version") do
         puts "rcov " + Rcov::VERSION + " " + Rcov::RELEASE_DATE
         exit
     end
+end
+
+if (idx = ARGV.index("--"))
+    extra_args = ARGV[idx+1..-1]
+    ARGV.replace(ARGV[0,idx])
+else
+    extra_args = []
 end
 
 opts.parse! ARGV
@@ -706,10 +728,15 @@ Rcov::COVERAGE__.formatter = klass.new options.destdir, :color => options.color,
 Rcov::Formatter.ignore_files = options.skip
 
 Rcov::COVERAGE__.install_hook
-prog = ARGV.shift
-$0 = prog
 options.loadpaths.reverse_each{|x| $:.unshift x}
-load prog
+
+pending_scripts = ARGV.clone
+ARGV.replace extra_args
+until pending_scripts.empty?
+    prog = pending_scripts.shift
+    $0 = prog
+    load prog
+end
 
 # CSS styling follows
 __END__
