@@ -39,7 +39,7 @@ Usage
 License
 -------
 
-  rcov is licensed distributed the same terms as Ruby. See LICENSE.txt.
+  rcov is licensed distributed the same terms as Ruby. See LICENSE.
   rcov includes a copy of the xx library (lib/xx-0.1.0.rb), which 
   carries the following copyright notice:
 
