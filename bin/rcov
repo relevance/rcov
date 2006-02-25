@@ -322,7 +322,7 @@ EOS
 
 
     
-    DEFAULT_OPTS = {:color, false, :fsr, 30, :textmode, false}
+    DEFAULT_OPTS = {:color, false, :fsr, 30, :textmode, false, :nohtml, false}
     def initialize(dest_dir = ".", opts = {})
         super()
         @dest = dest_dir
@@ -330,14 +330,15 @@ EOS
         @color = options[:color]
         @fsr = options[:fsr]
         @textmode = options[:textmode]
+        @nohtml = options[:nohtml]
     end
 
     def execute
         return if @files.size == 0
         FileUtils.mkdir_p @dest 
-        create_index(File.join(@dest, "index.html"))
+        create_index(File.join(@dest, "index.html")) unless @nohtml
         @files.each do |filename, fileinfo|
-            create_file(File.join(@dest, file_name(filename)), fileinfo)
+            create_file(File.join(@dest, file_name(filename)), fileinfo) unless @nohtml
             next unless @textmode
             puts "=" * 80
             puts filename
@@ -671,7 +672,7 @@ class HTMLProfiling < HTMLCoverage
 end
 
 
-module COVERAGE__
+module RCOV__
     COVER = {}
     class << self; attr_accessor :formatter end
     
@@ -706,7 +707,8 @@ module COVERAGE__
 
     END {
         remove_hook
-#Rcov::COVERAGE__::COVER.each_pair do |name, counts|
+#Rcov::RCOV__::COVER.each_pair do |name, counts|
+#    next if Formatter.ignore_files.any?{|x| x === filename}
 #    next unless SCRIPT_LINES__[name]
 #    puts "=" * 80
 #    puts name
@@ -730,10 +732,10 @@ module COVERAGE__
                 marked_info << marked
                 cover_info << (covers[c+1] || 0)
             end
-            COVERAGE__.formatter.add_file(file, line_info, marked_info,
+            RCOV__.formatter.add_file(file, line_info, marked_info,
                                           cover_info)
         end
-        COVERAGE__.formatter.execute
+        RCOV__.formatter.execute
     }
 end
 
@@ -748,6 +750,7 @@ options.destdir = nil
 options.loadpaths = []
 options.textmode = false
 options.skip = Rcov::Formatter.ignore_files
+options.nohtml = false
 
 EXTRA_HELP = <<-EOF
 
@@ -790,7 +793,7 @@ EOF
         options.profiling = true
         options.destdir ||= "profiling"
     end
-    opts.on("-r", "--range", Float, 
+    opts.on("-r", "--range RANGE", Float, 
             "Color scale range for profiling info (dB).") do |val|
         options.range = val
     end
@@ -799,6 +802,9 @@ EOF
     end
     opts.on("-T", "--rich-text", "Output coverage info with ANSI sequences to stdout.") do
         options.textmode = :rich
+    end
+    opts.on("--no-html", "Don't generate HTML output (no output unless -T or -t).") do
+        options.nohtml = true
     end
     opts.separator ""
     opts.on_tail("-h", "--help", "Show this message") do
@@ -830,12 +836,13 @@ if options.profiling
 else
     klass = Rcov::HTMLCoverage
 end
-Rcov::COVERAGE__.formatter = klass.new options.destdir, :color => options.color, 
-                                       :fsr => options.range, :textmode => options.textmode
+Rcov::RCOV__.formatter = klass.new options.destdir, :color => options.color, 
+                                       :fsr => options.range, :textmode => options.textmode,
+                                       :nohtml => options.nohtml
 
 Rcov::Formatter.ignore_files = options.skip
 
-Rcov::COVERAGE__.install_hook
+Rcov::RCOV__.install_hook
 options.loadpaths.reverse_each{|x| $:.unshift x}
 
 pending_scripts = ARGV.clone

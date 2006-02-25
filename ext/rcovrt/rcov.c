@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 static VALUE mRcov;
-static VALUE mCOVERAGE__;
+static VALUE mRCOV__;
 static VALUE oSCRIPT_LINES__;
 static ID id_cover;
 static st_table* coverinfo;
@@ -124,13 +124,13 @@ cov_remove_hook(VALUE self)
          return Qfalse;
  else {
          rb_remove_event_hook(coverage_event_hook);
-	 if(rb_const_defined_at(mCOVERAGE__, id_cover)) {
-		 rb_mod_remove_const(mCOVERAGE__, ID2SYM(id_cover));
+	 if(rb_const_defined_at(mRCOV__, id_cover)) {
+		 rb_mod_remove_const(mRCOV__, ID2SYM(id_cover));
 	 }
          
          cover = rb_hash_new();
          st_foreach(coverinfo, populate_cover, cover);
-         rb_define_const(mCOVERAGE__, "COVER", cover);
+         rb_define_const(mRCOV__, "COVER", cover);
          st_foreach(coverinfo, free_table, cover);
          st_free_table(coverinfo);
          coverinfo = 0;
@@ -143,7 +143,7 @@ void
 Init_rcovrt()
 {
  ID id_rcov = rb_intern("Rcov");
- ID id_coverage__ = rb_intern("COVERAGE__");
+ ID id_coverage__ = rb_intern("RCOV__");
  ID id_script_lines__ = rb_intern("SCRIPT_LINES__");
  
  id_cover = rb_intern("COVER");
@@ -154,9 +154,9 @@ Init_rcovrt()
          mRcov = rb_define_module("Rcov");
 
  if(rb_const_defined(mRcov, id_coverage__))
-         mCOVERAGE__ = rb_const_get_at(mRcov, id_coverage__);
+         mRCOV__ = rb_const_get_at(mRcov, id_coverage__);
  else
-         mCOVERAGE__ = rb_define_module_under(mRcov, "COVERAGE__");
+         mRCOV__ = rb_define_module_under(mRcov, "RCOV__");
 
  if(rb_const_defined(rb_cObject, id_script_lines__))
          oSCRIPT_LINES__ = rb_const_get(rb_cObject, rb_intern("SCRIPT_LINES__"));
@@ -167,6 +167,6 @@ Init_rcovrt()
 
  hook_set_p = 0;
 
- rb_define_singleton_method(mCOVERAGE__, "install_hook", cov_install_hook, 0);
- rb_define_singleton_method(mCOVERAGE__, "remove_hook", cov_remove_hook, 0);
+ rb_define_singleton_method(mRCOV__, "install_hook", cov_install_hook, 0);
+ rb_define_singleton_method(mRCOV__, "remove_hook", cov_remove_hook, 0);
 }
