@@ -763,7 +763,8 @@ after --:
   rcov -Ilib -t something.rb -- --theseopts --are --given --to --something.rb
 
 If you run several programs, they will all be passed the same command-line
-arguments.
+arguments. Keep in mind that all the programs are run under the same process
+(i.e. they just get Kernel#load()'ed in sequence).
 EOF
 
 opts = OptionParser.new do |opts|
