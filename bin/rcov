@@ -790,6 +790,11 @@ EOF
                 regexps = list.split(/,/).map{|x| Regexp.new x}
                 options.skip += regexps
             end
+    opts.on("--exclude-only PATTERNS",
+            "Skip info generation only for the files matching the",
+            "given patterns (i.e. discard the default regexp list).") do |list|
+                options.skip = list.split(/,/).map{|x| Regexp.new(x) }
+            end
     opts.on("-p", "--profile", "Generate bogo-profiling info.") do
         options.profiling = true
         options.destdir ||= "profiling"
