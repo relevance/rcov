@@ -164,7 +164,7 @@ class SourceFile
         #TODO: write a comprehensive list
         #TODO: handle here docs?
         #FIXME: / matches regexps too
-        r = /(,|\.|\+|-|\*|\/|<|>|%|&&|\|\||<<|\(|\[|\{|=)\s*(?:#.*)?$/.match @lines[idx]
+        r = /(,|\.|\+|-|\*|\/|<|>|%|&&|\|\||<<|\(|\[|\{|=|and|or)\s*(?:#.*)?$/.match @lines[idx]
         if /(do|\{)\s*\|.*\|\s*(?:#.*)?$/.match @lines[idx]
             return false
         end
