@@ -348,8 +348,13 @@ EOS
                 when :plain
                     puts "%-70s| %6d" % [line.chomp, fileinfo.counts[[i-1,0].max]]
                 when :rich
-                    color = fileinfo.coverage[i] ? "\e[32;40m" : "\e[31;40m"
-                    puts "#{color}%s\e[37;40m" % line.chomp
+                    if @color
+                        prefix = fileinfo.coverage[i] ? "\e[32;40m" : "\e[31;40m"
+                        puts "#{prefix}%s\e[37;40m" % line.chomp
+                    else
+                        prefix = fileinfo.coverage[i] ? "   " : "## "
+                        puts "#{prefix}#{line}"
+                    end
                 end
             end
         end
