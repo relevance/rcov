@@ -356,7 +356,7 @@ EOS
     end
 
     def file_name(base)
-        base.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/\//, "-") + ".html"
+        base.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".html"
     end
 
     private

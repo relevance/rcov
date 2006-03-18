@@ -1,0 +1,4 @@
+
+Tom Dolbilin:
+ * idenfified and fixed backslash problem on win32 for generated filenames
+
