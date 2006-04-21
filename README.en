@@ -1,4 +1,5 @@
 rcov  copyright (c) 2004-2006 Mauricio Fernandez <mfp@acm.org>
+rcov includes xx 0.1.0, copyright (c) 2005, ePark Labs, Inc. and contributors 
 
 rcov README
 ============
@@ -10,7 +11,8 @@ Requirements
 
   * Ruby 1.8
   * (recommended) C compiler: you can also use rcov without the rcovrt
-    extension but rcov will be two orders of magnitude slower.
+    extension but rcov will be two orders of magnitude slower. The extension
+    is known to work on Ruby 1.8.3 and above.
 
 
 Normal install
@@ -53,9 +55,9 @@ Usage
 License
 -------
 
-  rcov is licensed distributed the same terms as Ruby. See LICENSE.
-  rcov includes a copy of the xx library (lib/xx-0.1.0.rb), which 
-  carries the following copyright notice:
+  rcov is licensed under the same terms as Ruby. See LICENSE.
+  rcov includes a copy of the xx library, which carries the following
+  copyright notice:
 
 ePark Labs Public License version 1
 Copyright (c) 2005, ePark Labs, Inc. and contributors
