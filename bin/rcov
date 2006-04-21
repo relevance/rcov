@@ -836,7 +836,14 @@ else
     extra_args = []
 end
 
-opts.parse! ARGV
+begin
+    opts.parse! ARGV
+rescue OptionParser::InvalidOption => e
+    puts opts
+    puts
+    puts e.message
+    exit(-1)
+end
 options.destdir ||= "coverage"
 unless ARGV[0]
     puts opts
