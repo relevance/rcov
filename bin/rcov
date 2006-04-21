@@ -335,7 +335,7 @@ EOS
 
     def execute
         return if @files.size == 0
-        FileUtils.mkdir_p @dest 
+        FileUtils.mkdir_p @dest unless @nohtml
         create_index(File.join(@dest, "index.html")) unless @nohtml
         @files.each do |filename, fileinfo|
             create_file(File.join(@dest, file_name(filename)), fileinfo) unless @nohtml
