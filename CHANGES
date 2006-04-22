@@ -8,6 +8,8 @@ Since 0.2.0 (2006-02-25)
 Features
 --------
 * --exclude-only
+* consolidate multiple references to the same underlying .rb file
+  (much needed for Rails)
 
 Fixes
 -----

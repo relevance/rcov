@@ -45,15 +45,11 @@ class CoverageInfo
     end
 
     def []=(idx, val)
-        unless [true, false].include? val
+        unless [true, false, :inferred].include? val
             raise RuntimeError, "What does #{val} mean?" 
         end
         return if idx < 0 || idx >= @cover.size
-        if val
-            @cover[idx] = :inferred
-        else
-            @cover[idx] = false
-        end
+        @cover[idx] = val
     end
 
     def method_missing(meth, *a, &b)
@@ -99,6 +95,12 @@ class SourceFile
         # if there was any change, we have to recompute; we'll eventually
         # reach a fixed point and stop there
         precompute_coverage(comments_run_by_default) if changed
+    end
+
+    def merge(lines, coverage, counts)
+        coverage.each_with_index{|v, idx| @coverage[idx] ||= v }
+        counts.each_with_index{|v, idx| @counts[idx] += v }
+        precompute_coverage false
     end
 
     def total_coverage
@@ -181,8 +183,13 @@ class Formatter
     end
 
     def add_file(filename, lines, coverage, counts)
+        filename = File.expand_path(filename).gsub(/^#{Regexp.escape(Dir.getwd)}\//, '')
         return nil if Formatter.ignore_files.any?{|x| x === filename}
-        @files[filename] = SourceFile.new filename, lines, coverage, counts
+        if @files[filename]
+            @files[filename].merge(lines, coverage, counts)
+        else
+            @files[filename] = SourceFile.new filename, lines, coverage, counts
+        end
     end
 
     def total_coverage
