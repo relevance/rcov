@@ -1,0 +1,15 @@
+
+User-visible changes.
+
+
+Since 0.2.0 (2006-02-25)
+========================
+
+Features
+--------
+* --exclude-only
+
+Fixes
+-----
+* consider and/op operators
+* honor --no-color in (rich) text mode 
