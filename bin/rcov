@@ -409,15 +409,16 @@ EOS
                                     table_(:cellpadding => 0, :cellspacing => 0, :align => "right") { 
                                         tr_ { 
                                             td_ {
-                                                 tt_ { "%02.1f%%" % value } 
+                                                 tt_ { "%3.1f%%" % value } 
                                                  x_ "&nbsp;"
                                             }
+                                            ivalue = value.round
                                             td_ {
                                                 table_(:class => "percent_graph", :cellpadding => 0,
                                                    :cellspacing => 0, :width => 100) {
                                                     tr_ {
-                                                        td_(:class => "covered", :width => value)
-                                                        td_(:class => "uncovered", :width => (100-value))
+                                                        td_(:class => "covered", :width => ivalue)
+                                                        td_(:class => "uncovered", :width => (100-ivalue))
                                                     }
                                                 }
                                             }
@@ -444,10 +445,12 @@ EOS
     def create_index(destname)
         files = [SummaryFileInfo.new(self)] + @files.keys.sort.map{|k| @files[k]}
         title = default_title
-        output = xhtml_ {
-            head_ { title_{ title } }
-            style_(:type => "text/css") { t_{ "body { background-color: #{default_color}; }" }  }
-            style_(:type => "text/css") { CSS_PROLOG }
+        output = xhtml_ { html_ {
+            head_ {
+                title_{ title }
+                style_(:type => "text/css") { t_{ "body { background-color: #{default_color}; }" }  }
+                style_(:type => "text/css") { CSS_PROLOG }
+            }
             body_ {
                 h3_{ "#{title} generated on #{Time.new.to_s}" }
                 hr_
@@ -456,7 +459,7 @@ EOS
                 p_ {
                     a_(:href => "http://validator.w3.org/check/referer") {
                     img_(:src => "http://www.w3.org/Icons/valid-xhtml11",
-                         :alt => "Valid XHTML 1.1!", :heigth => 31, :width => 88)
+                         :alt => "Valid XHTML 1.1!", :height => 31, :width => 88)
                     }
                     a_(:href => "http://jigsaw.w3.org/css-validator/check/referer") {
                         img_(:style => "border:0;width:88px;height:31px",
@@ -465,7 +468,7 @@ EOS
                     }
                 }
             }
-        }
+        } }
         File.open(destname, "w") do |f|
             f.puts output.pretty
         end

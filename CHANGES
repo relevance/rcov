@@ -13,3 +13,4 @@ Fixes
 -----
 * consider and/op operators
 * honor --no-color in (rich) text mode 
+* output valid XHTML indices
