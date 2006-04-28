@@ -16,3 +16,8 @@ Fixes
 * consider and/op operators
 * honor --no-color in (rich) text mode 
 * output valid XHTML indices
+
+Since 0.1.0
+===========
+Tons. Better output, MUCH faster (two orders of magnitude), better command
+line...
