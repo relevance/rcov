@@ -98,7 +98,14 @@ class SourceFile
     end
 
     def merge(lines, coverage, counts)
-        coverage.each_with_index{|v, idx| @coverage[idx] ||= v }
+        coverage.each_with_index do |v, idx|
+            case v
+            when true
+                @coverage[idx] = v
+            when :inferred
+                @coverage[idx] ||= v
+            end
+        end
         counts.each_with_index{|v, idx| @counts[idx] += v }
         precompute_coverage false
     end
