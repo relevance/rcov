@@ -714,19 +714,18 @@ module RCOV__
             raise if abi[0] != RCOVRT_ABI[0] || abi[1] < RCOVRT_ABI[1]
         rescue
             $stderr.puts <<-EOF
-The rcovrt extension that was loaded was built for a different version of rcov.
+The rcovrt extension I found was built for a different version of rcov.
 The required ABI is:              #{RCOVRT_ABI.join(".")}
 Your current rcovrt extension is: #{abi.join(".")}
 
 Please delete rcovrt.{so,bundle,dll,...} and install the required one.
-
-rcov will now run in pure-Ruby mode, which is about two orders of magnitude slower.
-
             EOF
             raise LoadError
         end
     rescue LoadError
         $stderr.puts <<-EOF
+rcov will run in pure-Ruby mode, which is about two orders of magnitude slower.
+
 If you're on win32, you can find a pre-built extension (usable with recent
 One Click Installer and the mswin32* builds) at http://eigenclass.org/rcov .
         EOF
