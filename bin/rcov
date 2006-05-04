@@ -34,6 +34,7 @@ module Rcov
 
 VERSION = "0.2.0"
 RELEASE_DATE = "2006-02-25"
+RCOVRT_ABI = [0,1,0]
     
 class CoverageInfo
     def initialize(coverage_array)
@@ -707,7 +708,28 @@ module RCOV__
     
     begin
         require 'rcovrt'
+        abi = [0,0,0]
+        begin
+            abi = RCOV__.ABI
+            raise if abi[0] != RCOVRT_ABI[0] || abi[1] < RCOVRT_ABI[1]
+        rescue
+            $stderr.puts <<-EOF
+The rcovrt extension that was loaded was built for a different version of rcov.
+The required ABI is:              #{EXPECTED_ABI.join(".")}
+Your current rcovrt extension is: #{abi.join(".")}
+
+Please delete rcovrt.{so,bundle,dll,...} and install the required one.
+
+rcov will now run in pure-Ruby mode, which is about two orders of magnitude slower.
+
+            EOF
+            raise LoadError
+        end
     rescue LoadError
+        $stderr.puts <<-EOF
+If you're on win32, you can find a pre-built extension (usable with recent
+One Click Installer and the mswin32* builds) at http://eigenclass.org/rcov .
+        EOF
         def self.install_hook
             set_trace_func lambda {|event, file, line, id, binding, klass|
                 case event
@@ -723,24 +745,25 @@ module RCOV__
         def self.remove_hook
             set_trace_func(nil)
         end
+
+        def self.reset
+            COVER.replace {}
+        end
+
+        def generate_coverage_info
+            COVER
+        end
     end
 
-    def self.reset
-        COVER.replace {}
-    end
-
-    END {
+    def self.run_hooked
+        install_hook
+        yield
+    ensure
         remove_hook
-#Rcov::RCOV__::COVER.each_pair do |name, counts|
-#    next if Formatter.ignore_files.any?{|x| x === filename}
-#    next unless SCRIPT_LINES__[name]
-#    puts "=" * 80
-#    puts name
-#    puts "=" * 80
-#    SCRIPT_LINES__[name].each_with_index do |line, i|
-#        puts "%-70s: %5d" % [line.chomp, counts[i]]
-#    end
-#end
+    end
+
+    def self.dump_coverage_info
+        generate_coverage_info # create/fill COVER
         COVER.each do |file, lines|
             next if SCRIPT_LINES__.has_key?(file) == false
             lines = SCRIPT_LINES__[file]
@@ -760,7 +783,7 @@ module RCOV__
                                           cover_info)
         end
         RCOV__.formatter.execute
-    }
+    end
 end
 
 end # Rcov
@@ -775,6 +798,7 @@ options.loadpaths = []
 options.textmode = false
 options.skip = Rcov::Formatter.ignore_files
 options.nohtml = false
+options.test_unit_only = false
 
 EXTRA_HELP = <<-EOF
 
@@ -805,6 +829,10 @@ EOF
             "Prepend PATHS to $: (colon separated list)") do |paths|
                 options.loadpaths = paths.split(/:/)
             end
+    opts.on("--test-unit-only",
+            "Only trace code executed in TestCases.") do
+        options.test_unit_only = true
+    end
     opts.on("-n", "--no-color", "Create colorblind-safe output.") do
         options.color = false
     end
@@ -879,8 +907,47 @@ Rcov::RCOV__.formatter = klass.new options.destdir, :color => options.color,
 
 Rcov::Formatter.ignore_files = options.skip
 
-Rcov::RCOV__.install_hook
 options.loadpaths.reverse_each{|x| $:.unshift x}
+
+# must be registered before test/unit puts its own
+END {
+    Rcov::RCOV__.remove_hook
+    Rcov::RCOV__.dump_coverage_info
+}
+
+if options.test_unit_only
+    require 'test/unit'
+    module Test::Unit
+        class TestCase
+            def run(result)
+                yield(STARTED, name)
+                @_result = result
+                begin
+                    Rcov::RCOV__.run_hooked do 
+                        setup
+                        __send__(@method_name)
+                    end
+                rescue AssertionFailedError => e
+                    add_failure(e.message, e.backtrace)
+                rescue StandardError, ScriptError
+                    add_error($!)
+                ensure
+                    begin
+                        Rcov::RCOV__.run_hooked { teardown }
+                    rescue AssertionFailedError => e
+                        add_failure(e.message, e.backtrace)
+                    rescue StandardError, ScriptError
+                        add_error($!)
+                    end
+                end
+                result.add_run
+                yield(FINISHED, name)
+            end
+        end
+    end
+else
+    Rcov::RCOV__.install_hook
+end
 
 pending_scripts = ARGV.clone
 ARGV.replace extra_args
