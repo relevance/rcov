@@ -190,7 +190,9 @@ class Formatter
     end
 
     def add_file(filename, lines, coverage, counts)
+        old_filename = filename
         filename = File.expand_path(filename).gsub(/^#{Regexp.escape(Dir.getwd)}\//, '')
+        SCRIPT_LINES__[filename] = SCRIPT_LINES__[old_filename]
         return nil if Formatter.ignore_files.any?{|x| x === filename}
         if @files[filename]
             @files[filename].merge(lines, coverage, counts)
