@@ -749,7 +749,7 @@ One Click Installer and the mswin32* builds) at http://eigenclass.org/rcov .
             COVER.replace {}
         end
 
-        def generate_coverage_info
+        def self.generate_coverage_info
             COVER
         end
     end
