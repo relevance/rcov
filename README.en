@@ -13,6 +13,8 @@ Requirements
   * (recommended) C compiler: you can also use rcov without the rcovrt
     extension but rcov will be two orders of magnitude slower. The extension
     is known to work on Ruby 1.8.3 and above.
+    If you're on win32, you can find a pre-built rcovrt extension at
+	 http://eigenclass.org/hiki.rb?rcov
 
 
 Normal install
@@ -30,7 +32,9 @@ Normal install
   Try "ruby setup.rb --help".
 
   This requires a working C toolchain; if you cannot compile Ruby extensions
-  proceed as described below.
+  proceed as described below.  If you're on win32, you can find a pre-built
+  rcovrt extension at
+	 http://eigenclass.org/hiki.rb?rcov
 
 Install without the rcovrt extension
 ------------------------------------
