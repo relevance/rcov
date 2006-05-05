@@ -732,6 +732,13 @@ If you're on win32, you can find a pre-built extension (usable with recent
 One Click Installer and mswin32 builds) at http://eigenclass.org/rcov .
 
         EOF
+
+        methods = %w[install_hook remove_hook reset generate_coverage_info]
+        sklass = class << self; self end
+        (methods & sklass.instance_methods).each do |meth|
+            sklass.class_eval{ remove_method meth }
+        end
+
         def self.install_hook
             set_trace_func lambda {|event, file, line, id, binding, klass|
                 case event
