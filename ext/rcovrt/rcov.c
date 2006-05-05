@@ -4,6 +4,10 @@
 #include <st.h>
 #include <stdlib.h>
 
+#define RCOVRT_VERSION_MAJOR 0
+#define RCOVRT_VERSION_MINOR 1
+#define RCOVRT_VERSION_REV   0
+
 static VALUE mRcov;
 static VALUE mRCOV__;
 static VALUE oSCRIPT_LINES__;
@@ -169,9 +173,9 @@ cov_ABI(VALUE self)
   VALUE ret;
 
   ret = rb_ary_new();
-  rb_ary_push(ret, INT2FIX(0));
-  rb_ary_push(ret, INT2FIX(1));
-  rb_ary_push(ret, INT2FIX(0));
+  rb_ary_push(ret, INT2FIX(RCOVRT_VERSION_MAJOR));
+  rb_ary_push(ret, INT2FIX(RCOVRT_VERSION_MINOR));
+  rb_ary_push(ret, INT2FIX(RCOVRT_VERSION_REV));
 
   return ret;
 }
