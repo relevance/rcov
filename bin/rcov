@@ -729,7 +729,7 @@ Since the rcovrt extension couldn't be loaded, rcov will run in pure-Ruby
 mode, which is about two orders of magnitude slower.
 
 If you're on win32, you can find a pre-built extension (usable with recent
-One Click Installer and mswin32 builds) at http://eigenclass.org/rcov .
+One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
 
         EOF
 
