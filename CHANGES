@@ -10,6 +10,7 @@ Features
 * --exclude-only
 * consolidate multiple references to the same underlying .rb file
   (much needed for Rails)
+* --test-unit-only
 
 Fixes
 -----
