@@ -956,6 +956,9 @@ EOF
     opts.on("--no-html", "Don't generate HTML output (no output unless -T or -t).") do
         options.nohtml = true
     end
+    opts.on("-w", "Turn warnings on (like ruby).") do
+        $VERBOSE = true
+    end
     opts.separator ""
     opts.on_tail("-h", "--help", "Show this message") do
         puts opts

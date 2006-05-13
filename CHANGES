@@ -9,6 +9,7 @@ Features
 * better heuristics (supports heredocs at last, including variants your editor
   is probably unable to handle)
 * new color scheme, with alternating shades of the base colors
+* -w to set $VERBOSE=true (turns on warnings)
 
 Since 0.2.0 (2006-02-25)
 ========================
