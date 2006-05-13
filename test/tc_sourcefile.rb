@@ -3,15 +3,30 @@ load File.join(File.dirname(File.expand_path(__FILE__)), "..", "bin", "rcov")
 require 'test/unit'
 
 class Test_Sourcefile < Test::Unit::TestCase
-  def test_basic_heredocs_are_handled
+  def test_heredocs_basic
     verify_everything_marked "heredocs-basic.rb", <<-EOF
-    1 puts 1 + 1
-    1 puts <<HEREDOC
-    0   first line of the heredoc
-    0   not marked
-    0   but should be
-    0 HEREDOC
-    1 puts 1
+      1 puts 1 + 1
+      1 puts <<HEREDOC
+      0   first line of the heredoc
+      0   not marked
+      0   but should be
+      0 HEREDOC
+      1 puts 1
+    EOF
+    verify_everything_marked "squote", <<-EOF
+      1 puts <<'HEREDOC'
+      0   first line of the heredoc
+      0 HEREDOC
+    EOF
+    verify_everything_marked "dquote", <<-EOF
+      1 puts <<"HEREDOC"
+      0   first line of the heredoc
+      0 HEREDOC
+    EOF
+    verify_everything_marked "xquote", <<-EOF
+      1 puts <<`HEREDOC`
+      0   first line of the heredoc
+      0 HEREDOC
     EOF
   end
 
