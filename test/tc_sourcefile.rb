@@ -28,7 +28,13 @@ class Test_Sourcefile < Test::Unit::TestCase
       0   first line of the heredoc
       0 HEREDOC
     EOF
+    verify_everything_marked "stuff-after-heredoc", <<-EOF
+      1 full_message = build_message(msg, <<EOT, object1, object2)
+      0 <?> and <?> do not contain the same elements
+      0 EOT
+    EOF
   end
+
   def test_heredocs_multiple
     verify_everything_marked "multiple-unquoted", <<-EOF
       1 puts <<HEREDOC, <<HERE2
@@ -52,6 +58,13 @@ class Test_Sourcefile < Test::Unit::TestCase
       0 H
       0 bar
       0 H
+    EOF
+    verify_everything_marked "stuff-after-heredoc", <<-EOF
+      1 full_message = build_message(msg, <<EOT, object1, object2, <<EOT)
+      0 <?> and <?> do not contain the same elements
+      0 EOT
+      0 <?> and <?> are foo bar baz
+      0 EOT
     EOF
   end
   def test_ignore_non_heredocs
