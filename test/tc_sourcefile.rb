@@ -46,6 +46,13 @@ class Test_Sourcefile < Test::Unit::TestCase
       0 dsfdsfffd
       0 HERE3
     EOF
+    verify_everything_marked "same-identifier", <<-EOF
+      1 puts <<H, <<H
+      0 foo
+      0 H
+      0 bar
+      0 H
+    EOF
   end
 
   def verify_everything_marked(testname, str)
