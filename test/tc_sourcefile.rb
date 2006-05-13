@@ -54,15 +54,29 @@ class Test_Sourcefile < Test::Unit::TestCase
       0 H
     EOF
   end
+  def test_ignore_non_heredocs
+    verify_marked_exactly "bitshift-numeric", [0], <<-EOF
+    1 puts 1<<2
+    0 do_stuff()
+    0 2
+    EOF
+  end
 
-  def verify_everything_marked(testname, str)
+  def verify_marked_exactly(testname, marked_indices, str)
     lines, coverage, counts = code_info_from_string(str)
 
     sf = Rcov::SourceFile.new(testname, lines, coverage, counts)
     lines.size.times do |i|
-      assert(sf.coverage[i], 
-             "Line should have been marked as covered: #{lines[i].inspect}.")
+      if marked_indices.include? i
+        assert(sf.coverage[i], "Line should have been marked: #{lines[i].inspect}.")
+      else
+        assert(!sf.coverage[i], "Line should not have been marked: #{lines[i].inspect}.")
+      end
     end
+  end
+  
+  def verify_everything_marked(testname, str)
+    verify_marked_exactly(testname, (0...str.size).to_a, str)
   end
 
 
