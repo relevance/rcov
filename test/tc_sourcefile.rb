@@ -4,7 +4,7 @@ require 'test/unit'
 
 class Test_Sourcefile < Test::Unit::TestCase
   def test_basic_heredocs_are_handled
-    lines, coverage, counts = code_info_from_string <<-EOF
+    verify_everything_marked "heredocs-basic.rb", <<-EOF
     1 puts 1 + 1
     1 puts <<HEREDOC
     0   first line of the heredoc
@@ -13,12 +13,18 @@ class Test_Sourcefile < Test::Unit::TestCase
     0 HEREDOC
     1 puts 1
     EOF
-
-    sf = Rcov::SourceFile.new("prev_exp", lines, coverage, counts)
-    lines.size.times{|i| assert(sf.coverage[i], 
-      "Heredocs should be handled @ #{lines[i].inspect}.") }
-
   end
+
+  def verify_everything_marked(testname, str)
+    lines, coverage, counts = code_info_from_string(str)
+
+    sf = Rcov::SourceFile.new(testname, lines, coverage, counts)
+    lines.size.times do |i|
+      assert(sf.coverage[i], 
+             "Line should have been marked as covered: #{lines[i].inspect}.")
+    end
+  end
+
 
   def code_info_from_string(str)
     str = str.gsub(/^\s*/,"")
