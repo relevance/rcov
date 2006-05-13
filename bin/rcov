@@ -298,12 +298,28 @@ class HTMLCoverage < Formatter
     require 'fileutils'
 
     CSS_PROLOG = <<-EOS
-span.marked {
-  background-color: rgb(185, 200, 200);
+span.marked0 {
+  background-color: rgb(185, 210, 200);
   display: block;
 }
-span.inferred {
+span.inferred0 {
   background-color: rgb(170, 185, 185);
+  display: block;
+}
+span.marked1 {
+  background-color: rgb(190, 215, 205);
+  display: block;
+}
+span.inferred1 {
+  background-color: rgb(165, 180, 180);
+  display: block;
+}
+span.uncovered0 {
+  background-color: rgb(215, 80, 80);
+  display: block;
+}
+span.uncovered1 {
+  background-color: rgb(210, 75, 75);
   display: block;
 }
 span.overview {
@@ -403,6 +419,7 @@ EOS
         @fsr = options[:fsr]
         @textmode = options[:textmode]
         @nohtml = options[:nohtml]
+        @span_class_index = 0
     end
 
     def execute
@@ -574,13 +591,14 @@ EOS
     end
 
     def span_class(sourceinfo, marked, count)
+        @span_class_index ^= 1
         case marked
         when true
-            "marked"
+            "marked#{@span_class_index}"
         when :inferred
-            "inferred"
+            "inferred#{@span_class_index}"
         else 
-            false
+            "uncovered#{@span_class_index}"
         end
     end
 
@@ -601,13 +619,20 @@ EOS
                 hr_
                 if do_ctable
                     pre_ {
-                        span_(:class => "marked") { t_ { <<-EOS
-Marked code looks like this.
-This line is also marked as covered.
+                        span_(:class => "marked0") { t_ { <<-EOS
+Code reported as executed by Ruby looks like this...
                         EOS
                         } }
-                        span_(:class => "inferred") { t_ { <<-EOS
-Lines considered as run by rcov, but not reported by Ruby, look like this.
+                        span_(:class => "marked1") { t_ { <<-EOS
+and this: this line is also marked as covered.
+                        EOS
+                        } }
+                        span_(:class => "inferred0") { t_ { <<-EOS
+Lines considered as run by rcov, but not reported by Ruby, look like this,
+                        EOS
+                        } }
+                        span_(:class => "inferred1") { t_ { <<-EOS
+and this: these lines were inferred by rcov (using simple heuristics).
                         EOS
 #Ruby doesn't signal all the events it could in multi-line statements: for 
 #instance, an 'end' block/class/module/method terminator will not be reported
@@ -616,7 +641,7 @@ Lines considered as run by rcov, but not reported by Ruby, look like this.
 #definition which comprises blank lines and comments) to cope with that.
 #These heuristics are far from perfect and represent work in progress.
                         } }
-                        span_(:class => "false") { t_ { <<-EOS
+                        span_(:class => "uncovered0") { t_ { <<-EOS
 Finally, here's a line marked as not executed.
                         EOS
                         } }
