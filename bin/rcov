@@ -158,14 +158,21 @@ class SourceFile
             scanner = StringScanner.new(@lines[i])
             j = k = i
             loop do
-                scanner.search_full(/<<(-?)(?:(['"`])((?:(?!\2).)+)\2|([A-Z_a-z]\w*))/, 
-                                    true, true)
+                scanned_text = scanner.search_full(/<<(-?)(?:(['"`])((?:(?!\2).)+)\2|([A-Z_a-z]\w*))/, 
+                                                   true, true)
                 unless scanner.matched?
                     i = k
                     break
                 end
+                term = scanner[3] || scanner[4]
+                # try to ignore symbolic bitshifts like  1<<LSHIFT
+                ident_text = "<<#{scanner[1]}#{scanner[2]}#{term}#{scanner[2]}"
+                if scanned_text[/\d+\s*#{Regexp.escape(ident_text)}/]
+                    # it was preceded by a number, ignore
+                    i = k
+                    break
+                end
                 if @coverage[i]
-                    term = scanner[3] || scanner[4]
                     end_of_heredoc = (scanner[1] == "-") ? /^\s*#{Regexp.escape(term)}$/ :
                                           /^#{Regexp.escape(term)}$/
                     loop do

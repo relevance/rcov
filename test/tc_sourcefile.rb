@@ -57,8 +57,23 @@ class Test_Sourcefile < Test::Unit::TestCase
   def test_ignore_non_heredocs
     verify_marked_exactly "bitshift-numeric", [0], <<-EOF
     1 puts 1<<2
+    0 return if foo
     0 do_stuff()
     0 2
+    EOF
+    verify_marked_exactly "bitshift-symbolic", [0], <<-EOF
+    1 puts 1<<LSHIFT
+    0 return if bar
+    0 do_stuff()
+    0 LSHIFT
+    EOF
+    verify_marked_exactly "bitshift-symbolic-multi", 0..3, <<-EOF
+    1 puts <<EOF, 1<<LSHIFT
+    0 random text
+    0 EOF
+    1 return if bar
+    0 puts "foo"
+    0 LSHIFT
     EOF
   end
 
@@ -68,9 +83,11 @@ class Test_Sourcefile < Test::Unit::TestCase
     sf = Rcov::SourceFile.new(testname, lines, coverage, counts)
     lines.size.times do |i|
       if marked_indices.include? i
-        assert(sf.coverage[i], "Line should have been marked: #{lines[i].inspect}.")
+        assert(sf.coverage[i], "Test #{testname}; " + 
+               "line should have been marked: #{lines[i].inspect}.")
       else
-        assert(!sf.coverage[i], "Line should not have been marked: #{lines[i].inspect}.")
+        assert(!sf.coverage[i], "Test #{testname}; " + 
+               "line should not have been marked: #{lines[i].inspect}.")
       end
     end
   end
