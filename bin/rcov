@@ -32,8 +32,8 @@ SCRIPT_LINES__ = {} unless defined? SCRIPT_LINES__
 
 module Rcov
 
-VERSION = "0.3.0"
-RELEASE_DATE = "2006-05-05"
+VERSION = "0.4.0"
+RELEASE_DATE = "unreleased (internal/preliminary)"
 RCOVRT_ABI = [0,1,0]
     
 class CoverageInfo
