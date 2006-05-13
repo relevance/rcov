@@ -83,6 +83,32 @@ class Test_Sourcefile < Test::Unit::TestCase
     EOF
   end
 
+  def test_handle_multiline_expressions
+    verify_everything_marked "expression", <<-EOF
+      1 puts 1, 2.
+      0           abs + 
+      0           1 -
+      0           1 *
+      0           1 /  
+      0           1, 1 <
+      0           2, 3 > 
+      0           4 % 
+      0           3 &&
+      0           true ||
+      0           foo <<
+      0           bar(
+      0               baz[
+      0                   {
+      0                    1,2}] =
+      0               1 )
+    EOF
+    verify_everything_marked "boolean expression", <<-EOF
+      1 x = (foo and
+      0         bar) or
+      0     baz
+    EOF
+  end
+
   def verify_marked_exactly(testname, marked_indices, str)
     lines, coverage, counts = code_info_from_string(str)
 
