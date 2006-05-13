@@ -29,6 +29,24 @@ class Test_Sourcefile < Test::Unit::TestCase
       0 HEREDOC
     EOF
   end
+  def test_heredocs_multiple
+    verify_everything_marked "multiple-unquoted", <<-EOF
+      1 puts <<HEREDOC, <<HERE2
+      0   first line of the heredoc
+      0 HEREDOC
+      0   second heredoc
+      0 HERE2
+    EOF
+    verify_everything_marked "multiple-quoted", <<-EOF
+      1 puts <<'HEREDOC', <<`HERE2`, <<"HERE3"
+      0   first line of the heredoc
+      0 HEREDOC
+      0   second heredoc
+      0 HERE2
+      0 dsfdsfffd
+      0 HERE3
+    EOF
+  end
 
   def verify_everything_marked(testname, str)
     lines, coverage, counts = code_info_from_string(str)
