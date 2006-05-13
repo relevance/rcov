@@ -173,12 +173,14 @@ class SourceFile
                     break
                 end
                 if @coverage[i]
+                    must_mark = []
                     end_of_heredoc = (scanner[1] == "-") ? /^\s*#{Regexp.escape(term)}$/ :
                                           /^#{Regexp.escape(term)}$/
                     loop do
                         break if j == @lines.size
-                        @coverage[j] = true
+                        must_mark << j
                         if end_of_heredoc =~ @lines[j]
+                            must_mark.each{|n| @coverage[n] = true }
                             k = (j += 1)
                             break
                         end

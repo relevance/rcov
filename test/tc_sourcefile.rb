@@ -56,24 +56,30 @@ class Test_Sourcefile < Test::Unit::TestCase
   end
   def test_ignore_non_heredocs
     verify_marked_exactly "bitshift-numeric", [0], <<-EOF
-    1 puts 1<<2
-    0 return if foo
-    0 do_stuff()
-    0 2
+      1 puts 1<<2
+      0 return if foo
+      0 do_stuff()
+      0 2
     EOF
     verify_marked_exactly "bitshift-symbolic", [0], <<-EOF
-    1 puts 1<<LSHIFT
-    0 return if bar
-    0 do_stuff()
-    0 LSHIFT
+      1 puts 1<<LSHIFT
+      0 return if bar
+      0 do_stuff()
+      0 LSHIFT
     EOF
     verify_marked_exactly "bitshift-symbolic-multi", 0..3, <<-EOF
-    1 puts <<EOF, 1<<LSHIFT
-    0 random text
-    0 EOF
-    1 return if bar
-    0 puts "foo"
-    0 LSHIFT
+      1 puts <<EOF, 1<<LSHIFT
+      0 random text
+      0 EOF
+      1 return if bar
+      0 puts "foo"
+      0 LSHIFT
+    EOF
+    verify_marked_exactly "bitshift-symshift-evil", 0..2, <<-EOF
+      1 foo = 1
+      1 puts foo<<CONS
+      1 return if bar
+      0 foo + baz
     EOF
   end
 
