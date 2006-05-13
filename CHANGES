@@ -1,6 +1,14 @@
 
 User-visible changes.
 
+Since 0.3.0 (2006-05-05)
+========================
+
+Features
+--------
+* better heuristics (supports heredocs at last, including variants your editor
+  is probably unable to handle)
+* new color scheme, with alternating shades of the base colors
 
 Since 0.2.0 (2006-02-25)
 ========================
