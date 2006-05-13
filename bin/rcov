@@ -14,8 +14,8 @@ require 'cgi'
 require 'rbconfig'
 require 'optparse'
 require 'ostruct'
-include Config
-eval DATA.read  # load xx-0.1.0-1
+# load xx-0.1.0-1
+eval File.read(File.expand_path(__FILE__)).gsub(/.*^__END__$/m,"")
 
 # extend XX
 module XX
@@ -184,7 +184,7 @@ end
 
 class Formatter
     class << self; attr_accessor :ignore_files end 
-    @ignore_files = [/\A#{Regexp.escape(CONFIG["libdir"])}/, /tc_/, 
+    @ignore_files = [/\A#{Regexp.escape(Config::CONFIG["libdir"])}/, /tc_/, 
                      /\A#{Regexp.escape(__FILE__)}\z/]
     def initialize
         @files = {}
@@ -696,7 +696,11 @@ class HTMLProfiling < HTMLCoverage
     end
 end
 
+end # Rcov
 
+if __FILE__ == $0
+
+module Rcov
 module RCOV__
     COVER = {}
     class << self; attr_accessor :formatter end
@@ -793,8 +797,7 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
         end
         RCOV__.formatter.execute
     end
-end
-
+end # RCOV__
 end # Rcov
 
 
@@ -965,6 +968,8 @@ until pending_scripts.empty?
     $0 = prog
     load prog
 end
+
+end  # if __FILE__ == $0
 
 # xx-0.1.0-1 follows
 __END__
