@@ -65,6 +65,7 @@ class SourceFile
         @lines = lines
         @coverage = CoverageInfo.new initial_coverage
         @counts = counts
+        extend_heredocs
         precompute_coverage false
     end
 
@@ -93,6 +94,9 @@ class SourceFile
                 changed = true
             end
         end
+
+        extend_heredocs if changed
+
         # if there was any change, we have to recompute; we'll eventually
         # reach a fixed point and stop there
         precompute_coverage(comments_run_by_default) if changed
@@ -138,6 +142,40 @@ class SourceFile
     end
 
     private
+
+    def extend_heredocs
+        i = 0
+        while i < @lines.size
+            unless is_code? i
+                i += 1
+                next
+            end
+            #FIXME: using a restrictive regexp so that only <<[A-Z_a-z]\w*
+            # matches when unquoted, so as to avoid problems with 1<<2
+            # (keep in mind that whereas puts <<2 is valid, puts 1<<2 is a
+            # parse error, but  a = 1<<2  is of course fine)
+            if md = /<<(-?)(?:(['"`])((?:(?!\2).)+)\2|([A-Z_a-z]\w*))/.match(@lines[i])
+                j = i
+                if @coverage[j]
+                    term = md[3] || md[4]
+                    end_of_heredoc = (md[1] == "-") ? /^\s*#{Regexp.escape(term)}$/ :
+                                          /^#{Regexp.escape(term)}$/
+                    loop do
+                        break if j == @lines.size
+                        @coverage[j] = true
+                        if end_of_heredoc =~ @lines[j]
+                            i = j+1
+                            break
+                        end
+                        j += 1
+                    end
+                end
+            end
+
+            i += 1
+        end
+    end
+
     def next_expr_marked?(lineno)
         return false if lineno >= @lines.size
         found = false
