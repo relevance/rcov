@@ -426,9 +426,23 @@ EOS
         return if @files.size == 0
         FileUtils.mkdir_p @dest unless @nohtml
         create_index(File.join(@dest, "index.html")) unless @nohtml
+        # FIXME: refactor this, it's ugly! Move all the textual stuff to
+        # independent Formatters, use them sequentially.
+        summary = "%.1f%%   %d file(s)   %d LoCs   %d LoC'(w/comments)" % [code_coverage * 100,
+            @files.size, num_code_lines, num_lines]
+        puts summary if [:summary, :report].include? @textmode
+        if @textmode == :report
+            @files.sort_by{|name,_| name}.each do |fname, finfo|
+                name = fname.size < 57 ? fname : "..." + fname[-54..-1]
+                puts "%-57s  %5d  %5d  %.1f%%" % [name, finfo.num_code_lines, 
+                    finfo.num_lines, 100 * finfo.code_coverage]
+            end
+            puts summary
+        end
         @files.each do |filename, fileinfo|
             create_file(File.join(@dest, file_name(filename)), fileinfo) unless @nohtml
-            next unless @textmode
+            next unless %w[:plain,:rich].include? @textmode
+            # :plain or :rich
             puts "=" * 80
             puts filename
             puts "=" * 80
@@ -603,7 +617,7 @@ EOS
     end
 
     def create_file(destfile, fileinfo)
-        $stderr.puts "Generating #{destfile.inspect}"
+        #$stderr.puts "Generating #{destfile.inspect}"
         body = format_overview(fileinfo) + format_lines(fileinfo)
         title = fileinfo.name + " - #{default_title}"
         do_ctable = output_color_table?
@@ -952,6 +966,13 @@ EOF
     end
     opts.on("-T", "--rich-text", "Output coverage info with ANSI sequences to stdout.") do
         options.textmode = :rich
+    end
+    opts.on("--text-report", "Output detailed plain-text report to stdout.",
+            "Fields: filename, LoC, LoC with comments, coverage.") do
+        options.textmode = :report
+    end
+    opts.on("--text-summary", "Output plain-text summary to stdout.") do
+        options.textmode = :summary
     end
     opts.on("--no-html", "Don't generate HTML output (no output unless -T or -t).") do
         options.nohtml = true

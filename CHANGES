@@ -10,6 +10,7 @@ Features
   is probably unable to handle)
 * new color scheme, with alternating shades of the base colors
 * -w to set $VERBOSE=true (turns on warnings)
+* --text-report and --text-summary
 
 Since 0.2.0 (2006-02-25)
 ========================
