@@ -240,11 +240,17 @@ end
 class Formatter
     ignore_files = [/\A#{Regexp.escape(Config::CONFIG["libdir"])}/, /tc_/, 
         /\A#{Regexp.escape(__FILE__)}\z/]
-    DEFAULT_OPTS = {:ignore => ignore_files}
+    DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false}
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
         @files = {}
         @ignore_files = options[:ignore]
+        @sort_criterium = case options[:sort]
+            when :loc : lambda{|fname, finfo| finfo.num_code_lines}
+            when :coverage : lambda{|fname, finfo| finfo.code_coverage}
+            else lambda{|fname, finfo| fname}
+        end
+        @sort_reverse = options[:sort_reverse]
     end
 
     def add_file(filename, lines, coverage, counts)
@@ -257,6 +263,16 @@ class Formatter
         else
             @files[filename] = SourceFile.new filename, lines, coverage, counts
         end
+    end
+
+    def each_file_pair_sorted(&b)
+        return sorted_file_pairs unless block_given?
+        sorted_file_pairs.each(&b)
+    end
+
+    def sorted_file_pairs
+        pairs = @files.sort_by{|fname, finfo| @sort_criterium.call(fname, finfo) }
+        @sort_reverse ? pairs.reverse : pairs
     end
 
     def total_coverage
@@ -307,7 +323,7 @@ end
 class TextReport < TextSummary
     def execute
         puts summary
-        @files.sort_by{|name,_| name}.each do |fname, finfo|
+        each_file_pair_sorted do |fname, finfo|
             name = fname.size < 57 ? fname : "..." + fname[-54..-1]
             puts "%-57s  %5d  %5d  %.1f%%" % [name, finfo.num_code_lines, 
                 finfo.num_lines, 100 * finfo.code_coverage]
@@ -326,8 +342,7 @@ class TextCoverage < Formatter
     end
 
     def execute
-        return if @files.empty?
-        @files.sort_by{|name,_| name}.each do |filename, fileinfo|
+        each_file_pair_sorted do |filename, fileinfo|
             puts "=" * 80
             puts filename
             puts "=" * 80
@@ -486,7 +501,7 @@ EOS
         return if @files.empty?
         FileUtils.mkdir_p @dest
         create_index(File.join(@dest, "index.html"))
-        @files.each do |filename, fileinfo|
+        each_file_pair_sorted do |filename, fileinfo|
             create_file(File.join(@dest, file_name(filename)), fileinfo)
         end
     end
@@ -578,7 +593,7 @@ EOS
     end
 
     def create_index(destname)
-        files = [SummaryFileInfo.new(self)] + @files.keys.sort.map{|k| @files[k]}
+        files = [SummaryFileInfo.new(self)] + each_file_pair_sorted.map{|k,v| v}
         title = default_title
         output = xhtml_ { html_ {
             head_ {
@@ -934,6 +949,8 @@ options.textmode = false
 options.skip = Rcov::Formatter::DEFAULT_OPTS[:ignore]
 options.nohtml = false
 options.test_unit_only = false
+options.sort = :name
+options.sort_reverse = false
 
 EXTRA_HELP = <<-EOF
 
@@ -1006,6 +1023,14 @@ EOF
     opts.on("--no-html", "Don't generate HTML output (no output unless -T or -t).") do
         options.nohtml = true
     end
+    opts.on("--sort [CRITERIUM]", [:name, :loc, :coverage],
+            "Sort files in the output by the specified field.",
+            "(name, loc, coverage)") do |criterium|
+        options.sort = criterium
+    end
+    opts.on("--sort-reverse", "Reverse files in the output.") do
+        options.sort_reverse = true
+    end
     opts.on("-w", "Turn warnings on (like ruby).") do
         $VERBOSE = true
     end
@@ -1045,7 +1070,8 @@ formatters = []
 make_formatter = lambda do |klass| 
 klass.new(:destdir => options.destdir, :color => options.color, 
           :fsr => options.range, :textmode => options.textmode,
-          :ignore => options.skip)
+          :ignore => options.skip, :sort => options.sort, 
+          :sort_reverse => options.sort_reverse)
 end
 
 unless options.nohtml

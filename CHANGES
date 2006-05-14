@@ -11,6 +11,7 @@ Features
 * new color scheme, with alternating shades of the base colors
 * -w to set $VERBOSE=true (turns on warnings)
 * --text-report and --text-summary
+* --sort and --sort-reverse for the summaries and reports
 
 Since 0.2.0 (2006-02-25)
 ========================
