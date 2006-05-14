@@ -1055,7 +1055,7 @@ end
 
 begin
     opts.parse! ARGV
-rescue OptionParser::InvalidOption => e
+rescue OptionParser::InvalidOption, OptionParser::InvalidArgument => e
     puts opts
     puts
     puts e.message
