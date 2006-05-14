@@ -406,6 +406,12 @@ table.report td.value {
     text-align: right;
     border: #d0d0d0 1px solid;
 }
+table.report tr.light {
+    background-color: rgb(240, 240, 245);
+}
+table.report tr.dark {
+    background-color: rgb(230, 230, 235);
+}
 EOS
 
 
@@ -493,8 +499,12 @@ EOS
                     }
                 }
                 tbody_ { 
+                    color_class_index = 1
+                    color_classes = %w[light dark]
                     file_infos.each do |f|
-                        tr_ {
+                        color_class_index += 1
+                        color_class_index %= color_classes.size
+                        tr_(:class => color_classes[color_class_index]) {
                             td_ { 
                                 case f.name
                                 when "TOTAL": 
