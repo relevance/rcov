@@ -302,24 +302,24 @@ span.marked0 {
   background-color: rgb(185, 210, 200);
   display: block;
 }
-span.inferred0 {
-  background-color: rgb(170, 185, 185);
-  display: block;
-}
 span.marked1 {
   background-color: rgb(190, 215, 205);
   display: block;
 }
-span.inferred1 {
+span.inferred0 {
   background-color: rgb(165, 180, 180);
   display: block;
 }
+span.inferred1 {
+  background-color: rgb(170, 185, 185);
+  display: block;
+}
 span.uncovered0 {
-  background-color: rgb(215, 80, 80);
+  background-color: rgb(225, 110, 110);
   display: block;
 }
 span.uncovered1 {
-  background-color: rgb(210, 75, 75);
+  background-color: rgb(235, 120, 120);
   display: block;
 }
 span.overview {
