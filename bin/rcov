@@ -238,18 +238,20 @@ class SourceFile
 end
 
 class Formatter
-    class << self; attr_accessor :ignore_files end 
-    @ignore_files = [/\A#{Regexp.escape(Config::CONFIG["libdir"])}/, /tc_/, 
-                     /\A#{Regexp.escape(__FILE__)}\z/]
-    def initialize
+    ignore_files = [/\A#{Regexp.escape(Config::CONFIG["libdir"])}/, /tc_/, 
+        /\A#{Regexp.escape(__FILE__)}\z/]
+    DEFAULT_OPTS = {:ignore => ignore_files}
+    def initialize(opts = {})
+        options = DEFAULT_OPTS.clone.update(opts)
         @files = {}
+        @ignore_files = options[:ignore]
     end
 
     def add_file(filename, lines, coverage, counts)
         old_filename = filename
         filename = File.expand_path(filename).gsub(/^#{Regexp.escape(Dir.getwd)}\//, '')
         SCRIPT_LINES__[filename] = SCRIPT_LINES__[old_filename]
-        return nil if Formatter.ignore_files.any?{|x| x === filename}
+        return nil if @ignore_files.any?{|x| x === filename}
         if @files[filename]
             @files[filename].merge(lines, coverage, counts)
         else
@@ -291,6 +293,62 @@ class Formatter
         lines
     end
 end
+class TextSummary < Formatter
+    def execute
+        puts summary
+    end
+
+    def summary
+        "%.1f%%   %d file(s)   %d LoCs   %d LoC'(w/comments)" % [code_coverage * 100,
+            @files.size, num_code_lines, num_lines]
+    end
+end
+
+class TextReport < TextSummary
+    def execute
+        puts summary
+        @files.sort_by{|name,_| name}.each do |fname, finfo|
+            name = fname.size < 57 ? fname : "..." + fname[-54..-1]
+            puts "%-57s  %5d  %5d  %.1f%%" % [name, finfo.num_code_lines, 
+                finfo.num_lines, 100 * finfo.code_coverage]
+        end
+        puts summary
+    end
+end
+
+class TextCoverage < Formatter
+    DEFAULT_OPTS = {:textmode => :rich}
+    def initialize(opts = {})
+        options = DEFAULT_OPTS.clone.update(opts)
+        @textmode = options[:textmode]
+        @color = options[:color]
+        super(options)
+    end
+
+    def execute
+        return if @files.empty?
+        @files.each do |filename, fileinfo|
+            puts "=" * 80
+            puts filename
+            puts "=" * 80
+            SCRIPT_LINES__[filename].each_with_index do |line, i|
+                case @textmode
+                when :plain
+                    puts "%-70s| %6d" % [line.chomp, fileinfo.counts[[i-1,0].max]]
+                when :rich
+                    if @color
+                        prefix = fileinfo.coverage[i] ? "\e[32;40m" : "\e[31;40m"
+                        puts "#{prefix}%s\e[37;40m" % line.chomp
+                    else
+                        prefix = fileinfo.coverage[i] ? "   " : "## "
+                        puts "#{prefix}#{line}"
+                    end
+                end
+            end
+        end
+    end
+end
+
 
 class HTMLCoverage < Formatter
     include XX::XHTML
@@ -414,58 +472,22 @@ table.report tr.dark {
 }
 EOS
 
-
-    
-    DEFAULT_OPTS = {:color, false, :fsr, 30, :textmode, false, :nohtml, false}
-    def initialize(dest_dir = ".", opts = {})
-        super()
-        @dest = dest_dir
+    DEFAULT_OPTS = {:color => false, :fsr => 30, :destdir => "coverage"}
+    def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
+        super(options)
+        @dest = options[:destdir]
         @color = options[:color]
         @fsr = options[:fsr]
-        @textmode = options[:textmode]
-        @nohtml = options[:nohtml]
         @span_class_index = 0
     end
 
     def execute
-        return if @files.size == 0
-        FileUtils.mkdir_p @dest unless @nohtml
-        create_index(File.join(@dest, "index.html")) unless @nohtml
-        # FIXME: refactor this, it's ugly! Move all the textual stuff to
-        # independent Formatters, use them sequentially.
-        summary = "%.1f%%   %d file(s)   %d LoCs   %d LoC'(w/comments)" % [code_coverage * 100,
-            @files.size, num_code_lines, num_lines]
-        puts summary if [:summary, :report].include? @textmode
-        if @textmode == :report
-            @files.sort_by{|name,_| name}.each do |fname, finfo|
-                name = fname.size < 57 ? fname : "..." + fname[-54..-1]
-                puts "%-57s  %5d  %5d  %.1f%%" % [name, finfo.num_code_lines, 
-                    finfo.num_lines, 100 * finfo.code_coverage]
-            end
-            puts summary
-        end
+        return if @files.empty?
+        FileUtils.mkdir_p @dest
+        create_index(File.join(@dest, "index.html"))
         @files.each do |filename, fileinfo|
-            create_file(File.join(@dest, file_name(filename)), fileinfo) unless @nohtml
-            next unless %w[:plain,:rich].include? @textmode
-            # :plain or :rich
-            puts "=" * 80
-            puts filename
-            puts "=" * 80
-            SCRIPT_LINES__[filename].each_with_index do |line, i|
-                case @textmode
-                when :plain
-                    puts "%-70s| %6d" % [line.chomp, fileinfo.counts[[i-1,0].max]]
-                when :rich
-                    if @color
-                        prefix = fileinfo.coverage[i] ? "\e[32;40m" : "\e[31;40m"
-                        puts "#{prefix}%s\e[37;40m" % line.chomp
-                    else
-                        prefix = fileinfo.coverage[i] ? "   " : "## "
-                        puts "#{prefix}#{line}"
-                    end
-                end
-            end
+            create_file(File.join(@dest, file_name(filename)), fileinfo)
         end
     end
 
@@ -754,8 +776,10 @@ end
 
 class HTMLProfiling < HTMLCoverage
 
-    def initialize(*a)
-        super
+    DEFAULT_OPTS = {:destdir => "profiling"}
+    def initialize(opts = {})
+        options = DEFAULT_OPTS.clone.update(opts)
+        super(options)
         @max_cache = {}
         @median_cache = {}
     end
@@ -802,18 +826,12 @@ end
 
 end # Rcov
 
+#{{{ only run if executed directly
 if __FILE__ == $0
 
 module Rcov
 module RCOV__
     COVER = {}
-    class << self; attr_accessor :formatter end
-    
-    @formatter = Rcov::HTMLCoverage.new "coverage"
-    #@formatter = Rcov::HTMLProfiling.new "profiling", true, 10
-    # the range has to be adjusted depending on what we want to see
-    # and the app. (+-10--40dB are not bad)
-    
     begin
         require 'rcovrt'
         abi = [0,0,0]
@@ -879,7 +897,7 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
         remove_hook
     end
 
-    def self.dump_coverage_info
+    def self.dump_coverage_info(formatters)
         generate_coverage_info # create/fill COVER
         COVER.each do |file, lines|
             next if SCRIPT_LINES__.has_key?(file) == false
@@ -896,15 +914,16 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
                 marked_info << marked
                 cover_info << (covers[c+1] || 0)
             end
-            RCOV__.formatter.add_file(file, line_info, marked_info,
-                                          cover_info)
+            formatters.each do |formatter|
+                formatter.add_file(file, line_info, marked_info, cover_info)
+            end
         end
-        RCOV__.formatter.execute
+        formatters.each{|formatter| formatter.execute}
     end
 end # RCOV__
 end # Rcov
 
-
+#{{{ "main" code
 options = OpenStruct.new
 options.color = true
 options.range = 30.0
@@ -912,7 +931,7 @@ options.profiling = false
 options.destdir = nil
 options.loadpaths = []
 options.textmode = false
-options.skip = Rcov::Formatter.ignore_files
+options.skip = Rcov::Formatter::DEFAULT_OPTS[:ignore]
 options.nohtml = false
 options.test_unit_only = false
 
@@ -1022,23 +1041,32 @@ unless ARGV[0]
     puts opts
     exit
 end
-if options.profiling
-    klass = Rcov::HTMLProfiling
-else
-    klass = Rcov::HTMLCoverage
+formatters = []
+make_formatter = lambda do |klass| 
+klass.new(:destdir => options.destdir, :color => options.color, 
+          :fsr => options.range, :textmode => options.textmode,
+          :ignore => options.skip)
 end
-Rcov::RCOV__.formatter = klass.new options.destdir, :color => options.color, 
-                                       :fsr => options.range, :textmode => options.textmode,
-                                       :nohtml => options.nohtml
 
-Rcov::Formatter.ignore_files = options.skip
+unless options.nohtml
+    if options.profiling
+        formatters << make_formatter[Rcov::HTMLProfiling]
+    else
+        formatters << make_formatter[Rcov::HTMLCoverage]
+    end
+end
+textual_formatters = {:plain => Rcov::TextCoverage, :rich => Rcov::TextCoverage,
+                      :summary => Rcov::TextSummary, :report => Rcov::TextReport}
 
+if textual_formatters[options.textmode]
+    formatters << make_formatter[textual_formatters[options.textmode]]
+end
 options.loadpaths.reverse_each{|x| $:.unshift x}
 
 # must be registered before test/unit puts its own
 END {
     Rcov::RCOV__.remove_hook
-    Rcov::RCOV__.dump_coverage_info
+    Rcov::RCOV__.dump_coverage_info(formatters)
 }
 
 if options.test_unit_only
