@@ -327,7 +327,7 @@ class TextCoverage < Formatter
 
     def execute
         return if @files.empty?
-        @files.each do |filename, fileinfo|
+        @files.sort_by{|name,_| name}.each do |filename, fileinfo|
             puts "=" * 80
             puts filename
             puts "=" * 80
