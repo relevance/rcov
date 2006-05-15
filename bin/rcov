@@ -1051,7 +1051,8 @@ EOF
     opts.on("--text-summary", "Output plain-text summary to stdout.") do
         options.textmode = :summary
     end
-    opts.on("--no-html", "Don't generate HTML output (no output unless -T or -t).") do
+    opts.on("--no-html", "Don't generate HTML output.",
+            "(no output unless text output specified)") do
         options.nohtml = true
     end
     opts.on("--sort [CRITERION]", [:name, :loc, :coverage],
