@@ -122,6 +122,33 @@ class Test_Sourcefile < Test::Unit::TestCase
     EOF
   end
 
+  def test_begin_end_comment_blocks
+    verify_everything_marked "=begin/=end", <<-EOF
+    1 x = foo
+    0 =begin
+    0 return if bar(x)
+    0 =end
+    1 y = 1
+    EOF
+  end
+
+  def test_is_code_p
+    lines, coverage, counts = code_info_from_string <<-EOF
+    1 x = foo
+    0 =begin
+    0 return if bar(x)
+    0 =end
+    0 # foo
+    0 # bar
+    1 y = 1
+    EOF
+
+    sf = Rcov::SourceFile.new("is_code?", lines, coverage, counts)
+    ([true] + [false] * 5 + [true]).each_with_index do |val,i|
+      assert_equal(sf.is_code?(i), val, "Unable to detect comments properly.")
+    end
+  end
+
   def verify_marked_exactly(testname, marked_indices, str)
     lines, coverage, counts = code_info_from_string(str)
 
