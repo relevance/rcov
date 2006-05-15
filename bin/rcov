@@ -65,7 +65,7 @@ class SourceFile
         @lines = lines
         @coverage = CoverageInfo.new initial_coverage
         @counts = counts
-        @begin_comment_block_cache = nil
+        @begin_comment_cache = nil
         extend_heredocs
         precompute_coverage false
     end
@@ -138,8 +138,8 @@ class SourceFile
     end
 
     def is_code?(lineno)
-        unless @begin_comment_block_cache
-            @begin_comment_block_cache = Array.new(@lines.size, false)
+        unless @begin_comment_cache
+            @begin_comment_cache = Array.new(@lines.size, false)
             pending = []
             state = :code
             @lines.each_with_index do |line, index|
@@ -153,13 +153,13 @@ class SourceFile
                     pending << index
                     if /^=end\b/ =~ line
                         state = :code
-                        pending.each{|idx| @begin_comment_block_cache[idx] = true}
+                        pending.each{|idx| @begin_comment_cache[idx] = true}
                         pending.clear
                     end
                 end
             end
         end
-        @lines[lineno] && !@begin_comment_block_cache[lineno] && 
+        @lines[lineno] && !@begin_comment_cache[lineno] && 
             @lines[lineno] !~ /^\s*(#|$)/ 
     end
 
