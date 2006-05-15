@@ -87,14 +87,14 @@ class SourceFile
                   /^\s*case\s*(?:#.*)?$/ =~ line && next_expr_marked?(i) or
                   /^\s*(\)|\]|\})(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
                  prev_expr_continued?(i+1) && next_expr_marked?(i)
-                 @coverage[i] = true
+                 @coverage[i] ||= :inferred
                  changed = true
             end
         end
         (@lines.size-1).downto(0) do |i|
             next if @coverage[i]
             if !is_code?(i) and @coverage[i+1] 
-                @coverage[i] = true
+                @coverage[i] = :inferred
                 changed = true
             end
         end
@@ -207,7 +207,7 @@ class SourceFile
                         if end_of_heredoc =~ @lines[j]
                             must_mark.each do |n|
                                 @heredoc_start[n] = i
-                                @coverage[n] = true
+                                @coverage[n] ||= :inferred
                             end
                             k = (j += 1)
                             break
