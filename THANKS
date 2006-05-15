@@ -9,3 +9,4 @@ Andrew Kreiling:
 Robert Feldt:
 * pointed me to dynamic uses of the tracing hooks, provided the inspiration
   for RCOV__.run_hooked
+* helped to refine the color scheme
