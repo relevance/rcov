@@ -120,6 +120,17 @@ class Test_Sourcefile < Test::Unit::TestCase
       0         bar) or
       0     baz
     EOF
+    verify_marked_exactly "code blocks", [0, 3, 6], <<-EOF
+      1 x = foo do   # stuff
+      0   baz
+      0 end
+      1 bar do |x|
+      0   baz
+      0 end
+      1 bar {|a, b|    # bleh | +1
+      0   baz
+      0 }
+    EOF
   end
 
   def test_begin_end_comment_blocks
