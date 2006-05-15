@@ -82,15 +82,13 @@ class SourceFile
         (0...lines.size).each do |i|
             next if @coverage[i]
             line = @lines[i]
-            if /^\s*(?:begin\s*(?:#.*)?|ensure\s*(?:#.*)?|else\s*(?:#.*)?)$/ =~line &&
-                next_expr_marked?(i) or
+            if /^\s*(begin|ensure|else|case)\s*(?:#.*)?$/ =~ line && next_expr_marked?(i) or
                 /^\s*(?:end|\})\s*(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
+                /^\s*rescue\b/ =~ line && next_expr_marked?(i) or
                 prev_expr_continued?(i) && prev_expr_marked?(i) or
                 comments_run_by_default && !is_code?(i) or 
-                  /^\s*(?:rescue)/ =~ line && next_expr_marked?(i) or
-                  /^\s*case\s*(?:#.*)?$/ =~ line && next_expr_marked?(i) or
-                  /^\s*(\)|\]|\})(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
-                 prev_expr_continued?(i+1) && next_expr_marked?(i)
+                /^\s*(\)|\]|\})(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
+                prev_expr_continued?(i+1) && next_expr_marked?(i)
                  @coverage[i] ||= :inferred
                  changed = true
             end

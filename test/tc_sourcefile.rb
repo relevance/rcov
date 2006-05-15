@@ -3,6 +3,64 @@ load File.join(File.dirname(File.expand_path(__FILE__)), "..", "bin", "rcov")
 require 'test/unit'
 
 class Test_Sourcefile < Test::Unit::TestCase
+  def test_trailing_end_is_inferred
+    verify_everything_marked "trailing end", <<-EOF
+      1 class X
+      1   def foo
+      2     "foo"
+      0   end
+      0 end
+    EOF
+    verify_everything_marked "trailing end with comments", <<-EOF
+      1 class X
+      1   def foo
+      2     "foo"
+      0   end
+      0 # foo bar
+      0 =begin
+      0  ....
+      0 =end
+      0 end
+    EOF
+  end
+
+  def test_begin_ensure_else_case_are_inferred
+    verify_everything_marked "begin ensure else case", <<-EOF
+      0 begin
+      #   bleh
+      2   puts a
+      0   begin
+      2     raise "foo"
+      0   rescue Exception => e
+      2     puts b
+      0   ensure
+      2     puts c
+      0   end
+      2   if a()
+      1     b
+      0   else
+      1     c
+      0   end
+      0   case 
+      2   when bar =~ /foo/
+      1     puts "bar"
+      0   else
+      1     puts "baz"
+      0   end
+      0 end
+    EOF
+  end
+
+  def test_rescue_is_inferred
+    verify_everything_marked "rescue", <<-EOF
+      0 begin
+      1   foo
+      0 rescue
+      1   puts "bar"
+      0 end
+    EOF
+  end
+  
   def test_merge
     lines, coverage, counts = code_info_from_string <<-EOF
       1 a = 1
