@@ -3,6 +3,35 @@ load File.join(File.dirname(File.expand_path(__FILE__)), "..", "bin", "rcov")
 require 'test/unit'
 
 class Test_Sourcefile < Test::Unit::TestCase
+  def test_merge
+    lines, coverage, counts = code_info_from_string <<-EOF
+      1 a = 1
+      1 if bar
+      0   b = 2
+      0 end
+      0 puts <<EOF
+      0  bleh
+      0 EOF
+      3 c.times{ i += 1}
+    EOF
+    sf = Rcov::SourceFile.new("merge", lines, coverage, counts)
+    lines, coverage, counts = code_info_from_string <<-EOF
+      1 a = 1
+      1 if bar
+      1   b = 2
+      0 end
+      1 puts <<EOF
+      0  bleh
+      0 EOF
+      10 c.times{ i += 1}
+    EOF
+    sf2 = Rcov::SourceFile.new("merge", lines, coverage, counts)
+    expected = [true, true, true, :inferred, true, :inferred, :inferred, true]
+    assert_equal(expected, sf2.coverage.to_a)
+    sf.merge(sf2.lines, sf2.coverage, sf2.counts)
+    assert_equal(expected, sf.coverage.to_a)
+    assert_equal([2, 2, 1, 0, 1, 0, 0, 13], sf.counts)
+  end
   def test_heredocs_basic
     verify_everything_marked "heredocs-basic.rb", <<-EOF
       1 puts 1 + 1

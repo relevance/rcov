@@ -38,7 +38,7 @@ RCOVRT_ABI = [0,1,0]
     
 class CoverageInfo
     def initialize(coverage_array)
-        @cover = coverage_array
+        @cover = coverage_array.clone
     end
 
     def [](idx)
@@ -51,6 +51,10 @@ class CoverageInfo
         end
         return if idx < 0 || idx >= @cover.size
         @cover[idx] = val
+    end
+
+    def to_a
+        @cover.clone
     end
 
     def method_missing(meth, *a, &b)
@@ -108,11 +112,9 @@ class SourceFile
 
     def merge(lines, coverage, counts)
         coverage.each_with_index do |v, idx|
-            case v
-            when true
-                @coverage[idx] = v
-            when :inferred
-                @coverage[idx] ||= v
+            case @coverage[idx]
+            when :inferred : @coverage[idx] = v || @coverage[idx]
+            when false : @coverage[idx] ||= v
             end
         end
         counts.each_with_index{|v, idx| @counts[idx] += v }
