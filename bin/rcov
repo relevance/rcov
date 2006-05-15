@@ -139,20 +139,23 @@ class SourceFile
 
     def is_code?(lineno)
         unless @begin_comment_block_cache
-            @begin_comment_block_cache = Array.new(@lines.size)
+            @begin_comment_block_cache = Array.new(@lines.size, false)
+            pending = []
             state = :code
             @lines.each_with_index do |line, index|
                 case state
                 when :code
                     if /^=begin\b/ =~ line
                         state = :comment
-                        @begin_comment_block_cache[index] = true
-                    else
-                        @begin_comment_block_cache[index] = false
+                        pending << index
                     end
                 when :comment
-                    state = :code if /^=end\b/ =~ line
-                    @begin_comment_block_cache[index] = true
+                    pending << index
+                    if /^=end\b/ =~ line
+                        state = :code
+                        pending.each{|idx| @begin_comment_block_cache[idx] = true}
+                        pending.clear
+                    end
                 end
             end
         end
