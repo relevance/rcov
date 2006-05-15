@@ -65,7 +65,10 @@ class SourceFile
         @lines = lines
         @coverage = CoverageInfo.new initial_coverage
         @counts = counts
-        @begin_comment_cache = nil
+        @is_begin_comment = nil
+        # points to the line defining the heredoc identifier
+        # but only if it was marked (we don't care otherwise)
+        @heredoc_start = Array.new(lines.size, false)
         extend_heredocs
         precompute_coverage false
     end
@@ -138,8 +141,8 @@ class SourceFile
     end
 
     def is_code?(lineno)
-        unless @begin_comment_cache
-            @begin_comment_cache = Array.new(@lines.size, false)
+        unless @is_begin_comment
+            @is_begin_comment = Array.new(@lines.size, false)
             pending = []
             state = :code
             @lines.each_with_index do |line, index|
@@ -153,13 +156,13 @@ class SourceFile
                     pending << index
                     if /^=end\b/ =~ line
                         state = :code
-                        pending.each{|idx| @begin_comment_cache[idx] = true}
+                        pending.each{|idx| @is_begin_comment[idx] = true}
                         pending.clear
                     end
                 end
             end
         end
-        @lines[lineno] && !@begin_comment_cache[lineno] && 
+        @lines[lineno] && !@is_begin_comment[lineno] && 
             @lines[lineno] !~ /^\s*(#|$)/ 
     end
 
@@ -202,7 +205,10 @@ class SourceFile
                         break if j == @lines.size
                         must_mark << j
                         if end_of_heredoc =~ @lines[j]
-                            must_mark.each{|n| @coverage[n] = true }
+                            must_mark.each do |n|
+                                @heredoc_start[n] = i
+                                @coverage[n] = true
+                            end
                             k = (j += 1)
                             break
                         end
@@ -243,13 +249,16 @@ class SourceFile
         return false if lineno <= 0
         found = false
         idx = (lineno-1).downto(0) do |i|
+            if @heredoc_start[i]
+                found = true
+                break @heredoc_start[i] 
+            end
             next unless is_code? i
             found = true
             break i
         end
         return false unless found
         #TODO: write a comprehensive list
-        #TODO: handle here docs?
         #FIXME: / matches regexps too
         r = /(,|\.|\+|-|\*|\/|<|>|%|&&|\|\||<<|\(|\[|\{|=|and|or)\s*(?:#.*)?$/.match @lines[idx]
         if /(do|\{)\s*\|.*\|\s*(?:#.*)?$/.match @lines[idx]

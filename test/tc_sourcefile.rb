@@ -133,6 +133,16 @@ class Test_Sourcefile < Test::Unit::TestCase
     EOF
   end
 
+  def test_handle_multiline_expressions_with_heredocs
+    verify_everything_marked "multiline and heredocs", <<-EOF
+      1 puts <<EOF + 
+      0 testing
+      0 one two three   
+      0 EOF
+      0 somevar
+    EOF
+  end
+
   def test_begin_end_comment_blocks
     verify_everything_marked "=begin/=end", <<-EOF
     1 x = foo
