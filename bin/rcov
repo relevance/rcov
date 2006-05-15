@@ -1054,10 +1054,10 @@ EOF
     opts.on("--no-html", "Don't generate HTML output (no output unless -T or -t).") do
         options.nohtml = true
     end
-    opts.on("--sort [CRITERIUM]", [:name, :loc, :coverage],
+    opts.on("--sort [CRITERION]", [:name, :loc, :coverage],
             "Sort files in the output by the specified field.",
-            "(name, loc, coverage)") do |criterium|
-        options.sort = criterium
+            "(name, loc, coverage)") do |criterion|
+        options.sort = criterion
     end
     opts.on("--sort-reverse", "Reverse files in the output.") do
         options.sort_reverse = true
