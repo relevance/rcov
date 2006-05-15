@@ -133,7 +133,7 @@ class Test_Sourcefile < Test::Unit::TestCase
   end
 
   def test_is_code_p
-    lines, coverage, counts = code_info_from_string <<-EOF
+    verify_is_code "basic", [true] + [false] * 5 + [true], <<-EOF
     1 x = foo
     0 =begin
     0 return if bar
@@ -142,24 +142,22 @@ class Test_Sourcefile < Test::Unit::TestCase
     0 # bar
     1 y = 1
     EOF
-
-    sf = Rcov::SourceFile.new("is_code?", lines, coverage, counts)
-    ([true] + [false] * 5 + [true]).each_with_index do |val,i|
-      assert_equal(val, sf.is_code?(i), 
-                   "Unable to detect =begin comments properly: #{lines[i].inspect}")
-    end
   end
 
   def test_is_code_p_tricky_heredocs
-    lines, coverage, counts = code_info_from_string <<-EOF
+    verify_is_code "tricky heredocs", [true] * 4, <<-EOF
     2 x = foo <<EOF and return
     0 =begin
     0 EOF
     0 z = x + 1
     EOF
+  end
 
-    sf = Rcov::SourceFile.new("is_code? tricky", lines, coverage, counts)
-    ([true] * 4).each_with_index do |val,i|
+  def verify_is_code(testname, is_code_arr, str)
+    lines, coverage, counts = code_info_from_string str
+
+    sf = Rcov::SourceFile.new(testname, lines, coverage, counts)
+    is_code_arr.each_with_index do |val,i|
       assert_equal(val, sf.is_code?(i), 
                    "Unable to detect =begin comments properly: #{lines[i].inspect}")
     end
