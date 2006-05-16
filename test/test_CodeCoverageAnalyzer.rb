@@ -24,6 +24,6 @@ EOF
       count_info = analyzer.refine_coverage_info(lines, cover)
     assert_equal(lines.map{|l| l.chomp}, line_info)
     assert_equal([true] * 2 + [false] * 3 + [true] * 3 + [false], marked_info)
-    assert_equal([1, 0, 0, 0, 5, 5, 5, 0, 0], count_info)
+    assert_equal([1, 1, 0, 0, 0, 5, 5, 5, 0], count_info)
   end
 end

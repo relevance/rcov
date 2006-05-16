@@ -380,7 +380,7 @@ class TextCoverage < Formatter
             SCRIPT_LINES__[filename].each_with_index do |line, i|
                 case @textmode
                 when :plain
-                    puts "%-70s| %6d" % [line.chomp, fileinfo.counts[[i-1,0].max]]
+                    puts "%-70s| %6d" % [line.chomp, fileinfo.counts[i]]
                 when :rich
                     if @color
                         prefix = fileinfo.coverage[i] ? "\e[32;40m" : "\e[31;40m"
@@ -664,7 +664,7 @@ EOS
         file.num_lines.times do |i|
             line = file.lines[i]
             marked = file.coverage[i]
-            count = file.counts[[i-1,0].max]
+            count = file.counts[i]
             spanclass = span_class(file, marked, count)
             if spanclass != last
                 result += end_of_span
@@ -924,7 +924,7 @@ class CodeCoverageAnalyzer
             marked = true if covers[c] && covers[c] > 0
             line_info << line
             marked_info << marked
-            count_info << (covers[c+1] || 0)
+            count_info << (covers[c] || 0)
         end
 
         [line_info, marked_info, count_info]
