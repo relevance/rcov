@@ -1,5 +1,7 @@
 
-load File.join(File.dirname(File.expand_path(__FILE__)), "..", "bin", "rcov")
+$rcov_loaded ||= false
+$rcov_loaded or load File.join(File.dirname(File.expand_path(__FILE__)), "..", "bin", "rcov")
+$rcov_loaded = true
 require 'test/unit'
 
 class Test_Sourcefile < Test::Unit::TestCase

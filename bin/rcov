@@ -871,12 +871,66 @@ class HTMLProfiling < HTMLCoverage
     end
 end
 
-end # Rcov
+class CodeCoverageAnalyzer
+    def initialize(script_lines__ = SCRIPT_LINES__)
+        @raw_coverage_info = nil
+        @script_lines__ = script_lines__
+        @needs_update = false
+    end
 
-#{{{ only run if executed directly
-if __FILE__ == $0
+    def raw_coverage_info
+        if @needs_update
+            @raw_coverage_info = Rcov::RCOV__.generate_coverage_info
+        end
+        @raw_coverage_info
+    end
 
-module Rcov
+    def run_hooked
+        Rcov::RCOV__.install_hook
+        yield
+    ensure
+        Rcov::RCOV__.remove_hook
+    end
+
+    def install_hook; Rcov::RCOV__.install_hook end
+
+    def remove_hook
+        Rcov::RCOV__.remove_hook
+        @needs_update = true
+    end
+
+    def dump_coverage_info(formatters)
+        raw_coverage_info.each do |file, lines|
+            next if @script_lines__.has_key?(file) == false
+            lines = @script_lines__[file]
+            raw_coverage_array = raw_coverage_info[file]
+
+            line_info, marked_info, 
+                count_info = refine_coverage_info(lines, raw_coverage_array)
+            formatters.each do |formatter|
+                formatter.add_file(file, line_info, marked_info, count_info)
+            end
+        end
+        formatters.each{|formatter| formatter.execute}
+    end
+
+    def refine_coverage_info(lines, covers)
+        line_info = []
+        marked_info = []
+        count_info = []
+        0.upto(lines.size - 1) do |c|
+            line = lines[c].chomp
+            marked = false
+            marked = true if covers[c] && covers[c] > 0
+            line_info << line
+            marked_info << marked
+            count_info << (covers[c+1] || 0)
+        end
+
+        [line_info, marked_info, count_info]
+    end
+end
+
 module RCOV__
     COVER = {}
     begin
@@ -936,39 +990,11 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
             COVER
         end
     end
-
-    def self.run_hooked
-        install_hook
-        yield
-    ensure
-        remove_hook
-    end
-
-    def self.dump_coverage_info(formatters)
-        generate_coverage_info # create/fill COVER
-        COVER.each do |file, lines|
-            next if SCRIPT_LINES__.has_key?(file) == false
-            lines = SCRIPT_LINES__[file]
-            covers = COVER[file]
-            line_info = []
-            marked_info = []
-            cover_info = []
-            0.upto(lines.size - 1) do |c|
-                line = lines[c].chomp
-                marked = false
-                marked = true if covers[c] && covers[c] > 0
-                line_info << line
-                marked_info << marked
-                cover_info << (covers[c+1] || 0)
-            end
-            formatters.each do |formatter|
-                formatter.add_file(file, line_info, marked_info, cover_info)
-            end
-        end
-        formatters.each{|formatter| formatter.execute}
-    end
 end # RCOV__
 end # Rcov
+
+#{{{ only run if executed directly
+if __FILE__ == $0
 
 #{{{ "main" code
 options = OpenStruct.new
@@ -1124,10 +1150,12 @@ if textual_formatters[options.textmode]
 end
 options.loadpaths.reverse_each{|x| $:.unshift x}
 
+$rcov_code_coverage_analyzer = Rcov::CodeCoverageAnalyzer.new
+
 # must be registered before test/unit puts its own
 END {
-    Rcov::RCOV__.remove_hook
-    Rcov::RCOV__.dump_coverage_info(formatters)
+    $rcov_code_coverage_analyzer.remove_hook
+    $rcov_code_coverage_analyzer.dump_coverage_info(formatters)
 }
 
 if options.test_unit_only
@@ -1138,7 +1166,7 @@ if options.test_unit_only
                 yield(STARTED, name)
                 @_result = result
                 begin
-                    Rcov::RCOV__.run_hooked do 
+                    $rcov_code_coverage_analyzer.run_hooked do 
                         setup
                         __send__(@method_name)
                     end
@@ -1148,7 +1176,7 @@ if options.test_unit_only
                     add_error($!)
                 ensure
                     begin
-                        Rcov::RCOV__.run_hooked { teardown }
+                        $rcov_code_coverage_analyzer.run_hooked { teardown }
                     rescue AssertionFailedError => e
                         add_failure(e.message, e.backtrace)
                     rescue StandardError, ScriptError
@@ -1161,7 +1189,7 @@ if options.test_unit_only
         end
     end
 else
-    Rcov::RCOV__.install_hook
+    $rcov_code_coverage_analyzer.install_hook
 end
 
 #{{{ Load scripts
