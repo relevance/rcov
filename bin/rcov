@@ -270,7 +270,7 @@ end
 
 class Formatter
     ignore_files = [/\A#{Regexp.escape(Config::CONFIG["libdir"])}/, /tc_/, 
-        /\A#{Regexp.escape(__FILE__)}\z/]
+        /_test\.rb\z/, /test\//, /\A#{Regexp.escape(__FILE__)}\z/]
     DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false}
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
