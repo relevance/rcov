@@ -35,6 +35,7 @@ module Rcov
 VERSION = "0.4.0"
 RELEASE_DATE = "unreleased (internal/preliminary)"
 RCOVRT_ABI = [0,1,0]
+UPSTREAM_URL = "http://eigenclass.org/hiki.rb?rcov"
     
 class CoverageInfo
     def initialize(coverage_array)
@@ -547,6 +548,18 @@ EOS
 
     private
 
+    def blurb
+        xmlish_ {
+                p_ { 
+                    t_{ "Generated using the " }
+                    a_(:href => "http://eigenclass.org/hiki.rb?rcov") {
+                        t_{ "rcov code coverage analysis tool for Ruby" }
+                    }
+                    t_{ " version #{Rcov::VERSION}." }
+                }
+        }.pretty
+    end
+
     def output_color_table?
         true
     end
@@ -637,11 +650,15 @@ EOS
                 style_(:type => "text/css") { CSS_PROLOG }
             }
             body_ {
-                h3_{ "#{title} generated on #{Time.new.to_s}" }
+                h3_{
+                    t_{ "#{title} generated on #{Time.new.to_s} with " }
+                    a_(:href => Rcov::UPSTREAM_URL){ "rcov #{Rcov::VERSION}" }
+                }
                 p_ { "Threshold: #{@output_threshold}%" } if @output_threshold != 101
                 hr_
                 x_{ format_overview(*files) }
                 hr_
+                x_{ blurb }
                 p_ {
                     a_(:href => "http://validator.w3.org/check/referer") {
                     img_(:src => "http://www.w3.org/Icons/valid-xhtml11",
@@ -712,7 +729,10 @@ EOS
                 style_(:type => "text/css") { h_ { colorscale } }
             }
             body_ {
-                h3_{ "#{default_title} generated on #{Time.new.to_s}" }
+                h3_{ 
+                    t_{ "#{default_title} generated on #{Time.new.to_s} with " }
+                    a_(:href => Rcov::UPSTREAM_URL){ "rcov #{Rcov::VERSION}" }
+                }
                 hr_
                 if do_ctable
                     pre_ {
@@ -746,6 +766,7 @@ Finally, here's a line marked as not executed.
                 end
                 x_{ body }
                 hr_
+                x_ { blurb }
                 p_ {
                     a_(:href => "http://validator.w3.org/check/referer") {
                     img_(:src => "http://www.w3.org/Icons/valid-xhtml10",
