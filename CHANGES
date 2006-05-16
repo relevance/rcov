@@ -15,7 +15,8 @@ Features
 
 Backwards incompatible changes
 ------------------------------
-* changed the meaning of -t and -T
+* changed the meaning of -t and -T (--text-summary and --text-report instead
+  of --text and --rich-text)
 
 Since 0.2.0 (2006-02-25)
 ========================
