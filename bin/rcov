@@ -634,6 +634,7 @@ EOS
             }
             body_ {
                 h3_{ "#{title} generated on #{Time.new.to_s}" }
+                p_ { "Threshold: #{@output_threshold}%" } if @output_threshold != 101
                 hr_
                 x_{ format_overview(*files) }
                 hr_
