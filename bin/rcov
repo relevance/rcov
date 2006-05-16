@@ -881,6 +881,7 @@ class CodeCoverageAnalyzer
     def raw_coverage_info
         if @needs_update
             @raw_coverage_info = Rcov::RCOV__.generate_coverage_info
+            @needs_update = false
         end
         @raw_coverage_info
     end
