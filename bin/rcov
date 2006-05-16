@@ -998,6 +998,7 @@ arguments. Keep in mind that all the programs are run under the same process
 (i.e. they just get Kernel#load()'ed in sequence).
 EOF
 
+#{{{ OptionParser
 opts = OptionParser.new do |opts|
     opts.banner = <<-EOF
 rcov #{Rcov::VERSION} #{Rcov::RELEASE_DATE}
@@ -1020,14 +1021,14 @@ EOF
         options.color = false
     end
     opts.on("-x", "--exclude PATTERNS", 
-            "Don't generate info for the files matching any",
-            "of the given patterns (comma-separated regexp list)") do |list|
+            "Don't generate info for files matching a",
+            "pattern (comma-separated regexp list)") do |list|
                 regexps = list.split(/,/).map{|x| Regexp.new x}
                 options.skip += regexps
             end
     opts.on("--exclude-only PATTERNS",
-            "Skip info generation only for the files matching the",
-            "given patterns (i.e. discard the default regexp list).") do |list|
+            "Skip info only for files matching the",
+            "given patterns.") do |list|
                 options.skip = list.split(/,/).map{|x| Regexp.new(x) }
             end
     opts.on("-p", "--profile", "Generate bogo-profiling info.") do
@@ -1038,26 +1039,27 @@ EOF
             "Color scale range for profiling info (dB).") do |val|
         options.range = val
     end
-    opts.on("-t", "--text", "Output coverage info in plaintext to stdout.") do
+    opts.on("--text", "Dump coverage info in plaintext to stdout.") do
         options.textmode = :plain
     end
-    opts.on("-T", "--rich-text", "Output coverage info with ANSI sequences to stdout.") do
+    opts.on("--rich-text", "Dump coverage info to stdout, using",
+            "ANSI color sequences.") do
         options.textmode = :rich
     end
-    opts.on("--text-report", "Output detailed plain-text report to stdout.",
-            "Fields: filename, LoC, LoC with comments, coverage.") do
+    opts.on("-T", "--text-report", "Dump detailed plain-text report to stdout.",
+            "(filename, LoC, total lines, coverage)") do
         options.textmode = :report
     end
-    opts.on("--text-summary", "Output plain-text summary to stdout.") do
+    opts.on("-t", "--text-summary", "Dump plain-text summary to stdout.") do
         options.textmode = :summary
     end
     opts.on("--no-html", "Don't generate HTML output.",
             "(no output unless text output specified)") do
         options.nohtml = true
     end
-    opts.on("--sort [CRITERION]", [:name, :loc, :coverage],
-            "Sort files in the output by the specified field.",
-            "(name, loc, coverage)") do |criterion|
+    opts.on("--sort CRITERION", [:name, :loc, :coverage],
+            "Sort files in the output by the specified",
+            "field (name, loc, coverage)") do |criterion|
         options.sort = criterion
     end
     opts.on("--sort-reverse", "Reverse files in the output.") do
@@ -1161,6 +1163,7 @@ else
     Rcov::RCOV__.install_hook
 end
 
+#{{{ Load scripts
 pending_scripts = ARGV.clone
 ARGV.replace extra_args
 until pending_scripts.empty?

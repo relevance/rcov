@@ -13,6 +13,10 @@ Features
 * --text-report and --text-summary
 * --sort and --sort-reverse for the summaries and reports
 
+Backwards incompatible changes
+------------------------------
+* changed the meaning of -t and -T
+
 Since 0.2.0 (2006-02-25)
 ========================
 
