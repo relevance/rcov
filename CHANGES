@@ -15,8 +15,9 @@ Features
 
 Backwards incompatible changes
 ------------------------------
-* changed the meaning of -t and -T (--text-summary and --text-report instead
-  of --text and --rich-text)
+* renamed --text to --text-counts and --rich-text to --text: they were
+  misnamed to begin with
+* changed the meaning of -t and -T (--text-summary and --text-report)
 
 Since 0.2.0 (2006-02-25)
 ========================

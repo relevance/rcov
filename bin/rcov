@@ -364,7 +364,7 @@ class TextReport < TextSummary
 end
 
 class TextCoverage < Formatter
-    DEFAULT_OPTS = {:textmode => :rich}
+    DEFAULT_OPTS = {:textmode => :coverage}
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
         @textmode = options[:textmode]
@@ -379,9 +379,9 @@ class TextCoverage < Formatter
             puts "=" * 80
             SCRIPT_LINES__[filename].each_with_index do |line, i|
                 case @textmode
-                when :plain
+                when :counts
                     puts "%-70s| %6d" % [line.chomp, fileinfo.counts[i]]
-                when :rich
+                when :coverage
                     if @color
                         prefix = fileinfo.coverage[i] ? "\e[32;40m" : "\e[31;40m"
                         puts "#{prefix}%s\e[37;40m" % line.chomp
@@ -1067,12 +1067,12 @@ EOF
             "Color scale range for profiling info (dB).") do |val|
         options.range = val
     end
-    opts.on("--text", "Dump coverage info in plaintext to stdout.") do
-        options.textmode = :plain
+    opts.on("--text-counts", "Dump execution counts in plaintext.") do
+        options.textmode = :counts
     end
-    opts.on("--rich-text", "Dump coverage info to stdout, using",
-            "ANSI color sequences.") do
-        options.textmode = :rich
+    opts.on("--text", "Dump coverage info to stdout, using",
+            "ANSI color sequences unless -n.") do
+        options.textmode = :coverage
     end
     opts.on("-T", "--text-report", "Dump detailed plain-text report to stdout.",
             "(filename, LoC, total lines, coverage)") do
@@ -1143,7 +1143,7 @@ unless options.nohtml
         formatters << make_formatter[Rcov::HTMLCoverage]
     end
 end
-textual_formatters = {:plain => Rcov::TextCoverage, :rich => Rcov::TextCoverage,
+textual_formatters = {:counts => Rcov::TextCoverage, :coverage => Rcov::TextCoverage,
                       :summary => Rcov::TextSummary, :report => Rcov::TextReport}
 
 if textual_formatters[options.textmode]
