@@ -77,37 +77,6 @@ class SourceFile
         precompute_coverage false
     end
 
-    def precompute_coverage(comments_run_by_default = true)
-        changed = false
-        (0...lines.size).each do |i|
-            next if @coverage[i]
-            line = @lines[i]
-            if /^\s*(begin|ensure|else|case)\s*(?:#.*)?$/ =~ line && next_expr_marked?(i) or
-                /^\s*(?:end|\})\s*(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
-                /^\s*rescue\b/ =~ line && next_expr_marked?(i) or
-                prev_expr_continued?(i) && prev_expr_marked?(i) or
-                comments_run_by_default && !is_code?(i) or 
-                /^\s*(\)|\]|\})(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
-                prev_expr_continued?(i+1) && next_expr_marked?(i)
-                 @coverage[i] ||= :inferred
-                 changed = true
-            end
-        end
-        (@lines.size-1).downto(0) do |i|
-            next if @coverage[i]
-            if !is_code?(i) and @coverage[i+1] 
-                @coverage[i] = :inferred
-                changed = true
-            end
-        end
-
-        extend_heredocs if changed
-
-        # if there was any change, we have to recompute; we'll eventually
-        # reach a fixed point and stop there
-        precompute_coverage(comments_run_by_default) if changed
-    end
-
     def merge(lines, coverage, counts)
         coverage.each_with_index do |v, idx|
             case @coverage[idx]
@@ -167,6 +136,37 @@ class SourceFile
     end
 
     private
+
+    def precompute_coverage(comments_run_by_default = true)
+        changed = false
+        (0...lines.size).each do |i|
+            next if @coverage[i]
+            line = @lines[i]
+            if /^\s*(begin|ensure|else|case)\s*(?:#.*)?$/ =~ line && next_expr_marked?(i) or
+                /^\s*(?:end|\})\s*(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
+                /^\s*rescue\b/ =~ line && next_expr_marked?(i) or
+                prev_expr_continued?(i) && prev_expr_marked?(i) or
+                comments_run_by_default && !is_code?(i) or 
+                /^\s*(\)|\]|\})(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
+                prev_expr_continued?(i+1) && next_expr_marked?(i)
+                 @coverage[i] ||= :inferred
+                 changed = true
+            end
+        end
+        (@lines.size-1).downto(0) do |i|
+            next if @coverage[i]
+            if !is_code?(i) and @coverage[i+1] 
+                @coverage[i] = :inferred
+                changed = true
+            end
+        end
+
+        extend_heredocs if changed
+
+        # if there was any change, we have to recompute; we'll eventually
+        # reach a fixed point and stop there
+        precompute_coverage(comments_run_by_default) if changed
+    end
 
     require 'strscan'
     def extend_heredocs
