@@ -62,6 +62,31 @@ class Test_Sourcefile < Test::Unit::TestCase
       0 end
     EOF
   end
+
+  def test_code_metrics_are_computed_correctly
+    lines, coverage, counts = code_info_from_string <<-EOF
+      1 a = 1
+      0 # this is a comment
+      1 if bar
+      0   b = 2
+      0 end
+      0 =begin
+      0 this too
+      0 bleh
+      0 =end
+      0 puts <<EOF
+      0  bleh
+      0 EOF
+      3 c.times{ i += 1}
+    EOF
+    sf = Rcov::SourceFile.new("metrics", lines, coverage, counts)
+    assert_in_delta(0.307, sf.total_coverage, 0.01)
+    assert_in_delta(0.375, sf.code_coverage, 0.01)
+    assert_equal(8, sf.num_code_lines)
+    assert_equal(13, sf.num_lines)
+    assert_equal([true, :inferred, true, false, false, false, false, false, 
+                 false, false, false, false, true], sf.coverage.to_a)
+  end
   
   def test_merge
     lines, coverage, counts = code_info_from_string <<-EOF
@@ -92,6 +117,7 @@ class Test_Sourcefile < Test::Unit::TestCase
     assert_equal(expected, sf.coverage.to_a)
     assert_equal([2, 2, 1, 0, 1, 0, 0, 13], sf.counts)
   end
+
   def test_heredocs_basic
     verify_everything_marked "heredocs-basic.rb", <<-EOF
       1 puts 1 + 1
