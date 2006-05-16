@@ -411,11 +411,11 @@ span.marked1 {
   display: block;
 }
 span.inferred0 {
-  background-color: rgb(165, 180, 180);
+  background-color: rgb(175, 200, 200);
   display: block;
 }
 span.inferred1 {
-  background-color: rgb(170, 185, 185);
+  background-color: rgb(180, 205, 205);
   display: block;
 }
 span.uncovered0 {
