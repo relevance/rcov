@@ -12,6 +12,7 @@ Features
 * -w to set $VERBOSE=true (turns on warnings)
 * --text-report and --text-summary
 * --sort and --sort-reverse for the summaries and reports
+* --threshold and --only-uncovered
 
 Backwards incompatible changes
 ------------------------------

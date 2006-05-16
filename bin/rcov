@@ -271,7 +271,8 @@ end
 class Formatter
     ignore_files = [/\A#{Regexp.escape(Config::CONFIG["libdir"])}/, /tc_/, 
         /_test\.rb\z/, /test\//, /\A#{Regexp.escape(__FILE__)}\z/]
-    DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false}
+    DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false,
+                    :output_threshold => 101}
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
         @files = {}
@@ -282,6 +283,7 @@ class Formatter
             else lambda{|fname, finfo| fname}
         end
         @sort_reverse = options[:sort_reverse]
+        @output_threshold = options[:output_threshold]
     end
 
     def add_file(filename, lines, coverage, counts)
@@ -302,7 +304,9 @@ class Formatter
     end
 
     def sorted_file_pairs
-        pairs = @files.sort_by{|fname, finfo| @sort_criterium.call(fname, finfo) }
+        pairs = @files.sort_by do |fname, finfo|
+            @sort_criterium.call(fname, finfo)
+        end.select{|_, finfo| 100 * finfo.code_coverage < @output_threshold}
         @sort_reverse ? pairs.reverse : pairs
     end
 
@@ -1010,6 +1014,7 @@ options.nohtml = false
 options.test_unit_only = false
 options.sort = :name
 options.sort_reverse = false
+options.output_threshold = 101
 
 EXTRA_HELP = <<-EOF
 
@@ -1093,6 +1098,19 @@ EOF
     opts.on("--sort-reverse", "Reverse files in the output.") do
         options.sort_reverse = true
     end
+    opts.on("--threshold INT", "Only list files with coverage < INT %.",
+            "(default: 101)") do |threshold|
+        begin
+            threshold = Integer(threshold)
+            raise if threshold <= 0 || threshold > 101
+        rescue Exception
+            raise OptionParser::InvalidArgument, threshold
+        end
+        options.output_threshold = threshold
+    end
+    opts.on("--only-uncovered", "Same as --threshold 100") do
+        options.output_threshold = 100
+    end
     opts.on("-w", "Turn warnings on (like ruby).") do
         $VERBOSE = true
     end
@@ -1133,7 +1151,8 @@ make_formatter = lambda do |klass|
 klass.new(:destdir => options.destdir, :color => options.color, 
           :fsr => options.range, :textmode => options.textmode,
           :ignore => options.skip, :sort => options.sort, 
-          :sort_reverse => options.sort_reverse)
+          :sort_reverse => options.sort_reverse, 
+          :output_threshold => options.output_threshold)
 end
 
 unless options.nohtml
