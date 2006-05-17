@@ -13,12 +13,15 @@ Features
 * --text-report and --text-summary
 * --sort and --sort-reverse for the summaries and reports
 * --threshold and --only-uncovered
+* --replace-progname
 
 Backwards incompatible changes
 ------------------------------
 * renamed --text to --text-counts and --rich-text to --text: they were
   misnamed to begin with
 * changed the meaning of -t and -T (--text-summary and --text-report)
+* $0 is not changed by default for each loaded file anymore; the old 
+  behavior (modulo a small bugfix) can be reproduced with --replace-progname
 
 Since 0.2.0 (2006-02-25)
 ========================

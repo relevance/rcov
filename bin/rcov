@@ -1036,6 +1036,7 @@ options.test_unit_only = false
 options.sort = :name
 options.sort_reverse = false
 options.output_threshold = 101
+options.replace_prog_name = false
 
 EXTRA_HELP = <<-EOF
 
@@ -1047,9 +1048,12 @@ after --:
 
   rcov -Ilib -t something.rb -- --theseopts --are --given --to --something.rb
 
-If you run several programs, they will all be passed the same command-line
-arguments. Keep in mind that all the programs are run under the same process
+ARGV will be set to the specified parameters after --.
+Keep in mind that all the programs are run under the same process
 (i.e. they just get Kernel#load()'ed in sequence).
+
+$PROGRAM_NAME (aka. $0) will be set before each file is load()ed if
+--replace-progname is used.
 EOF
 
 #{{{ OptionParser
@@ -1132,11 +1136,14 @@ EOF
     opts.on("--only-uncovered", "Same as --threshold 100") do
         options.output_threshold = 100
     end
+    opts.on("--replace-progname", "Replace $0 when loading the .rb files.") do
+        options.replace_prog_name = true
+    end
     opts.on("-w", "Turn warnings on (like ruby).") do
         $VERBOSE = true
     end
     opts.separator ""
-    opts.on_tail("-h", "--help", "Show this message") do
+    opts.on_tail("-h", "--help", "Show help message") do
         puts opts
         puts EXTRA_HELP
         exit
@@ -1238,7 +1245,9 @@ pending_scripts = ARGV.clone
 ARGV.replace extra_args
 until pending_scripts.empty?
     prog = pending_scripts.shift
-    $0 = prog
+    if options.replace_prog_name
+        $0 = File.basename(File.expand_path(prog))
+    end
     load prog
 end
 
