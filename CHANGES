@@ -17,8 +17,8 @@ Features
 
 Backwards incompatible changes
 ------------------------------
-* renamed --text to --text-counts and --rich-text to --text: they were
-  misnamed to begin with
+* renamed --text to --text-counts and --rich-text to --text-coverage: they
+  were misnamed to begin with
 * changed the meaning of -t and -T (--text-summary and --text-report)
 * $0 is not changed by default for each loaded file anymore; the old 
   behavior (modulo a small bugfix) can be reproduced with --replace-progname
