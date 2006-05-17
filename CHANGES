@@ -6,6 +6,7 @@ Since 0.3.0 (2006-05-05)
 
 Features
 --------
+* easy automation via Rake using the bundled Rcov::RcovTask
 * better heuristics: supports heredocs at last, including variants your editor
   is probably unable to handle, and =begin/=end comments
 * new color scheme, with alternating shades of the base colors
