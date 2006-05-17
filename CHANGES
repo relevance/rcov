@@ -9,6 +9,7 @@ Features
 * easy automation via Rake using the bundled Rcov::RcovTask
 * better heuristics: supports heredocs at last, including variants your editor
   is probably unable to handle, and =begin/=end comments
+* --rails option to ignore files under vendor/, enviroment/ and config/
 * new color scheme, with alternating shades of the base colors
 * -w to set $VERBOSE=true (turns on warnings)
 * --text-report and --text-summary

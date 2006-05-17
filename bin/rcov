@@ -1089,6 +1089,9 @@ EOF
             "given patterns.") do |list|
                 options.skip = list.split(/,/).map{|x| Regexp.new(x) }
             end
+    opts.on("--rails", "Skip config/, environment/ and vendor/.") do 
+        options.skip.concat [%r{\bvendor/},%r{\bconfig/},%r{\benvironment/}]
+    end
     opts.on("-p", "--profile", "Generate bogo-profiling info.") do
         options.profiling = true
         options.destdir ||= "profiling"
