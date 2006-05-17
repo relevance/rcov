@@ -270,8 +270,8 @@ class SourceFile
 end
 
 class Formatter
-    ignore_files = [/\A#{Regexp.escape(Config::CONFIG["libdir"])}/, /tc_/, 
-        /_test\.rb\z/, /test\//, /\A#{Regexp.escape(__FILE__)}\z/]
+    ignore_files = [/\A#{Regexp.escape(Config::CONFIG["libdir"])}/, /\btc_[^.]*.rb/,
+        /_test\.rb\z/, /\btest\//, /\bvendor\//, /\A#{Regexp.escape(__FILE__)}\z/]
     DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false,
                     :output_threshold => 101}
     def initialize(opts = {})
@@ -1144,7 +1144,13 @@ EOF
     end
     opts.separator ""
     opts.on_tail("-h", "--help", "Show help message") do
+        require 'pp'
         puts opts
+        puts <<EOF
+
+Files matching any of the following regexps will be omitted in the report(s):
+#{PP.pp(options.skip, "").chomp}
+EOF
         puts EXTRA_HELP
         exit
     end
