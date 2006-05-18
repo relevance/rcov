@@ -6,7 +6,7 @@
 
 #define RCOVRT_VERSION_MAJOR 0
 #define RCOVRT_VERSION_MINOR 1
-#define RCOVRT_VERSION_REV   0
+#define RCOVRT_VERSION_REV   1
 
 static VALUE mRcov;
 static VALUE mRCOV__;
@@ -161,9 +161,9 @@ cov_reset(VALUE self)
 
   cached_array = 0;
   cached_file = 0;
-  coverinfo = 0;
   st_foreach(coverinfo, free_table, Qnil); 
   st_free_table(coverinfo);
+  coverinfo = 0;
   return Qnil;
 }
 
