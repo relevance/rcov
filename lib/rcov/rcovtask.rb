@@ -97,9 +97,10 @@ module Rcov
     # Create the tasks defined by this task lib.
     def define
       lib_path = @libs.join(File::PATH_SEPARATOR)
+      actual_name = Hash === name ? name.keys.first : name
       unless Rake.application.last_comment
         desc "Analyze code coverage with tests" + 
-          (@name==:rcov ? "" : " for #{@name}")
+          (@name==:rcov ? "" : " for #{actual_name}")
       end
       task @name do
 	run_code = ''
@@ -121,12 +122,12 @@ module Rcov
 	end
       end
 
-      desc "Remove rcov products for #{@name}"
-      task paste("clobber_", name) do
+      desc "Remove rcov products for #{actual_name}"
+      task paste("clobber_", actual_name) do
 	rm_r @output_dir rescue nil
       end
 
-      task :clobber => [paste("clobber_", name)]
+      task :clobber => [paste("clobber_", actual_name)]
       self
     end
 
