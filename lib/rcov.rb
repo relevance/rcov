@@ -119,7 +119,7 @@ class SourceFile
         /^\s*rescue\b/ =~ line && next_expr_marked?(i) or
         prev_expr_continued?(i) && prev_expr_marked?(i) or
         comments_run_by_default && !is_code?(i) or 
-        /^\s*(\)|\]|\})(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
+        /^\s*((\)|\]|\})\s*)+(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
         prev_expr_continued?(i+1) && next_expr_marked?(i)
         @coverage[i] ||= :inferred
         changed = true
@@ -219,6 +219,7 @@ class SourceFile
 
   def prev_expr_continued?(lineno)
     return false if lineno <= 0
+    return false if lineno >= @lines.size
     found = false
     idx = (lineno-1).downto(0) do |i|
       if @heredoc_start[i]
@@ -231,6 +232,9 @@ class SourceFile
     end
     return false unless found
     #TODO: write a comprehensive list
+    if is_code?(lineno) && /^\s*((\)|\]|\})\s*)+(?:#.*)?$/.match(@lines[lineno])
+      return true
+    end
     #FIXME: / matches regexps too
     r = /(,|\.|\+|-|\*|\/|<|>|%|&&|\|\||<<|\(|\[|\{|=|and|or)\s*(?:#.*)?$/.match @lines[idx]
     if /(do|\{)\s*\|.*\|\s*(?:#.*)?$/.match @lines[idx]

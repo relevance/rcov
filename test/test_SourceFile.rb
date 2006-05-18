@@ -246,6 +246,22 @@ class Test_Sourcefile < Test::Unit::TestCase
     EOF
   end
 
+  def test_handle_multiple_block_end_delimiters_in_empty_line
+    verify_everything_marked "multiline with }) delimiter, forward", <<-EOF
+      1 assert(@c.config == {
+      0 'host' => 'myhost.tld',
+      0 'port' => 1234 
+      0 })
+    EOF
+    verify_everything_marked "multiline with }) delimiter, backwards", <<-EOF
+      0 assert(@c.config == {
+      0 'host' => 'myhost.tld',
+      0 'port' => 1234 
+      1 })
+    EOF
+  end
+
+
   def test_handle_multiline_expressions_with_heredocs
     verify_everything_marked "multiline and heredocs", <<-EOF
       1 puts <<EOF + 
