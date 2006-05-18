@@ -127,7 +127,7 @@ class TextReport < TextSummary
         print_header
         print_lines
         each_file_pair_sorted do |fname, finfo|
-            name = fname.size < 54 ? fname : "..." + fname[-51..-1]
+            name = fname.size < 53 ? fname : "..." + fname[-49..-1]
             print_info(name, finfo.num_lines, finfo.num_code_lines, 
                        finfo.code_coverage)
         end
@@ -138,15 +138,15 @@ class TextReport < TextSummary
     end
 
     def print_info(name, lines, loc, coverage)
-        puts "|%-54s | %5d | %5d | %.1f%%|" % [name, lines, loc, 100 * coverage]
+        puts "|%-52s | %5d | %5d | %5.1f%% |" % [name, lines, loc, 100 * coverage]
     end
 
     def print_lines
-        puts "+-------------------------------------------------------+-------+-------+------+"
+        puts "+-----------------------------------------------------+-------+-------+--------+"
     end
 
     def print_header
-        puts "|                  File                                 | Lines |  LOC  |  COV |"
+        puts "|                  File                               | Lines |  LOC  |  COV   |"
     end
 end
 
