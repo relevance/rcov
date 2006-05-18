@@ -244,21 +244,30 @@ end
 autoload :RCOV__, "rcov/lowlevel.rb"
 
 class CodeCoverageAnalyzer
+  @@hook_level = 0
+  require 'thread'
+  @@mutex = Mutex.new
+  
   def initialize
-    @raw_coverage_info = {}
     @script_lines__ = SCRIPT_LINES__
-    @needs_update = false
+    @cache_state = :wait
+    @start_raw_data = {}
+    @end_raw_data = {}
+    @aggregated_data = {}
   end
 
   def analyzed_files
-    raw_coverage_info.select do |file, lines|
+    raw_data_relative.select do |file, lines|
       @script_lines__.has_key?(file)
     end.map{|fname,| fname}
   end
 
   def data(filename)
-    return nil unless @script_lines__.has_key?(filename)
-    refine_coverage_info(@script_lines__[filename], raw_coverage_info[file])
+    unless @script_lines__.has_key?(filename) && 
+           raw_data_relative.has_key?(filename)
+      return nil 
+    end
+    refine_coverage_info(@script_lines__[filename], raw_data_relative[filename])
   end
 
   def run_hooked
@@ -269,23 +278,40 @@ class CodeCoverageAnalyzer
   end
 
   def install_hook
+    @start_raw_data = raw_data_absolute
     Rcov::RCOV__.install_hook
+    @cache_state = :hooked
+    @@mutex.synchronize{ @@hook_level += 1 }
   end
 
   def remove_hook
-    Rcov::RCOV__.remove_hook
-    @needs_update = true
+    @@mutex.synchronize do 
+      @@hook_level -= 1
+      Rcov::RCOV__.remove_hook if @@hook_level == 0
+    end
+    @end_raw_data = raw_data_absolute
+    @cache_state = :done
+    raw_data_relative
   end
 
   def reset
-    Rcov::RCOV__.reset
+    @@mutex.synchronize do
+      if @@hook_level == 0
+        Rcov::RCOV__.reset
+        @start_raw_data = @end_raw_data = {}
+      else
+        @start_raw_data = @end_raw_data = raw_data_absolute
+      end
+      @raw_data_relative = {}
+      @aggregated_data = {}
+    end
   end
 
   def dump_coverage_info(formatters)
-    raw_coverage_info.each do |file, lines|
+    raw_data_relative.each do |file, lines|
       next if @script_lines__.has_key?(file) == false
       lines = @script_lines__[file]
-      raw_coverage_array = raw_coverage_info[file]
+      raw_coverage_array = raw_data_relative[file]
 
       line_info, marked_info, 
         count_info = refine_coverage_info(lines, raw_coverage_array)
@@ -298,13 +324,50 @@ class CodeCoverageAnalyzer
 
   private
 
-  def raw_coverage_info
-    if @needs_update
-      @raw_coverage_info = Rcov::RCOV__.generate_coverage_info
-      @needs_update = false
-    end
-    @raw_coverage_info
+  def raw_data_absolute
+    Rcov::RCOV__.generate_coverage_info
   end
+
+  def raw_data_relative
+    case @cache_state
+    when :wait
+      return @aggregated_data
+    when :hooked
+      new_diff = compute_raw_data_difference(@start_raw_data, 
+                                                       raw_data_absolute)
+    when :done
+      @cache_state = :wait
+      new_diff = compute_raw_data_difference(@start_raw_data, 
+                                             @end_raw_data)
+    end
+
+    new_diff.each_pair do |file, cov_arr|
+      dest = (@aggregated_data[file] ||= Array.new(cov_arr.size, 0))
+      cov_arr.each_with_index{|x,i| dest[i] += x}
+    end
+
+    @aggregated_data
+  end
+
+  def compute_raw_data_difference(first, last)
+    difference = {}
+    last.each_pair do |fname, cov_arr|
+      unless first.has_key?(fname)
+        difference[fname] = cov_arr.clone
+      else
+        orig_arr = first[fname]
+        diff_arr = Array.new(cov_arr.size, 0)
+        changed = false
+        cov_arr.each_with_index do |x, i|
+          diff_arr[i] = diff = (x || 0) - (orig_arr[i] || 0)
+          changed = true if diff != 0
+        end
+        difference[fname] = diff_arr if changed
+      end
+    end
+    difference
+  end
+
 
   def refine_coverage_info(lines, covers)
     line_info = []
