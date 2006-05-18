@@ -323,7 +323,7 @@ autoload :RCOV__, "rcov/lowlevel.rb"
 #  analyzer.analyzed_files   # => ["foo.rb", "bar.rb", ... ]
 #  lines, marked_info, count_info = analyzer.data("foo.rb")
 #
-# In this example, two pieces of code are monitored, an the data generated in
+# In this example, two pieces of code are monitored, and the data generated in
 # both runs are aggregated. +lines+ is an array of strings representing the 
 # source code of <tt>foo.rb</tt>. +marked_info+ is an array holding false,
 # true values indicating whether the corresponding lines of code were reported
@@ -331,6 +331,15 @@ autoload :RCOV__, "rcov/lowlevel.rb"
 # many times each line of code has been executed (more precisely, how many
 # events where reported by Ruby --- a single line might correspond to several
 # events, e.g. many method calls).
+#
+# You can have several CodeCoverageAnalyzer objects at a time, and it is
+# possible to nest the #run_hooked / #install_hook/#remove_hook blocks: each
+# analyzer will manage its data separately. Note however that no special
+# provision is taken to ignore code executed "inside" the CodeCoverageAnalyzer
+# class. At any rate this will not pose a problem since it's easy to ignore it
+# manually: just don't do
+#   lines, coverage, counts = analyzer.data("/path/to/lib/rcov.rb")
+# if you're not interested in that information.
 class CodeCoverageAnalyzer
   @@hook_level = 0
   require 'thread'
@@ -363,6 +372,10 @@ class CodeCoverageAnalyzer
   # many times each line of code has been executed (more precisely, how many
   # events where reported by Ruby --- a single line might correspond to several
   # events, e.g. many method calls).
+  #
+  # The returned data corresponds to the aggregation of all the statistics
+  # collected in each #run_hooked or #install_hook/#remove_hook runs. You can
+  # reset the data at any time with #reset to start from scratch.
   def data(filename)
     unless @script_lines__.has_key?(filename) && 
            raw_data_relative.has_key?(filename)
@@ -392,6 +405,8 @@ class CodeCoverageAnalyzer
   end
 
   # Stop collecting code coverage and execution count information.
+  # #remove_hook will also stop collecting info if it is run inside a
+  # #run_hooked block.
   def remove_hook
     @@mutex.synchronize do 
       @@hook_level -= 1
