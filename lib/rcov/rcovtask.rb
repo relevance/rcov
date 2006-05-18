@@ -127,7 +127,10 @@ module Rcov
 	rm_r @output_dir rescue nil
       end
 
-      task :clobber => [paste("clobber_", actual_name)]
+      clobber_task = paste("clobber_", actual_name)
+      task :clobber => [clobber_task]
+
+      task actual_name => clobber_task
       self
     end
 
