@@ -7,12 +7,17 @@ require 'rcov/rcovtask'
 require 'rake/testtask'
 require 'rake/rdoctask'
 
+# Use the specified rcov executable instead of the one in $PATH
+# (this way we get a sort of informal functional test).
+# This could also be specified from the command like, e.g.
+#   rake rcov RCOVPATH=/path/to/myrcov
+ENV["RCOVPATH"] = "bin/rcov"
+
 desc "Analyze code coverage of the unit tests."
 Rcov::RcovTask.new do |t|
   t.test_files = FileList['test/test*.rb']
   t.verbose = true
   t.rcov_opts << "--text-report"
-  t.rcov_opts << "--threshold 80"
 end
 
 desc "Analyze code coverage for the SourceFile class."
