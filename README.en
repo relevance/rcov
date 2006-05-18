@@ -48,9 +48,6 @@ Install without the rcovrt extension
   # ruby setup.rb all --without-ext
 
   will install rcov without building the rcovrt extension.
-  Alternatively, you can just copy bin/rcov to a directory in your PATH:
-  for the time being that executable is self-sufficient, so you don't even
-  have to run setup.rb, but that might change in future releases.
   
 Usage
 -----

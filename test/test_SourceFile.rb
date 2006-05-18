@@ -1,8 +1,6 @@
 
-$rcov_loaded ||= false
-$rcov_loaded or load File.join(File.dirname(File.expand_path(__FILE__)), "..", "bin", "rcov")
-$rcov_loaded = true
 require 'test/unit'
+require 'rcov'
 
 class Test_Sourcefile < Test::Unit::TestCase
   def test_trailing_end_is_inferred
