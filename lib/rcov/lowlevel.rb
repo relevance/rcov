@@ -6,6 +6,15 @@ require 'rcov/version'
 
 module Rcov
 
+  # RCOV__ performs the low-level tracing of the execution, gathering code
+  # coverage information in the process. The C core made available through the
+  # rcovrt extension will be used if possible. Otherwise the functionality
+  # will be emulated using set_trace_func, but this is very expensive and
+  # will fail if other libraries (e.g. breakpoint) change the trace_func.
+  #
+  # Do not use this module; it is very low-level and subject to frequent
+  # changes. Rcov::CodeCoverageAnalyzer offers a much more convenient and
+  # stable interface.
 module RCOV__
   COVER = {}
   begin
@@ -41,7 +50,7 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
       sklass.class_eval{ remove_method meth }
     end
 
-    def self.install_hook
+    def self.install_hook # :nodoc:
       set_trace_func lambda {|event, file, line, id, binding, klass|
         case event
         when 'c-call', 'c-return', 'class'
@@ -53,15 +62,15 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
       }
     end
 
-    def self.remove_hook
+    def self.remove_hook # :nodoc:
       set_trace_func(nil)
     end
 
-    def self.reset
+    def self.reset # :nodoc:
       COVER.replace {}
     end
 
-    def self.generate_coverage_info
+    def self.generate_coverage_info # :nodoc:
       COVER
     end
   end

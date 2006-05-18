@@ -8,32 +8,68 @@ SCRIPT_LINES__ = {} unless defined? SCRIPT_LINES__
 
 module Rcov
     
+# Rcov::CoverageInfo is but a wrapper for an array, with some additional
+# checks. It is returned by SourceFile#coverage.
 class CoverageInfo
   def initialize(coverage_array)
     @cover = coverage_array.clone
   end
 
-  def [](idx)
-    @cover[idx]
+# Return the coverage status for the requested line. There are four possible
+# return values:
+# * nil if there's no information for the requested line (i.e. it doesn't exist)
+# * true if the line was reported by Ruby as executed
+# * :inferred if rcov inferred it was executed, despite not being reported 
+#   by Ruby.
+# * false otherwise, i.e. if it was not reported by Ruby and rcov's
+#   heuristics indicated that it was not executed
+  def [](line)
+    @cover[line]
   end
 
-  def []=(idx, val)
+  def []=(line, val) # :nodoc:
     unless [true, false, :inferred].include? val
       raise RuntimeError, "What does #{val} mean?" 
     end
-    return if idx < 0 || idx >= @cover.size
-    @cover[idx] = val
+    return if line < 0 || line >= @cover.size
+    @cover[line] = val
   end
 
+# Return an Array holding the code coverage information.
   def to_a
     @cover.clone
   end
 
-  def method_missing(meth, *a, &b)
+  def method_missing(meth, *a, &b) # :nodoc:
     @cover.send(meth, *a, &b)
   end
 end
 
+# A SourceFile object associates a filename to:
+# 1. its source code
+# 2. the per-line coverage information after correction using rcov's heuristics
+# 3. the per-line execution counts
+#
+# A SourceFile object can be therefore be built given the filename, the
+# associated source code, and an array holding execution counts (i.e. how many
+# times each line has been executed).
+#
+# SourceFile is relatively intelligent: it handles normal comments,
+# <tt>=begin/=end</tt>, heredocs, many multiline-expressions... It uses a
+# number of heuristics to determine what is code and what is a comment, and to
+# refine the initial (incomplete) coverage information.
+#
+# Basic usage is as follows:
+#  sf = SourceFile.new("foo.rb", ["puts 1", "if true &&", "   false", 
+#                                 "puts 2", "end"],  [1, 1, 0, 0, 0])
+#  sf.num_lines        # => 5
+#  sf.num_code_lines   # => 5
+#  sf.coverage[2]      # => true
+#  sf.coverage[3]      # => :inferred
+#  sf.code_coverage    # => 0.6
+#                    
+# The array of strings representing the source code and the array of execution
+# counts would normally be obtained from a Rcov::CodeCoverageAnalyzer.
 class SourceFile
   attr_reader :name, :lines, :coverage, :counts
   def initialize(name, lines, counts)
@@ -50,6 +86,16 @@ class SourceFile
     precompute_coverage false
   end
 
+  # Merge code coverage and execution count information.
+  # As for code coverage, a line will be considered
+  # * covered for sure (true) if it is covered in either +self+ or in the 
+  #   +coverage+ array
+  # * considered <tt>:inferred</tt> if the neither +self+ nor the +coverage+ array
+  #   indicate that it was definitely executed, but it was <tt>inferred</tt>
+  #   in either one 
+  # * not covered (<tt>false</tt>) if it was uncovered in both
+  #
+  # Execution counts are just summated on a per-line basis.
   def merge(lines, coverage, counts)
     coverage.each_with_index do |v, idx|
       case @coverage[idx]
@@ -61,11 +107,17 @@ class SourceFile
     precompute_coverage false
   end
 
+  # Total coverage rate if comments are also considered "executable", given as
+  # a fraction, i.e. from 0 to 1.0.
+  # A comment is attached to the code following it (RDoc-style): it will be
+  # considered executed if the the next statement was executed.
   def total_coverage
     return 0 if @coverage.size == 0
     @coverage.inject(0.0) {|s,a| s + (a ? 1:0) } / @coverage.size
   end
 
+  # Code coverage rate: fraction of lines of code executed, relative to the
+  # total amount of lines of code (loc). Returns a float from 0 to 1.0.
   def code_coverage
     indices = (0...@lines.size).select{|i| is_code? i }
     return 0 if indices.size == 0
@@ -73,15 +125,19 @@ class SourceFile
     indices.each {|i| count += 1 if @coverage[i] }
     1.0 * count / indices.size
   end
-
+  
+  # Number of lines of code (loc).
   def num_code_lines
     (0...@lines.size).select{|i| is_code? i}.size
   end
 
+  # Total number of lines.
   def num_lines
     @lines.size
   end
 
+  # Returns true if the given line number corresponds to code, as opposed to a
+  # comment (either # or =begin/=end blocks).
   def is_code?(lineno)
     unless @is_begin_comment
       @is_begin_comment = Array.new(@lines.size, false)
@@ -248,6 +304,33 @@ end
 
 autoload :RCOV__, "rcov/lowlevel.rb"
 
+# A CodeCoverageAnalyzer is responsible for tracing code execution and
+# returning code coverage and execution count information.
+#
+#  analyzer = Rcov::CodeCoverageAnalyzer.new
+#  analyzer.run_hooked do 
+#    do_foo  
+#    # all the code executed as a result of this method call is traced
+#  end
+#  # ....
+#  
+#  analyzer.run_hooked do 
+#    do_bar
+#    # the code coverage information generated in this run is aggregated
+#    # to the previously recorded one
+#  end
+#
+#  analyzer.analyzed_files   # => ["foo.rb", "bar.rb", ... ]
+#  lines, marked_info, count_info = analyzer.data("foo.rb")
+#
+# In this example, two pieces of code are monitored, an the data generated in
+# both runs are aggregated. +lines+ is an array of strings representing the 
+# source code of <tt>foo.rb</tt>. +marked_info+ is an array holding false,
+# true values indicating whether the corresponding lines of code were reported
+# as executed by Ruby. +count_info+ is an array of integers representing how
+# many times each line of code has been executed (more precisely, how many
+# events where reported by Ruby --- a single line might correspond to several
+# events, e.g. many method calls).
 class CodeCoverageAnalyzer
   @@hook_level = 0
   require 'thread'
@@ -260,13 +343,26 @@ class CodeCoverageAnalyzer
     @end_raw_data = {}
     @aggregated_data = {}
   end
-
+  
+  # Return an array with the names of the files whose code was executed inside
+  # the block given to #run_hooked or between #install_hook and #remove_hook.
   def analyzed_files
     raw_data_relative.select do |file, lines|
       @script_lines__.has_key?(file)
     end.map{|fname,| fname}
   end
 
+  # Return the available data about the requested file, or nil if none of its
+  # code was executed or it cannot be found.
+  # The return value is an array with three elements:
+  #  lines, marked_info, count_info = analyzer.data("foo.rb")
+  # +lines+ is an array of strings representing the 
+  # source code of <tt>foo.rb</tt>. +marked_info+ is an array holding false,
+  # true values indicating whether the corresponding lines of code were reported
+  # as executed by Ruby. +count_info+ is an array of integers representing how
+  # many times each line of code has been executed (more precisely, how many
+  # events where reported by Ruby --- a single line might correspond to several
+  # events, e.g. many method calls).
   def data(filename)
     unless @script_lines__.has_key?(filename) && 
            raw_data_relative.has_key?(filename)
@@ -275,6 +371,8 @@ class CodeCoverageAnalyzer
     refine_coverage_info(@script_lines__[filename], raw_data_relative[filename])
   end
 
+  # Execute the code in the given block, monitoring it in order to gather
+  # information about which code was executed.
   def run_hooked
     install_hook
     yield
@@ -282,6 +380,10 @@ class CodeCoverageAnalyzer
     remove_hook
   end
 
+  # Start monitoring execution to gather code coverage and execution count
+  # information. Such data will be collected until #remove_hook is called.
+  #
+  # Use #run_hooked instead if possible.
   def install_hook
     @start_raw_data = raw_data_absolute
     Rcov::RCOV__.install_hook
@@ -289,6 +391,7 @@ class CodeCoverageAnalyzer
     @@mutex.synchronize{ @@hook_level += 1 }
   end
 
+  # Stop collecting code coverage and execution count information.
   def remove_hook
     @@mutex.synchronize do 
       @@hook_level -= 1
@@ -299,6 +402,11 @@ class CodeCoverageAnalyzer
     raw_data_relative
   end
 
+  # Remove the data collected so far. The coverage and execution count
+  # "history" will be erased, and further collection will start from scratch:
+  # no code is considered executed, and therefore all execution counts are 0.
+  # Right after #reset, #analyzed_files will return an empty array, and
+  # #data(filename) will return nil.
   def reset
     @@mutex.synchronize do
       if @@hook_level == 0
@@ -312,7 +420,7 @@ class CodeCoverageAnalyzer
     end
   end
 
-  def dump_coverage_info(formatters)
+  def dump_coverage_info(formatters) # :nodoc:
     raw_data_relative.each do |file, lines|
       next if @script_lines__.has_key?(file) == false
       lines = @script_lines__[file]
