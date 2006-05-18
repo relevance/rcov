@@ -40,9 +40,9 @@ You can specify a different destination directory, which comes handy if you
 have several <tt>RcovTask</tt>s; the <tt>clobber_*</tt> will take care of
 removing that directory:
 
- desc "Analyze code coverage for the SourceFile class."
+ desc "Analyze code coverage for the FileStatistics class."
  Rcov::RcovTask.new(:rcov_sourcefile) do |t|
-   t.test_files = FileList['test/test_SourceFile.rb']
+   t.test_files = FileList['test/test_FileStatistics.rb']
    t.verbose = true
    t.rcov_opts << "--test-unit-only"
    t.output_dir = "coverage.sourcefile"

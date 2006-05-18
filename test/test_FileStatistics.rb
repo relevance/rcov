@@ -2,7 +2,7 @@
 require 'test/unit'
 require 'rcov'
 
-class Test_Sourcefile < Test::Unit::TestCase
+class Test_FileStatistics < Test::Unit::TestCase
   def test_trailing_end_is_inferred
     verify_everything_marked "trailing end", <<-EOF
       1 class X
@@ -77,7 +77,7 @@ class Test_Sourcefile < Test::Unit::TestCase
       0 EOF
       3 c.times{ i += 1}
     EOF
-    sf = Rcov::SourceFile.new("metrics", lines, counts)
+    sf = Rcov::FileStatistics.new("metrics", lines, counts)
     assert_in_delta(0.307, sf.total_coverage, 0.01)
     assert_in_delta(0.375, sf.code_coverage, 0.01)
     assert_equal(8, sf.num_code_lines)
@@ -97,7 +97,7 @@ class Test_Sourcefile < Test::Unit::TestCase
       0 EOF
       3 c.times{ i += 1}
     EOF
-    sf = Rcov::SourceFile.new("merge", lines, counts)
+    sf = Rcov::FileStatistics.new("merge", lines, counts)
     lines, coverage, counts = code_info_from_string <<-EOF
       1 a = 1
       1 if bar
@@ -108,7 +108,7 @@ class Test_Sourcefile < Test::Unit::TestCase
       0 EOF
       10 c.times{ i += 1}
     EOF
-    sf2 = Rcov::SourceFile.new("merge", lines, counts)
+    sf2 = Rcov::FileStatistics.new("merge", lines, counts)
     expected = [true, true, true, :inferred, true, :inferred, :inferred, true]
     assert_equal(expected, sf2.coverage.to_a)
     sf.merge(sf2.lines, sf2.coverage, sf2.counts)
@@ -306,7 +306,7 @@ class Test_Sourcefile < Test::Unit::TestCase
   def verify_is_code(testname, is_code_arr, str)
     lines, coverage, counts = code_info_from_string str
 
-    sf = Rcov::SourceFile.new(testname, lines, counts)
+    sf = Rcov::FileStatistics.new(testname, lines, counts)
     is_code_arr.each_with_index do |val,i|
       assert_equal(val, sf.is_code?(i), 
                    "Unable to detect =begin comments properly: #{lines[i].inspect}")
@@ -316,7 +316,7 @@ class Test_Sourcefile < Test::Unit::TestCase
   def verify_marked_exactly(testname, marked_indices, str)
     lines, coverage, counts = code_info_from_string(str)
 
-    sf = Rcov::SourceFile.new(testname, lines, counts)
+    sf = Rcov::FileStatistics.new(testname, lines, counts)
     lines.size.times do |i|
       if marked_indices.include? i
         assert(sf.coverage[i], "Test #{testname}; " + 

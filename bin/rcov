@@ -60,7 +60,7 @@ class Formatter
         if @files[filename]
             @files[filename].merge(lines, coverage, counts)
         else
-            @files[filename] = SourceFile.new filename, lines, counts
+            @files[filename] = FileStatistics.new filename, lines, counts
         end
     end
 

@@ -22,10 +22,10 @@ exposes some of its code so that you can build on top of its heuristics for
 code analysis and its capabilities for coverage information and execution
 count gathering.
 
-The main classes of interest are Rcov::SourceFile and
+The main classes of interest are Rcov::FileStatistics and
 Rcov::CodeCoverageAnalyzer. 
 
-Rcov::SourceFile can use some heuristics to determine
+Rcov::FileStatistics can use some heuristics to determine
 which parts of the file are executable and which are mere comments.
 
 Rcov::CodeCoverageAnalyzer is used to gather code coverage and execution

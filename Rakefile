@@ -20,9 +20,9 @@ Rcov::RcovTask.new do |t|
   t.rcov_opts << "--text-report"
 end
 
-desc "Analyze code coverage for the SourceFile class."
+desc "Analyze code coverage for the FileStatistics class."
 Rcov::RcovTask.new(:rcov_sourcefile) do |t|
-  t.test_files = FileList['test/test_SourceFile.rb']
+  t.test_files = FileList['test/test_FileStatistics.rb']
   t.verbose = true
   t.rcov_opts << "--test-unit-only"
   t.output_dir = "coverage.sourcefile"

@@ -9,7 +9,7 @@ SCRIPT_LINES__ = {} unless defined? SCRIPT_LINES__
 module Rcov
     
 # Rcov::CoverageInfo is but a wrapper for an array, with some additional
-# checks. It is returned by SourceFile#coverage.
+# checks. It is returned by FileStatistics#coverage.
 class CoverageInfo
   def initialize(coverage_array)
     @cover = coverage_array.clone
@@ -45,22 +45,22 @@ class CoverageInfo
   end
 end
 
-# A SourceFile object associates a filename to:
+# A FileStatistics object associates a filename to:
 # 1. its source code
 # 2. the per-line coverage information after correction using rcov's heuristics
 # 3. the per-line execution counts
 #
-# A SourceFile object can be therefore be built given the filename, the
+# A FileStatistics object can be therefore be built given the filename, the
 # associated source code, and an array holding execution counts (i.e. how many
 # times each line has been executed).
 #
-# SourceFile is relatively intelligent: it handles normal comments,
+# FileStatistics is relatively intelligent: it handles normal comments,
 # <tt>=begin/=end</tt>, heredocs, many multiline-expressions... It uses a
 # number of heuristics to determine what is code and what is a comment, and to
 # refine the initial (incomplete) coverage information.
 #
 # Basic usage is as follows:
-#  sf = SourceFile.new("foo.rb", ["puts 1", "if true &&", "   false", 
+#  sf = FileStatistics.new("foo.rb", ["puts 1", "if true &&", "   false", 
 #                                 "puts 2", "end"],  [1, 1, 0, 0, 0])
 #  sf.num_lines        # => 5
 #  sf.num_code_lines   # => 5
@@ -70,7 +70,7 @@ end
 #                    
 # The array of strings representing the source code and the array of execution
 # counts would normally be obtained from a Rcov::CodeCoverageAnalyzer.
-class SourceFile
+class FileStatistics
   attr_reader :name, :lines, :coverage, :counts
   def initialize(name, lines, counts)
     @name = name
