@@ -868,6 +868,7 @@ if options.test_unit_only
     require 'test/unit'
     module Test::Unit
         class TestCase
+            remove_method(:run) if instance_methods.include? "run"
             def run(result)
                 yield(STARTED, name)
                 @_result = result
