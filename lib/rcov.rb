@@ -36,9 +36,10 @@ end
 
 class SourceFile
   attr_reader :name, :lines, :coverage, :counts
-  def initialize(name, lines, initial_coverage, counts)
+  def initialize(name, lines, counts)
     @name = name
     @lines = lines
+    initial_coverage = counts.map{|x| (x || 0) > 0 ? true : false }
     @coverage = CoverageInfo.new initial_coverage
     @counts = counts
     @is_begin_comment = nil
