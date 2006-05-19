@@ -510,8 +510,40 @@ class CodeCoverageAnalyzer
       count_info << (covers[c] || 0)
     end
 
-    [line_info, marked_info, count_info]
+    script_lines_workaround(line_info, marked_info, count_info)
   end
+
+  # Try to detect repeated data, based on observed repetitions in line_info:
+  # this is a workaround for SCRIPT_LINES__[filename] including as many copies
+  # of the file as the number of times it was parsed.
+  def script_lines_workaround(line_info, coverage_info, count_info)
+    is_repeated = lambda do |div|
+      n = line_info.size / div
+      break false unless line_info.size % div == 0 && n > 1
+      different = false
+      n.times do |i|
+        if (0...div).map{|j| line_info[i+j*n]}.uniq.size != 1
+          different = true
+          break
+        end
+      end
+
+      ! different
+    end
+
+    # FIXME find all prime factors, try them all
+    factors = (2..10).to_a.reverse
+    factors.each do |n|
+      if is_repeated[n]
+        line_info = line_info[0, line_info.size / n]
+        coverage_info = coverage_info[0, coverage_info.size / n]
+        count_info = count_info[0, count_info.size / n]
+      end
+    end
+    
+    [line_info, coverage_info, count_info]
+  end
+
 end # CodeCoverageAnalyzer
 
 end # Rcov

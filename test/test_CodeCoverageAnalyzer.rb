@@ -34,18 +34,43 @@ EOF
     lines = File.readlines(sample_file)
     analyzer = Rcov::CodeCoverageAnalyzer.new
     analyzer.run_hooked{ load sample_file }
-
-    s = lines.size
     
-    assert_equal(lines, SCRIPT_LINES__[sample_file][0, s])
+    assert_equal(lines, SCRIPT_LINES__[sample_file][0, lines.size])
     assert(analyzer.analyzed_files.include?(sample_file))
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    assert_equal(lines.map{|l| l.chomp}, line_info[0, s])
-    assert_equal([true, true, false, false, true, false, true], cov_info[0, s])
-    assert_equal([1, 2, 0, 0, 1, 0, 11], count_info[0, s])
+    assert_equal(lines.map{|l| l.chomp}, line_info)
+    assert_equal([true, true, false, false, true, false, true], cov_info)
+    assert_equal([1, 2, 0, 0, 1, 0, 11], count_info)
     analyzer.reset
     assert_equal(nil, analyzer.data(sample_file))
     assert_equal([], analyzer.analyzed_files)
+  end
+
+  def test_script_lines_workaround_detects_correctly
+    analyzer = Rcov::CodeCoverageAnalyzer.new
+    lines = ["puts a", "foo", "bar"] * 3
+    coverage = [true] * 3 + [false] * 6
+    counts = [1] * 3 + [0] * 6
+    nlines, ncoverage, ncounts = analyzer.instance_eval do 
+      script_lines_workaround(lines, coverage, counts)
+    end
+   
+    assert_equal(["puts a", "foo", "bar"], nlines)
+    assert_equal([true, true, true], ncoverage)
+    assert_equal([1, 1, 1], ncounts)
+  end
+
+  def test_script_lines_workaround_no_false_positives
+    analyzer = Rcov::CodeCoverageAnalyzer.new
+    lines = ["puts a", "foo", "bar"] * 2 + ["puts a", "foo", "baz"]
+    coverage = [true] * 9
+    counts = [1] * 9
+    nlines, ncoverage, ncounts = analyzer.instance_eval do 
+      script_lines_workaround(lines, coverage, counts)
+    end
+    assert_equal(lines, nlines)
+    assert_equal(coverage, ncoverage)
+    assert_equal(counts, ncounts)
   end
 
   def test_differential_coverage_data
