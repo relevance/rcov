@@ -308,8 +308,8 @@ autoload :RCOV__, "rcov/lowlevel.rb"
 # returning code coverage and execution count information.
 #
 # Note that you must <tt>require 'rcov'</tt> before the code you want to
-# analyze is parsed (i.e. before it gets loaded or required). You can
-# do that by either invoking ruby with the <tt>-rrcov</tt> command-line option or
+# analyze is parsed (i.e. before it gets loaded or required). You can do that
+# by either invoking ruby with the <tt>-rrcov</tt> command-line option or
 # just:
 #  require 'rcov'
 #  require 'mycode'
