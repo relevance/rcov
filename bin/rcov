@@ -167,7 +167,7 @@ class TextCoverage < Formatter
             SCRIPT_LINES__[filename].each_with_index do |line, i|
                 case @textmode
                 when :counts
-                    puts "%-70s| %6d" % [line.chomp, fileinfo.counts[i]]
+                    puts "%-70s| %6d" % [line.chomp[0,70], fileinfo.counts[i]]
                 when :coverage
                     if @color
                         prefix = fileinfo.coverage[i] ? "\e[32;40m" : "\e[31;40m"
