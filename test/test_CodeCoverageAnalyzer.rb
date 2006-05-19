@@ -146,6 +146,22 @@ EOF
     assert_equal([0, 121, 121, 121, 0], counts2)
   end
 
+  def test_reset
+    a1 = Rcov::CodeCoverageAnalyzer.new
+
+    sample_file = File.join(File.dirname(__FILE__), "sample_02.rb")
+    load sample_file
+
+    a1.run_hooked do
+      100.times do |i|
+        Rcov::Test::Temporary::Sample02.foo(1, 1)
+        a1.reset if i == 49
+      end
+    end
+
+    assert_equal([0, 50, 50, 50, 0], a1.data(sample_file)[2])
+  end
+
   def test_compute_raw_difference
     first = {"a" => [1,1,1,1,1]}
     last =  {"a" => [2,1,5,2,1], "b" => [1,2,3,4,5]}
