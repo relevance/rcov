@@ -14,6 +14,15 @@ end
   bar if baz
 end
 EOF
+
+  def setup
+    if defined? Rcov::Test::Temporary
+      Rcov::Test::Temporary.constants.each do |name|
+        Rcov::Test::Temporary.module_eval{ remove_const(name) }
+      end
+    end
+  end
+
   def test_refine_coverage_info
     analyzer = Rcov::CodeCoverageAnalyzer.new
     cover = [1, 1, nil, nil, 0, 5, 5, 5, 0]
@@ -101,6 +110,40 @@ EOF
     10.times{ analyzer.run_hooked{ Rcov::Test::Temporary::Sample02.foo(1, 1) } }
     line_info, cov_info, count_info = analyzer.data(sample_file)
     assert_equal([0, 21, 21, 21, 0], count_info)
+  end
+
+  def test_nested_analyzer_blocks
+    a1 = Rcov::CodeCoverageAnalyzer.new
+    a2 = Rcov::CodeCoverageAnalyzer.new
+
+    sample_file = File.join(File.dirname(__FILE__), "sample_02.rb")
+    load sample_file
+    
+    a1.run_hooked do 
+      100.times{ Rcov::Test::Temporary::Sample02.foo(1, 1) }
+      a2.run_hooked do
+        10.times{ Rcov::Test::Temporary::Sample02.foo(1, 1) }
+      end
+      100.times{ Rcov::Test::Temporary::Sample02.foo(1, 1) }
+    end
+
+    a2.run_hooked do
+      100.times{ Rcov::Test::Temporary::Sample02.foo(1, 1) }
+      10.times{ a1.run_hooked { Rcov::Test::Temporary::Sample02.foo(1, 1) } }
+    end
+
+    a1.install_hook
+    Rcov::Test::Temporary::Sample02.foo(1, 1)
+    a1.remove_hook
+
+    a2.install_hook
+    Rcov::Test::Temporary::Sample02.foo(1, 1)
+    a2.remove_hook
+
+    _, _, counts1 = a1.data(sample_file)
+    _, _, counts2 = a2.data(sample_file)
+    assert_equal([0, 221, 221, 221, 0], counts1)
+    assert_equal([0, 121, 121, 121, 0], counts2)
   end
 
   def test_compute_raw_difference
