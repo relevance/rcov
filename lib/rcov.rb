@@ -293,7 +293,7 @@ class FileStatistics
       return true
     end
     #FIXME: / matches regexps too
-    r = /(,|\.|\+|-|\*|\/|<|>|%|&&|\|\||<<|\(|\[|\{|=|and|or)\s*(?:#.*)?$/.match @lines[idx]
+    r = /(,|\.|\+|-|\*|\/|<|>|%|&&|\|\||<<|\(|\[|\{|=|and|or|\\)\s*(?:#.*)?$/.match @lines[idx]
     if /(do|\{)\s*\|.*\|\s*(?:#.*)?$/.match @lines[idx]
       return false
     end

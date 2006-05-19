@@ -244,6 +244,13 @@ class Test_FileStatistics < Test::Unit::TestCase
       0   baz
       0 }
     EOF
+    verify_everything_marked "escaped linebreaks", <<-EOF
+      1 def t2
+      0    puts \\
+      1      "foo"
+      0  end
+      0 end
+    EOF
   end
 
   def test_handle_multiple_block_end_delimiters_in_empty_line
