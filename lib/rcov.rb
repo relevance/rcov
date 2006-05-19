@@ -307,6 +307,16 @@ autoload :RCOV__, "rcov/lowlevel.rb"
 # A CodeCoverageAnalyzer is responsible for tracing code execution and
 # returning code coverage and execution count information.
 #
+# Note that you must <tt>require 'rcov'</tt> before the code you want to
+# analyze is parsed (i.e. before it gets loaded or required). You can
+# do that by either invoking ruby with the <tt>-rrcov</tt> command-line option or
+# just:
+#  require 'rcov'
+#  require 'mycode'
+#  # ....
+#
+# == Example
+#
 #  analyzer = Rcov::CodeCoverageAnalyzer.new
 #  analyzer.run_hooked do 
 #    do_foo  
