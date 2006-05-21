@@ -17,7 +17,6 @@ desc "Analyze code coverage of the unit tests."
 Rcov::RcovTask.new do |t|
   t.test_files = FileList['test/test*.rb']
   t.verbose = true
-  t.rcov_opts << "--text-report"
 end
 
 desc "Analyze code coverage for the FileStatistics class."

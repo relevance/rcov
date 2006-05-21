@@ -64,7 +64,7 @@ module Rcov
 
     # Array of commandline options to pass to rcov. An explicit
     # RCOVOPTS=opts on the command line will override this. (default
-    # is NONE)
+    # is <tt>["--text-report"]</tt>)
     attr_accessor :rcov_opts
 
     # Output directory for the XHTML report.
@@ -86,7 +86,7 @@ module Rcov
       @test_files = nil
       @verbose = false
       @warning = false
-      @rcov_opts = []
+      @rcov_opts = ["--text-report"]
       @ruby_opts = []
       @output_dir = "coverage"
       yield self if block_given?
