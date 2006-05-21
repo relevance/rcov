@@ -13,6 +13,9 @@ require 'rake/rdoctask'
 #   rake rcov RCOVPATH=/path/to/myrcov
 ENV["RCOVPATH"] = "bin/rcov"
 
+# The following task is largely equivalent to:
+#   Rcov::RcovTask.new
+# (really!)
 desc "Analyze code coverage of the unit tests."
 Rcov::RcovTask.new do |t|
   t.test_files = FileList['test/test*.rb']
