@@ -387,11 +387,12 @@ class CodeCoverageAnalyzer
   # collected in each #run_hooked or #install_hook/#remove_hook runs. You can
   # reset the data at any time with #reset to start from scratch.
   def data(filename)
+    raw_data = raw_data_relative
     unless @script_lines__.has_key?(filename) && 
-           raw_data_relative.has_key?(filename)
+           raw_data.has_key?(filename)
       return nil 
     end
-    refine_coverage_info(@script_lines__[filename], raw_data_relative[filename])
+    refine_coverage_info(@script_lines__[filename], raw_data[filename])
   end
 
   # Execute the code in the given block, monitoring it in order to gather
