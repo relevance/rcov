@@ -110,6 +110,17 @@ EOF
     10.times{ analyzer.run_hooked{ Rcov::Test::Temporary::Sample02.foo(1, 1) } }
     line_info, cov_info, count_info = analyzer.data(sample_file)
     assert_equal([0, 21, 21, 21, 0], count_info)
+
+    count_info2 = nil
+    10.times do |i|
+      analyzer.run_hooked do 
+        Rcov::Test::Temporary::Sample02.foo(1, 1)
+        line_info, cov_info, count_info = analyzer.data(sample_file) if i == 3
+        line_info2, cov_info2, count_info2 = analyzer.data(sample_file)
+      end
+    end
+    assert_equal([0, 25, 25, 25, 0], count_info)
+    assert_equal([0, 31, 31, 31, 0], count_info2)
   end
 
   def test_nested_analyzer_blocks

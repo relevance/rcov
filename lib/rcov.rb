@@ -424,6 +424,12 @@ class CodeCoverageAnalyzer
     end
     @end_raw_data = raw_data_absolute
     @cache_state = :done
+    # force computation of the stats for the traced code in this run;
+    # we cannot simply let it be if @@hook_level == 0 because 
+    # some other analyzer could install a hook, causing the raw_data_absolute
+    # to change again.
+    # TODO: lazy computation of raw_data_relative, only when the hook gets
+    # activated again.
     raw_data_relative
   end
 
@@ -435,6 +441,9 @@ class CodeCoverageAnalyzer
   def reset
     @@mutex.synchronize do
       if @@hook_level == 0
+        # Unfortunately there's no way to report this as covered with rcov:
+        # if we run the tests under rcov @@hook_level will be >= 1 !
+        # It is however executed when we run the tests normally.
         Rcov::RCOV__.reset
         @start_raw_data = @end_raw_data = {}
       else
@@ -471,8 +480,9 @@ class CodeCoverageAnalyzer
     when :wait
       return @aggregated_data
     when :hooked
-      new_diff = compute_raw_data_difference(@start_raw_data, 
-                                                       raw_data_absolute)
+      new_start = raw_data_absolute
+      new_diff = compute_raw_data_difference(@start_raw_data, new_start)
+      @start_raw_data = new_start
     when :done
       @cache_state = :wait
       new_diff = compute_raw_data_difference(@start_raw_data, 
