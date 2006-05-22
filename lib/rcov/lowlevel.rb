@@ -68,7 +68,7 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
     end
 
     def self.reset # :nodoc:
-      COVER.replace {}
+      COVER.replace({})
     end
 
     def self.generate_coverage_info # :nodoc:
