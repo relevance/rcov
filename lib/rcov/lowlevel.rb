@@ -52,11 +52,12 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
 
     def self.install_hook # :nodoc:
       set_trace_func lambda {|event, file, line, id, binding, klass|
+        next unless SCRIPT_LINES__.has_key? file
         case event
         when 'c-call', 'c-return', 'class'
           return
         end
-        COVER[file] ||= []
+        COVER[file] ||= Array.new(SCRIPT_LINES__[file].size, 0)
         COVER[file][line - 1] ||= 0
         COVER[file][line - 1] += 1
       }
@@ -71,7 +72,7 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
     end
 
     def self.generate_coverage_info # :nodoc:
-      COVER
+      Marshal.load(Marshal.dump(COVER))
     end
   end
 end # RCOV__
