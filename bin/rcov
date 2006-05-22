@@ -32,7 +32,6 @@ SCRIPT_LINES__ = {} unless defined? SCRIPT_LINES__
 require 'rcov/version'
 
 module Rcov
-EXEC_VERSION = "0.4.0"
 
 class Formatter
     ignore_files = [/\A#{Regexp.escape(Config::CONFIG["libdir"])}/, /\btc_[^.]*.rb/,
