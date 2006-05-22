@@ -684,7 +684,6 @@ end
 end # Rcov
 
 #{{{ only run if executed directly
-if __FILE__ == $0
 
 #{{{ "main" code
 options = OpenStruct.new
@@ -930,7 +929,6 @@ until pending_scripts.empty?
     load prog
 end
 
-end  # if __FILE__ == $0
 
 # xx-0.1.0-1 follows
 __END__
