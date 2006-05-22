@@ -433,7 +433,10 @@ EOS
             }
             body_ {
                 h3_{
-                    t_{ "#{title} generated on #{Time.new.to_s} with " }
+                    t_{ title }
+                }
+                p_ {
+                    t_{ "Generated on #{Time.new.to_s} with " }
                     a_(:href => Rcov::UPSTREAM_URL){ "rcov #{Rcov::VERSION}" }
                 }
                 p_ { "Threshold: #{@output_threshold}%" } if @output_threshold != 101
@@ -511,8 +514,9 @@ EOS
                 style_(:type => "text/css") { h_ { colorscale } }
             }
             body_ {
-                h3_{ 
-                    t_{ "#{default_title} generated on #{Time.new.to_s} with " }
+                h3_{ t_{ default_title } }
+                p_ {
+                    t_{ "Generated on #{Time.new.to_s} with " }
                     a_(:href => Rcov::UPSTREAM_URL){ "rcov #{Rcov::VERSION}" }
                 }
                 hr_
