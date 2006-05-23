@@ -379,8 +379,8 @@ EOS
                                     a_(:href => file_name(f.name)){ t_ { f.name } } 
                                 end
                             }
-                            [f.num_lines, f.num_lines].each do |value| 
-                                td_(:class => "value") { tt_{ f.num_lines } }
+                            [f.num_lines, f.num_code_lines].each do |value| 
+                                td_(:class => "value") { tt_{ value } }
                             end
                             [f.total_coverage, f.code_coverage].each do |value|
                                 value *= 100
