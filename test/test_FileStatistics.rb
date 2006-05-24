@@ -253,6 +253,20 @@ class Test_FileStatistics < Test::Unit::TestCase
     EOF
   end
 
+  def test_handle_multiline_expression_1st_line_ends_in_block_header
+    # excerpt taken from mongrel/handlers.rb
+    verify_everything_marked "multiline with block starting on 1st", <<-EOF
+    1 uris = listener.classifier.handler_map
+    0 results << table("handlers", uris.map {|uri,handlers| 
+    1  [uri, 
+    0    "<pre>" + 
+    1    handlers.map {|h| h.class.to_s }.join("\n") + 
+    0    "</pre>"
+    0  ]
+    1 })
+    EOF
+  end
+
   def test_handle_multiple_block_end_delimiters_in_empty_line
     verify_everything_marked "multiline with }) delimiter, forward", <<-EOF
       1 assert(@c.config == {

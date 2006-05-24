@@ -301,7 +301,18 @@ class FileStatistics
     end
     #FIXME: / matches regexps too
     r = /(,|\.|\+|-|\*|\/|<|>|%|&&|\|\||<<|\(|\[|\{|=|and|or|\\)\s*(?:#.*)?$/.match @lines[idx]
-    if /(do|\{)\s*\|.*\|\s*(?:#.*)?$/.match @lines[idx]
+    # try to see if a multi-line expression with opening, closing delimiters
+    # started on that line
+    [%w!( )!].each do |opening_str, closing_str| 
+      # conservative: only consider nesting levels opened in that line, not
+      # previous ones too.
+      # next regexp considers interpolation too
+      line = @lines[idx].gsub(/#(?![{$@]).*$/, "")
+      opened = line.scan(/#{Regexp.escape(opening_str)}/).size
+      closed = line.scan(/#{Regexp.escape(closing_str)}/).size
+      return true if opened - closed > 0
+    end
+    if /(do|\{)\s*\|[^|]*\|\s*(?:#.*)?$/.match @lines[idx]
       return false
     end
     r
