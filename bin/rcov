@@ -808,6 +808,10 @@ EOF
     opts.on("-w", "Turn warnings on (like ruby).") do
         $VERBOSE = true
     end
+    opts.on("--no-rcovrt", "Do not use the optimized C runtime.",
+            "(will run 30-300 times slower)") do 
+        $rcov_do_not_use_rcovrt = true
+    end
     opts.separator ""
     opts.on_tail("-h", "--help", "Show help message") do
         require 'pp'
