@@ -281,7 +281,47 @@ class Test_FileStatistics < Test::Unit::TestCase
       1 })
     EOF
   end
+  
+  STRING_DELIMITER_PAIRS = [
+    %w-%{ }-, %w-%q{ }-, %w-%Q{ }-, %w{%[ ]}, %w{%q[ ]}, 
+    %w{%( )}, %w{%Q( )}, %w{%Q[ ]}, %w{%q! !}, %w{%! !},
+  ]
+  
+  def test_multiline_strings_basic
+    STRING_DELIMITER_PAIRS.each do |s_delim, e_delim|
+      verify_everything_marked "multiline strings, basic #{s_delim}", <<-EOF
+        1 PATTERN_TEXT = #{s_delim}
+        0   NUMBERS       = 'one|two|three|four|five'
+        0   ON_OFF        = 'on|off'
+        0 #{e_delim}
+      EOF
+    end
+    STRING_DELIMITER_PAIRS.each do |s_delim, e_delim|
+      verify_marked_exactly "multiline strings, escaped #{s_delim}", [0], <<-EOF
+        1 PATTERN_TEXT = #{s_delim} foooo bar baz \\#{e_delim} baz #{e_delim}
+        0 NUMBERS       = 'one|two|three|four|five'
+        0 ON_OFF        = 'on|off'
+      EOF
 
+      verify_marked_exactly "multiline strings, #{s_delim}, interpolation", 
+                            [0], <<-EOF
+        1 PATTERN_TEXT = #{s_delim}  \#{#{s_delim} foo #{e_delim}} \\#{e_delim} baz #{e_delim}
+        0 NUMBERS       = 'one|two|three|four|five'
+        0 ON_OFF        = 'on|off'
+      EOF
+    end
+  end
+  
+  def test_multiline_strings_escaped_delimiter
+    STRING_DELIMITER_PAIRS.each do |s_delim, e_delim|
+      verify_everything_marked "multiline, escaped #{s_delim}", <<-EOF
+        1 PATTERN_TEXT = #{s_delim}  foo \\#{e_delim}
+        0   NUMBERS       = 'one|two|three|four|five'
+        0   ON_OFF        = 'on|off'
+        0 #{e_delim}
+      EOF
+    end
+  end
 
   def test_handle_multiline_expressions_with_heredocs
     verify_everything_marked "multiline and heredocs", <<-EOF

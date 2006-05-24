@@ -89,7 +89,9 @@ class FileStatistics
     # points to the line defining the heredoc identifier
     # but only if it was marked (we don't care otherwise)
     @heredoc_start = Array.new(lines.size, false)
+    @multiline_string_start = Array.new(lines.size, false)
     extend_heredocs
+    find_multiline_strings
     precompute_coverage false
   end
 
@@ -172,6 +174,36 @@ class FileStatistics
   end
 
   private
+
+  def find_multiline_strings
+    state = :awaiting_string
+    wanted_delimiter = nil
+    string_begin_line = 0
+    @lines.each_with_index do |line, i|
+      matching_delimiters = Hash.new{|h,k| k} 
+      matching_delimiters.update("{" => "}", "[" => "]", "(" => ")")
+      case state
+      when :awaiting_string
+        # very conservative, doesn't consider the last delimited string but
+        # only the very first one
+        if md = /^[^#]*%(?:[qQ])?(.)/.match(line)
+          wanted_delimiter = /(?!\\).#{Regexp.escape(matching_delimiters[md[1]])}/
+          # check if closed on the very same line
+          # conservative again, we might have several quoted strings with the
+          # same delimiter on the same line, leaving the last one open
+          unless wanted_delimiter.match(md.post_match)
+            state = :want_end_delimiter
+            string_begin_line = i
+          end
+        end
+      when :want_end_delimiter
+        @multiline_string_start[i] = string_begin_line
+        if wanted_delimiter.match(line)
+          state = :awaiting_string
+        end
+      end
+    end
+  end
 
   def precompute_coverage(comments_run_by_default = true)
     changed = false
@@ -285,6 +317,11 @@ class FileStatistics
     return false if lineno <= 0
     return false if lineno >= @lines.size
     found = false
+    if @multiline_string_start[lineno] && 
+      @multiline_string_start[lineno] < lineno
+      return true
+    end
+    # find index of previous code line
     idx = (lineno-1).downto(0) do |i|
       if @heredoc_start[i]
         found = true
@@ -300,7 +337,8 @@ class FileStatistics
       return true
     end
     #FIXME: / matches regexps too
-    r = /(,|\.|\+|-|\*|\/|<|>|%|&&|\|\||<<|\(|\[|\{|=|and|or|\\)\s*(?:#.*)?$/.match @lines[idx]
+    # the following regexp tries to reject #{interpolation}
+    r = /(,|\.|\+|-|\*|\/|<|>|%|&&|\|\||<<|\(|\[|\{|=|and|or|\\)\s*(?:#(?![{$@]).*)?$/.match @lines[idx]
     # try to see if a multi-line expression with opening, closing delimiters
     # started on that line
     [%w!( )!].each do |opening_str, closing_str| 
@@ -315,6 +353,7 @@ class FileStatistics
     if /(do|\{)\s*\|[^|]*\|\s*(?:#.*)?$/.match @lines[idx]
       return false
     end
+
     r
   end
 end
