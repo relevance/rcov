@@ -749,19 +749,31 @@ EOF
     opts.on("-i", "--include-file PATTERNS", 
             "Generate info for files matching a",
             "pattern (comma-separated regexp list)") do |list|
-                regexps = list.split(/,/).map{|x| Regexp.new(x) }
-                options.include += regexps
+                begin
+                    regexps = list.split(/,/).map{|x| Regexp.new(x) }
+                    options.include += regexps
+                rescue RegexpError => e
+                    raise OptionParser::InvalidArgument, e.message
+                end
             end
     opts.on("-x", "--exclude PATTERNS", 
             "Don't generate info for files matching a",
             "pattern (comma-separated regexp list)") do |list|
-                regexps = list.split(/,/).map{|x| Regexp.new x}
-                options.skip += regexps
+                begin
+                    regexps = list.split(/,/).map{|x| Regexp.new x}
+                    options.skip += regexps
+                rescue RegexpError => e
+                    raise OptionParser::InvalidArgument, e.message
+                end
             end
     opts.on("--exclude-only PATTERNS",
             "Skip info only for files matching the",
             "given patterns.") do |list|
-                options.skip = list.split(/,/).map{|x| Regexp.new(x) }
+                begin
+                    options.skip = list.split(/,/).map{|x| Regexp.new(x) }
+                rescue RegexpError => e
+                    raise OptionParser::InvalidArgument, e.message
+                end
             end
     opts.on("--rails", "Skip config/, environment/ and vendor/.") do 
         options.skip.concat [%r{\bvendor/},%r{\bconfig/},%r{\benvironment/}]
