@@ -1,6 +1,20 @@
 
 User-visible changes.
 
+Since 0.4.0 (2006-05-22)
+========================
+Features
+--------
+* more refinements in the heuristics: now several kinds of multi-line quoted
+  strings are handled properly
+
+Bugfixes
+--------
+* corrected the LOC counts in the XHTML summaries
+* pure-Ruby tracing module works again; was broken in 0.4.0
+* RcovTask#ruby_opts fixed; they were being passed to rcov instead of ruby
+
+
 Since 0.3.0 (2006-05-05)
 ========================
 
