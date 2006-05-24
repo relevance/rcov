@@ -7,6 +7,7 @@ Features
 --------
 * more refinements in the heuristics: now several kinds of multi-line quoted
   strings are handled properly
+* --include-file to specify files not to be ignored in the report(s)
 
 Bugfixes
 --------

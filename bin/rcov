@@ -37,11 +37,12 @@ class Formatter
     ignore_files = [/\A#{Regexp.escape(Config::CONFIG["libdir"])}/, /\btc_[^.]*.rb/,
         /_test\.rb\z/, /\btest\//, /\bvendor\//, /\A#{Regexp.escape(__FILE__)}\z/]
     DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false,
-                    :output_threshold => 101}
+                    :output_threshold => 101, :dont_ignore => []}
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
         @files = {}
         @ignore_files = options[:ignore]
+        @dont_ignore_files = options[:dont_ignore]
         @sort_criterium = case options[:sort]
             when :loc : lambda{|fname, finfo| finfo.num_code_lines}
             when :coverage : lambda{|fname, finfo| finfo.code_coverage}
@@ -55,7 +56,10 @@ class Formatter
         old_filename = filename
         filename = File.expand_path(filename).gsub(/^#{Regexp.escape(Dir.getwd)}\//, '')
         SCRIPT_LINES__[filename] = SCRIPT_LINES__[old_filename]
-        return nil if @ignore_files.any?{|x| x === filename}
+        if @ignore_files.any?{|x| x === filename} && 
+           !@dont_ignore_files.any?{|x| x === filename}
+            return nil
+        end
         if @files[filename]
             @files[filename].merge(lines, coverage, counts)
         else
@@ -694,6 +698,7 @@ options.destdir = nil
 options.loadpaths = []
 options.textmode = false
 options.skip = Rcov::Formatter::DEFAULT_OPTS[:ignore]
+options.include = []
 options.nohtml = false
 options.test_unit_only = false
 options.sort = :name
@@ -741,6 +746,12 @@ EOF
     opts.on("-n", "--no-color", "Create colorblind-safe output.") do
         options.color = false
     end
+    opts.on("-i", "--include-file PATTERNS", 
+            "Generate info for files matching a",
+            "pattern (comma-separated regexp list)") do |list|
+                regexps = list.split(/,/).map{|x| Regexp.new(x) }
+                options.include += regexps
+            end
     opts.on("-x", "--exclude PATTERNS", 
             "Don't generate info for files matching a",
             "pattern (comma-separated regexp list)") do |list|
@@ -855,7 +866,8 @@ formatters = []
 make_formatter = lambda do |klass| 
 klass.new(:destdir => options.destdir, :color => options.color, 
           :fsr => options.range, :textmode => options.textmode,
-          :ignore => options.skip, :sort => options.sort, 
+          :ignore => options.skip, :dont_ignore => options.include, 
+          :sort => options.sort, 
           :sort_reverse => options.sort_reverse, 
           :output_threshold => options.output_threshold)
 end
@@ -895,6 +907,7 @@ following expressions, and were thus ignored:
 
 You can solve this by doing one or more of the following:
 * rename the files not to be ignored so they don't match the above regexps
+* use --include-file to give a list of patterns for files not to be ignored
 * use --exclude-only to give the new list of regexps to match against
 * structure your code as follows:
       test/test_*.rb  for the test cases
