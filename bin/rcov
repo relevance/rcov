@@ -460,8 +460,10 @@ EOS
                 }
             }
         } }
+        lines = output.pretty.to_a
+        lines.unshift lines.pop if /DOCTYPE/ =~ lines[-1]
         File.open(destname, "w") do |f|
-            f.puts output.pretty
+            f.puts lines
         end
     end
 
@@ -569,8 +571,10 @@ Finally, here's a line marked as not executed.
                 }
             }
         } }
+        lines = output.pretty.to_a
+        lines.unshift lines.pop if /DOCTYPE/ =~ lines[-1]
         File.open(destfile, "w") do |f|
-            f.puts output
+            f.puts lines
         end
     end
 

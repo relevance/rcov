@@ -14,6 +14,8 @@ Bugfixes
 * corrected the LOC counts in the XHTML summaries
 * pure-Ruby tracing module works again; was broken in 0.4.0
 * RcovTask#ruby_opts fixed; they were being passed to rcov instead of ruby
+* solved the DOCTYPE issue (it'd get put at the end of the file under some
+  Ruby versions)
 
 
 Since 0.3.0 (2006-05-05)
