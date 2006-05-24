@@ -885,6 +885,28 @@ $rcov_code_coverage_analyzer = Rcov::CodeCoverageAnalyzer.new
 END {
     $rcov_code_coverage_analyzer.remove_hook
     $rcov_code_coverage_analyzer.dump_coverage_info(formatters)
+    if formatters.all?{|formatter| formatter.sorted_file_pairs.empty? }
+        require 'pp'
+        $stderr.puts <<-EOF
+
+No file to analyze was found. All the files loaded by rcov matched one of the
+following expressions, and were thus ignored:
+#{PP.pp(options.skip, "").chomp}
+
+You can solve this by doing one or more of the following:
+* rename the files not to be ignored so they don't match the above regexps
+* use --exclude-only to give the new list of regexps to match against
+* structure your code as follows:
+      test/test_*.rb  for the test cases
+      lib/**/*.rb     for the target source code whose coverage you want
+  making sure that the test/test_*.rb files are loading from lib/, e.g. by 
+  using the -Ilib command-line argument, adding  
+    $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
+  to test/test_*.rb, or running rcov via a Rakefile (read the RDoc
+  documentation or README.rake in the source distribution).
+EOF
+        exit(-1)
+    end
 }
 
 if options.test_unit_only

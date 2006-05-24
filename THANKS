@@ -14,3 +14,8 @@ Robert Feldt:
 Andre Nathan:
 * identified a bug in the heuristics: missing propagation for lines
   with only }, ), ]
+
+David Roberts: 
+* reported confusing behavior when all files are ignored because they match
+  a regexp in the reject list
+* tested the RubyGems package for win32
