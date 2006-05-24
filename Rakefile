@@ -18,12 +18,14 @@ ENV["RCOVPATH"] = "bin/rcov"
 # (really!)
 desc "Analyze code coverage of the unit tests."
 Rcov::RcovTask.new do |t|
+  t.libs << "ext/rcovrt"
   t.test_files = FileList['test/test*.rb']
   t.verbose = true
 end
 
 desc "Analyze code coverage for the FileStatistics class."
 Rcov::RcovTask.new(:rcov_sourcefile) do |t|
+  t.libs << "ext/rcovrt"
   t.test_files = FileList['test/test_FileStatistics.rb']
   t.verbose = true
   t.rcov_opts << "--test-unit-only"
@@ -31,17 +33,29 @@ Rcov::RcovTask.new(:rcov_sourcefile) do |t|
 end
 
 Rcov::RcovTask.new(:rcov_ccanalyzer) do |t|
+  t.libs << "ext/rcovrt"
   t.test_files = FileList['test/test_CodeCoverageAnalyzer.rb']
   t.verbose = true
   t.rcov_opts << "--test-unit-only"
   t.output_dir = "coverage.ccanalyzer"
 end
 
-desc "Run the unit tests."
-Rake::TestTask.new do |t|
+desc "Run the unit tests with rcovrt."
+Rake::TestTask.new(:test_rcovrt) do |t|
+  t.libs << "ext/rcovrt"
   t.test_files = FileList['test/test*.rb']
   t.verbose = true
 end
+
+desc "Run the unit tests in pure-Ruby mode ."
+Rake::TestTask.new(:test_pure_ruby) do |t|
+  t.libs << "ext/rcovrt"
+  t.test_files = FileList['test/turn_off_rcovrt.rb', 'test/test*.rb']
+  t.verbose = true
+end
+
+desc "Run the unit tests, both rcovrt and pure-Ruby modes"
+task :test => [:test_rcovrt, :test_pure_ruby]
 
 desc "Generate rdoc documentation for the rcov library"
 Rake::RDocTask.new("rdoc") { |rdoc|
