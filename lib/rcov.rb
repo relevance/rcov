@@ -430,6 +430,19 @@ class DifferentialAnalyzer
     end
   end
 
+  protected
+  def raw_data_absolute
+    raise "must be implemented by the subclass"
+  end
+
+  def aggregate_data(aggregated_data, delta)
+    raise "must be implemented by the subclass"
+  end
+
+  def compute_raw_data_difference(first, last)
+    raise "must be implemented by the subclass"
+  end
+
   private
   def raw_data_relative
     case @cache_state
@@ -654,6 +667,69 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
   end
 
 end # CodeCoverageAnalyzer
+
+class CallSiteAnalyzer < DifferentialAnalyzer
+  def initialize
+    super
+  end
+
+  def analyzed_classes
+    raw_data_relative.keys.map{|klass, meth| klass}.uniq.sort
+  end
+
+  def methods_for_class(classname)
+    a = raw_data_relative.keys.select{|kl,_| kl == classname}.map{|_,meth| meth}.sort
+    a.empty? ? nil : a
+  end
+  alias_method :analyzed_methods, :methods_for_class
+
+  def callsites(classname, methodname)
+    raw_data_relative[[classname, methodname]]
+  end
+
+  private
+  def raw_data_absolute
+    raw = RCOV__.generate_callsite_info
+    ret = {}
+    raw.each_pair do |(klass, method), hash|
+      begin  
+        ret[[klass.to_s, method.to_s]] = hash.clone # no deep cloning needed
+      rescue Exception
+      end
+    end
+
+    ret
+  end
+
+  def aggregate_data(aggregated_data, delta)
+    delta.each_pair do |(klass, method), hash|
+      dest_hash = (aggregated_data[[klass, method]] ||= {})
+      hash.each_pair do |callsite, count|
+        dest_hash[callsite] ||= 0
+        dest_hash[callsite] += count
+      end
+    end
+  end
+
+  def compute_raw_data_difference(first, last)
+    difference = {}
+    default = Hash.new(0)
+    last.each_pair do |(klass, method), hash|
+      old_hash = first[[klass, method]] || default
+      dest_hash = 
+      hash.each_pair do |callsite, count|
+        diff = hash[callsite] - (old_hash[callsite] || 0)
+        if diff > 0
+          difference[[klass, method]] ||= {}
+          difference[[klass, method]][callsite] = diff
+        end
+      end
+    end
+    
+    difference
+  end
+
+end
 
 end # Rcov
 

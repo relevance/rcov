@@ -17,6 +17,7 @@ module Rcov
   # stable interface.
 module RCOV__
   COVER = {}
+  CALLSITES = {}
   pure_ruby_impl_needed = true
   unless defined? $rcov_do_not_use_rcovrt 
     begin
@@ -50,7 +51,8 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
   end
 
   if pure_ruby_impl_needed
-    methods = %w[install_hook remove_hook reset generate_coverage_info]
+    methods = %w[install_hook remove_hook reset generate_coverage_info
+                 generate_callsite_info]
     sklass = class << self; self end
     (methods & sklass.instance_methods).each do |meth|
       sklass.class_eval{ remove_method meth }
@@ -60,6 +62,14 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
       set_trace_func lambda {|event, file, line, id, binding, klass|
         next unless SCRIPT_LINES__.has_key? file
         case event
+        when 'call'
+          caller_arr = caller[1,1]
+          begin
+            hash = CALLSITES[[klass.to_s, id.to_s]] ||= {}
+            hash[caller_arr] ||= 0
+            hash[caller_arr] += 1
+          rescue Exception
+          end
         when 'c-call', 'c-return', 'class'
           return
         end
@@ -75,10 +85,15 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
 
     def self.reset # :nodoc:
       COVER.replace({})
+      CALLSITES.replace({})
     end
 
     def self.generate_coverage_info # :nodoc:
       Marshal.load(Marshal.dump(COVER))
+    end
+
+    def self.generate_callsite_info # :nodoc:
+      Marshal.load(Marshal.dump(CALLSITES))
     end
   end
 end # RCOV__
