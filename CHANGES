@@ -17,6 +17,9 @@ Bugfixes
 * solved the DOCTYPE issue (it'd get put at the end of the file under some
   Ruby versions)
 
+Minor enhancements
+------------------
+* slightly more readable XHTML reports, esp. for IE
 
 Since 0.3.0 (2006-05-05)
 ========================

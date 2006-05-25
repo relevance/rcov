@@ -246,7 +246,8 @@ h5 {
 div.separator {
     height: 10px;
 }
-
+/* Commented out for better readability, esp. on IE */
+/*
 table tr td, table tr th {
     font-size: 68%;
 }
@@ -254,6 +255,7 @@ table tr td, table tr th {
 td.value table tr td {
     font-size: 11px;
 }
+*/
 
 table.percent_graph {
     height: 12px;

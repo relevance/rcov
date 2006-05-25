@@ -19,3 +19,8 @@ David Roberts:
 * reported confusing behavior when all files are ignored because they match
   a regexp in the reject list
 * tested the RubyGems package for win32
+
+John-Mason Shackelford:
+* reported an important bug in the pure-Ruby tracer module, which broke it
+  altogether in 0.4.0
+* suggested a change in the CSS to make XHTML reports more readable under IE
