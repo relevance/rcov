@@ -20,6 +20,7 @@ Bugfixes
 Minor enhancements
 ------------------
 * slightly more readable XHTML reports, esp. for IE
+* text reports fit in 79 columns so they look OK with cmd.exe
 
 Since 0.3.0 (2006-05-05)
 ========================
