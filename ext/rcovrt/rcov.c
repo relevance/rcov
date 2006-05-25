@@ -201,7 +201,7 @@ cov_generate_coverage_info(VALUE self)
 }
 
 static VALUE
-cov_generate_tracer_info(VALUE self)
+cov_generate_callsite_info(VALUE self)
 {
   return caller_info;
 }
@@ -274,8 +274,8 @@ Init_rcovrt()
  rb_define_singleton_method(mRCOV__, "remove_hook", cov_remove_hook, 0);
  rb_define_singleton_method(mRCOV__, "generate_coverage_info", 
 		 cov_generate_coverage_info, 0);
- rb_define_singleton_method(mRCOV__, "generate_tracer_info", 
-		 cov_generate_tracer_info, 0);
+ rb_define_singleton_method(mRCOV__, "generate_callsite_info", 
+		 cov_generate_callsite_info, 0);
  rb_define_singleton_method(mRCOV__, "reset", cov_reset, 0);
  rb_define_singleton_method(mRCOV__, "ABI", cov_ABI, 0);
 }
