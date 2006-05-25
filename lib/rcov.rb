@@ -361,6 +361,97 @@ end
 
 autoload :RCOV__, "rcov/lowlevel.rb"
 
+class DifferentialAnalyzer
+  @@hook_level = 0
+  require 'thread'
+  @@mutex = Mutex.new
+
+  def initialize
+    @cache_state = :wait
+    @start_raw_data = {}
+    @end_raw_data = {}
+    @aggregated_data = {}
+  end
+
+  # Execute the code in the given block, monitoring it in order to gather
+  # information about which code was executed.
+  def run_hooked
+    install_hook
+    yield
+  ensure
+    remove_hook
+  end
+
+  # Start monitoring execution to gather information. Such data will be
+  # collected until #remove_hook is called.
+  #
+  # Use #run_hooked instead if possible.
+  def install_hook
+    @start_raw_data = raw_data_absolute
+    Rcov::RCOV__.install_hook
+    @cache_state = :hooked
+    @@mutex.synchronize{ @@hook_level += 1 }
+  end
+
+  # Stop collecting information.
+  # #remove_hook will also stop collecting info if it is run inside a
+  # #run_hooked block.
+  def remove_hook
+    @@mutex.synchronize do 
+      @@hook_level -= 1
+      Rcov::RCOV__.remove_hook if @@hook_level == 0
+    end
+    @end_raw_data = raw_data_absolute
+    @cache_state = :done
+    # force computation of the stats for the traced code in this run;
+    # we cannot simply let it be if @@hook_level == 0 because 
+    # some other analyzer could install a hook, causing the raw_data_absolute
+    # to change again.
+    # TODO: lazy computation of raw_data_relative, only when the hook gets
+    # activated again.
+    raw_data_relative
+  end
+
+  # Remove the data collected so far. Further collection will start from
+  # scratch.
+  def reset
+    @@mutex.synchronize do
+      if @@hook_level == 0
+        # Unfortunately there's no way to report this as covered with rcov:
+        # if we run the tests under rcov @@hook_level will be >= 1 !
+        # It is however executed when we run the tests normally.
+        Rcov::RCOV__.reset
+        @start_raw_data = @end_raw_data = {}
+      else
+        @start_raw_data = @end_raw_data = raw_data_absolute
+      end
+      @raw_data_relative = {}
+      @aggregated_data = {}
+    end
+  end
+
+  private
+  def raw_data_relative
+    case @cache_state
+    when :wait
+      return @aggregated_data
+    when :hooked
+      new_start = raw_data_absolute
+      new_diff = compute_raw_data_difference(@start_raw_data, new_start)
+      @start_raw_data = new_start
+    when :done
+      @cache_state = :wait
+      new_diff = compute_raw_data_difference(@start_raw_data, 
+                                             @end_raw_data)
+    end
+
+    aggregate_data(@aggregated_data, new_diff)
+
+    @aggregated_data
+  end
+  
+end
+
 # A CodeCoverageAnalyzer is responsible for tracing code execution and
 # returning code coverage and execution count information.
 #
@@ -407,17 +498,10 @@ autoload :RCOV__, "rcov/lowlevel.rb"
 # manually: just don't do
 #   lines, coverage, counts = analyzer.data("/path/to/lib/rcov.rb")
 # if you're not interested in that information.
-class CodeCoverageAnalyzer
-  @@hook_level = 0
-  require 'thread'
-  @@mutex = Mutex.new
-  
+class CodeCoverageAnalyzer < DifferentialAnalyzer
   def initialize
     @script_lines__ = SCRIPT_LINES__
-    @cache_state = :wait
-    @start_raw_data = {}
-    @end_raw_data = {}
-    @aggregated_data = {}
+    super
   end
   
   # Return an array with the names of the files whose code was executed inside
@@ -454,63 +538,25 @@ class CodeCoverageAnalyzer
 
   # Execute the code in the given block, monitoring it in order to gather
   # information about which code was executed.
-  def run_hooked
-    install_hook
-    yield
-  ensure
-    remove_hook
-  end
+  def run_hooked; super end
 
   # Start monitoring execution to gather code coverage and execution count
   # information. Such data will be collected until #remove_hook is called.
   #
   # Use #run_hooked instead if possible.
-  def install_hook
-    @start_raw_data = raw_data_absolute
-    Rcov::RCOV__.install_hook
-    @cache_state = :hooked
-    @@mutex.synchronize{ @@hook_level += 1 }
-  end
+  def install_hook; super end
 
   # Stop collecting code coverage and execution count information.
   # #remove_hook will also stop collecting info if it is run inside a
   # #run_hooked block.
-  def remove_hook
-    @@mutex.synchronize do 
-      @@hook_level -= 1
-      Rcov::RCOV__.remove_hook if @@hook_level == 0
-    end
-    @end_raw_data = raw_data_absolute
-    @cache_state = :done
-    # force computation of the stats for the traced code in this run;
-    # we cannot simply let it be if @@hook_level == 0 because 
-    # some other analyzer could install a hook, causing the raw_data_absolute
-    # to change again.
-    # TODO: lazy computation of raw_data_relative, only when the hook gets
-    # activated again.
-    raw_data_relative
-  end
+  def remove_hook; super end
 
   # Remove the data collected so far. The coverage and execution count
   # "history" will be erased, and further collection will start from scratch:
   # no code is considered executed, and therefore all execution counts are 0.
   # Right after #reset, #analyzed_files will return an empty array, and
   # #data(filename) will return nil.
-  def reset
-    @@mutex.synchronize do
-      if @@hook_level == 0
-        # Unfortunately there's no way to report this as covered with rcov:
-        # if we run the tests under rcov @@hook_level will be >= 1 !
-        # It is however executed when we run the tests normally.
-        Rcov::RCOV__.reset
-        @start_raw_data = @end_raw_data = {}
-      else
-        @start_raw_data = @end_raw_data = raw_data_absolute
-      end
-      @raw_data_relative = {}
-      @aggregated_data = {}
-    end
-  end
+  def reset; super end
 
   def dump_coverage_info(formatters) # :nodoc:
     raw_data_relative.each do |file, lines|
@@ -533,26 +579,11 @@ class CodeCoverageAnalyzer
     Rcov::RCOV__.generate_coverage_info
   end
 
-  def raw_data_relative
-    case @cache_state
-    when :wait
-      return @aggregated_data
-    when :hooked
-      new_start = raw_data_absolute
-      new_diff = compute_raw_data_difference(@start_raw_data, new_start)
-      @start_raw_data = new_start
-    when :done
-      @cache_state = :wait
-      new_diff = compute_raw_data_difference(@start_raw_data, 
-                                             @end_raw_data)
-    end
-
-    new_diff.each_pair do |file, cov_arr|
-      dest = (@aggregated_data[file] ||= Array.new(cov_arr.size, 0))
+  def aggregate_data(aggregated_data, delta)
+    delta.each_pair do |file, cov_arr|
+      dest = (aggregated_data[file] ||= Array.new(cov_arr.size, 0))
       cov_arr.each_with_index{|x,i| dest[i] += x}
     end
-
-    @aggregated_data
   end
 
   def compute_raw_data_difference(first, last)
