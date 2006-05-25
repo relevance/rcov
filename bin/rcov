@@ -528,33 +528,15 @@ EOS
                 }
                 hr_
                 if do_ctable
-                    pre_ {
-                        span_(:class => "marked0") { t_ { <<-EOS
-Code reported as executed by Ruby looks like this...
-                        EOS
-                        } }
-                        span_(:class => "marked1") { t_ { <<-EOS
-and this: this line is also marked as covered.
-                        EOS
-                        } }
-                        span_(:class => "inferred0") { t_ { <<-EOS
-Lines considered as run by rcov, but not reported by Ruby, look like this,
-                        EOS
-                        } }
-                        span_(:class => "inferred1") { t_ { <<-EOS
-and this: these lines were inferred by rcov (using simple heuristics).
-                        EOS
-#Ruby doesn't signal all the events it could in multi-line statements: for 
-#instance, an 'end' block/class/module/method terminator will not be reported
-#as run (and sure enough no event is reported for blank lines). rcov uses some
-#heuristics to infer which lines have actually been executed (for a broad
-#definition which comprises blank lines and comments) to cope with that.
-#These heuristics are far from perfect and represent work in progress.
-                        } }
-                        span_(:class => "uncovered0") { t_ { <<-EOS
-Finally, here's a line marked as not executed.
-                        EOS
-                        } }
+                    # this kludge needed to ensure .pretty doesn't mangle it
+                    x_ { <<EOS
+<pre><span class='marked0'>Code reported as executed by Ruby looks like this...
+</span><span class='marked1'>and this: this line is also marked as covered.
+</span><span class='inferred0'>Lines considered as run by rcov, but not reported by Ruby, look like this,
+</span><span class='inferred1'>and this: these lines were inferred by rcov (using simple heuristics).
+</span><span class='uncovered0'>Finally, here&apos;s a line marked as not executed.
+</span></pre>                       
+EOS
                     }
                 end
                 x_{ body }
@@ -573,8 +555,8 @@ Finally, here's a line marked as not executed.
                 }
             }
         } }
-        # don't use .pretty since it'd mess all our <pre> blocks!
-        lines = output.to_a
+        # .pretty needed to make sure DOCTYPE is in a separate line
+        lines = output.pretty.to_a
         lines.unshift lines.pop if /DOCTYPE/ =~ lines[-1]
         File.open(destfile, "w") do |f|
             f.puts lines
