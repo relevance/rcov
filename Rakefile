@@ -41,10 +41,15 @@ Rcov::RcovTask.new(:rcov_ccanalyzer) do |t|
 end
 
 desc "Run the unit tests with rcovrt."
-Rake::TestTask.new(:test_rcovrt) do |t|
+Rake::TestTask.new(:test_rcovrt => ["ext/rcovrt/rcovrt.so"]) do |t|
   t.libs << "ext/rcovrt"
   t.test_files = FileList['test/test*.rb']
   t.verbose = true
+end
+
+file "ext/rcovrt/rcovrt.so" => "ext/rcovrt/rcov.c" do
+  ruby "setup.rb config"
+  ruby "setup.rb setup"
 end
 
 desc "Run the unit tests in pure-Ruby mode ."
