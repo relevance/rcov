@@ -573,7 +573,8 @@ Finally, here's a line marked as not executed.
                 }
             }
         } }
-        lines = output.pretty.to_a
+        # don't use .pretty since it'd mess all our <pre> blocks!
+        lines = output.to_a
         lines.unshift lines.pop if /DOCTYPE/ =~ lines[-1]
         File.open(destfile, "w") do |f|
             f.puts lines
