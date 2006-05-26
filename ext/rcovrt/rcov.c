@@ -25,7 +25,13 @@ struct cov_array {
 static struct cov_array *cached_array = 0;
 static char *cached_file = 0; 
 
+typedef struct {
+        char *sourcefile;
+        unsigned int sourceline;
+        VALUE curr_meth;
+} type_def_site;       
 static VALUE caller_info = 0;
+static VALUE method_def_site_info = 0;
 
 static caller_stack_len = 1;
 
@@ -48,7 +54,8 @@ record_callsite_info(VALUE args)
   curr_meth = pargs[1];
   count_hash = rb_hash_aref(caller_info, curr_meth);
   if(TYPE(count_hash) != T_HASH) { 
-          /* Qnil, anything else should be impossible */
+          /* Qnil, anything else should be impossible unless somebody's been
+           * messing with ObjectSpace */
           count_hash = rb_hash_new();
           rb_hash_aset(caller_info, curr_meth, count_hash);
   }
@@ -57,10 +64,37 @@ record_callsite_info(VALUE args)
           count = INT2FIX(0);
   count = INT2FIX(FIX2UINT(count) + 1);
   rb_hash_aset(count_hash, caller_ary, count);
+  /*
+  printf("CALLSITE: %s -> %s   %d\n", RSTRING(rb_inspect(curr_meth))->ptr,
+                  RSTRING(rb_inspect(caller_ary))->ptr, FIX2INT(count));
+  */
 
   return Qnil;
 }
 
+
+static VALUE
+record_method_def_site(VALUE args)
+{
+  type_def_site *pargs = (type_def_site *)args;
+  VALUE def_site_info;
+  VALUE hash;
+
+  if( RTEST(rb_hash_aref(method_def_site_info, pargs->curr_meth)) )
+          return Qnil;
+  def_site_info = rb_ary_new();
+  rb_ary_push(def_site_info, rb_str_new2(pargs->sourcefile));
+  rb_ary_push(def_site_info, INT2NUM(pargs->sourceline+1));
+  rb_hash_aset(method_def_site_info, pargs->curr_meth, def_site_info);
+  /*
+  printf("DEFSITE: %s:%d  for %s\n", pargs->sourcefile, pargs->sourceline+1,
+                  RSTRING(rb_inspect(pargs->curr_meth))->ptr);
+  */
+  
+  return Qnil;
+}
+
+  
 static void
 coverage_event_callsite_hook(rb_event_t event, NODE *node, VALUE self, 
                 ID mid, VALUE klass)
@@ -69,6 +103,7 @@ coverage_event_callsite_hook(rb_event_t event, NODE *node, VALUE self,
  VALUE aref_args[2];
  VALUE curr_meth;
  VALUE args[2];
+ int status;
 
  caller_ary = rb_funcall(rb_mKernel, id_caller, 0);
  aref_args[0] = INT2FIX(0);
@@ -81,7 +116,15 @@ coverage_event_callsite_hook(rb_event_t event, NODE *node, VALUE self,
 
  args[0] = caller_ary;
  args[1] = curr_meth;
- rb_protect(record_callsite_info, (VALUE)args, 0);
+ rb_protect(record_callsite_info, (VALUE)args, &status);
+ if(!status && node) {
+         type_def_site args;        
+         
+         args.sourcefile = node->nd_file;
+         args.sourceline = nd_line(node) - 1;
+         args.curr_meth = curr_meth;
+         rb_protect(record_method_def_site, (VALUE)&args, 0);
+ }
 }
 
 
@@ -117,7 +160,12 @@ cov_remove_callsite_hook(VALUE self)
 static VALUE
 cov_generate_callsite_info(VALUE self)
 {
-  return caller_info;
+  VALUE ret;
+
+  ret = rb_ary_new();
+  rb_ary_push(ret, caller_info);
+  rb_ary_push(ret, method_def_site_info);
+  return ret;
 }
 
 
@@ -131,6 +179,7 @@ cov_reset_callsite(VALUE self)
   }
 
   caller_info = rb_hash_new();
+  method_def_site_info = rb_hash_new();
   return Qnil;
 }
 
@@ -328,7 +377,9 @@ Init_rcovrt()
  }
 
  caller_info = rb_hash_new();
+ method_def_site_info = rb_hash_new();
  rb_gc_register_address(&caller_info);
+ rb_gc_register_address(&method_def_site_info);
 
  coverage_hook_set_p = 0;
 

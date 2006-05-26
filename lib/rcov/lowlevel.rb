@@ -18,6 +18,7 @@ module Rcov
 module RCOV__
   COVER = {}
   CALLSITES = {}
+  DEFSITES = {}
   pure_ruby_impl_needed = true
   unless defined? $rcov_do_not_use_rcovrt 
     begin
@@ -77,6 +78,10 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
         case event
         when 'call'
           if @callsite_hook_activated
+            begin
+              DEFSITES[[klass.to_s, id.to_s]] = [file, line]
+            rescue Exception
+            end
             caller_arr = caller[1,1]
             begin
               hash = CALLSITES[[klass.to_s, id.to_s]] ||= {}
@@ -112,6 +117,7 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
 
     def self.reset_callsite # :nodoc:
       CALLSITES.replace({})
+      DEFSITES.replace({})
     end
 
     def self.generate_coverage_info # :nodoc:
@@ -119,7 +125,7 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
     end
 
     def self.generate_callsite_info # :nodoc:
-      Marshal.load(Marshal.dump(CALLSITES))
+      [CALLSITES, DEFSITES]
     end
   end
 end # RCOV__

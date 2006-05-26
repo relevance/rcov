@@ -367,9 +367,9 @@ class DifferentialAnalyzer
 
   def initialize(install_hook_meth, remove_hook_meth, reset_meth)
     @cache_state = :wait
-    @start_raw_data = {}
-    @end_raw_data = {}
-    @aggregated_data = {}
+    @start_raw_data = data_default
+    @end_raw_data = data_default
+    @aggregated_data = data_default
     @install_hook_meth = install_hook_meth
     @remove_hook_meth= remove_hook_meth
     @reset_meth= reset_meth
@@ -423,16 +423,22 @@ class DifferentialAnalyzer
         # if we run the tests under rcov self.class.hook_level will be >= 1 !
         # It is however executed when we run the tests normally.
         Rcov::RCOV__.send(@reset_meth)
-        @start_raw_data = @end_raw_data = {}
+        @start_raw_data = data_default
+        @end_raw_data = data_default
       else
         @start_raw_data = @end_raw_data = raw_data_absolute
       end
-      @raw_data_relative = {}
-      @aggregated_data = {}
+      @raw_data_relative = data_default
+      @aggregated_data = data_default
     end
   end
 
   protected
+
+  def data_default
+    raise "must be implemented by the subclass"
+  end
+    
   def self.hook_level
     raise "must be implemented by the subclass"
   end
@@ -600,6 +606,8 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
 
   private
 
+  def data_default; {} end
+
   def raw_data_absolute
     Rcov::RCOV__.generate_coverage_info
   end
@@ -692,49 +700,67 @@ class CallSiteAnalyzer < DifferentialAnalyzer
   end
 
   def analyzed_classes
-    raw_data_relative.keys.map{|klass, meth| klass}.uniq.sort
+    raw_data_relative.first.keys.map{|klass, meth| klass}.uniq.sort
   end
 
   def methods_for_class(classname)
-    a = raw_data_relative.keys.select{|kl,_| kl == classname}.map{|_,meth| meth}.sort
+    a = raw_data_relative.first.keys.select{|kl,_| kl == classname}.map{|_,meth| meth}.sort
     a.empty? ? nil : a
   end
   alias_method :analyzed_methods, :methods_for_class
 
   def callsites(classname, methodname)
-    raw_data_relative[[classname, methodname]]
+    raw_data_relative.first[[classname, methodname]]
+  end
+
+  def defsite(classname, methodname)
+    raw_data_relative[1][[classname, methodname]]
   end
 
   private
+
+  def data_default; [{}, {}] end
+
   def raw_data_absolute
-    raw = RCOV__.generate_callsite_info
-    ret = {}
+    raw, method_def_site = RCOV__.generate_callsite_info
+    ret1 = {}
+    ret2 = {}
     raw.each_pair do |(klass, method), hash|
       begin  
-        ret[[klass.to_s, method.to_s]] = hash.clone # no deep cloning needed
+        key = [klass.to_s, method.to_s]
+        ret1[key] = hash.clone # no deep cloning needed
+        ret2[key] = method_def_site[[klass, method]]
       rescue Exception
       end
     end
-
-    ret
+    
+    [ret1, ret2]
   end
 
   def aggregate_data(aggregated_data, delta)
-    delta.each_pair do |(klass, method), hash|
-      dest_hash = (aggregated_data[[klass, method]] ||= {})
+    callsites1, defsites1 = aggregated_data
+    callsites2, defsites2 = delta
+    
+    callsites2.each_pair do |(klass, method), hash|
+      dest_hash = (callsites1[[klass, method]] ||= {})
       hash.each_pair do |callsite, count|
         dest_hash[callsite] ||= 0
         dest_hash[callsite] += count
       end
     end
+
+    defsites1.update(defsites2)
   end
 
   def compute_raw_data_difference(first, last)
     difference = {}
     default = Hash.new(0)
-    last.each_pair do |(klass, method), hash|
-      old_hash = first[[klass, method]] || default
-      dest_hash = 
+
+    callsites1, defsites1 = *first
+    callsites2, defsites2 = *last
+    
+    callsites2.each_pair do |(klass, method), hash|
+      old_hash = callsites1[[klass, method]] || default
       hash.each_pair do |callsite, count|
         diff = hash[callsite] - (old_hash[callsite] || 0)
         if diff > 0
@@ -744,7 +770,7 @@ class CallSiteAnalyzer < DifferentialAnalyzer
       end
     end
     
-    difference
+    [difference, defsites1.update(defsites2)]
   end
 
 end
