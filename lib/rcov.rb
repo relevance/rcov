@@ -362,15 +362,17 @@ end
 autoload :RCOV__, "rcov/lowlevel.rb"
 
 class DifferentialAnalyzer
-  @@hook_level = 0
   require 'thread'
   @@mutex = Mutex.new
 
-  def initialize
+  def initialize(install_hook_meth, remove_hook_meth, reset_meth)
     @cache_state = :wait
     @start_raw_data = {}
     @end_raw_data = {}
     @aggregated_data = {}
+    @install_hook_meth = install_hook_meth
+    @remove_hook_meth= remove_hook_meth
+    @reset_meth= reset_meth
   end
 
   # Execute the code in the given block, monitoring it in order to gather
@@ -388,9 +390,9 @@ class DifferentialAnalyzer
   # Use #run_hooked instead if possible.
   def install_hook
     @start_raw_data = raw_data_absolute
-    Rcov::RCOV__.install_hook
+    Rcov::RCOV__.send(@install_hook_meth)
     @cache_state = :hooked
-    @@mutex.synchronize{ @@hook_level += 1 }
+    @@mutex.synchronize{ self.class.hook_level += 1 }
   end
 
   # Stop collecting information.
@@ -398,13 +400,13 @@ class DifferentialAnalyzer
   # #run_hooked block.
   def remove_hook
     @@mutex.synchronize do 
-      @@hook_level -= 1
-      Rcov::RCOV__.remove_hook if @@hook_level == 0
+      self.class.hook_level -= 1
+      Rcov::RCOV__.send(@remove_hook_meth) if self.class.hook_level == 0
     end
     @end_raw_data = raw_data_absolute
     @cache_state = :done
     # force computation of the stats for the traced code in this run;
-    # we cannot simply let it be if @@hook_level == 0 because 
+    # we cannot simply let it be if self.class.hook_level == 0 because 
     # some other analyzer could install a hook, causing the raw_data_absolute
     # to change again.
     # TODO: lazy computation of raw_data_relative, only when the hook gets
@@ -416,11 +418,11 @@ class DifferentialAnalyzer
   # scratch.
   def reset
     @@mutex.synchronize do
-      if @@hook_level == 0
+      if self.class.hook_level == 0
         # Unfortunately there's no way to report this as covered with rcov:
-        # if we run the tests under rcov @@hook_level will be >= 1 !
+        # if we run the tests under rcov self.class.hook_level will be >= 1 !
         # It is however executed when we run the tests normally.
-        Rcov::RCOV__.reset
+        Rcov::RCOV__.send(@reset_meth)
         @start_raw_data = @end_raw_data = {}
       else
         @start_raw_data = @end_raw_data = raw_data_absolute
@@ -431,6 +433,10 @@ class DifferentialAnalyzer
   end
 
   protected
+  def self.hook_level
+    raise "must be implemented by the subclass"
+  end
+
   def raw_data_absolute
     raise "must be implemented by the subclass"
   end
@@ -512,9 +518,15 @@ end
 #   lines, coverage, counts = analyzer.data("/path/to/lib/rcov.rb")
 # if you're not interested in that information.
 class CodeCoverageAnalyzer < DifferentialAnalyzer
+  @hook_level = 0
+  # defined this way instead of attr_accessor so that it's covered
+  def self.hook_level; @hook_level end         # :nodoc:
+  def self.hook_level=(x); @hook_level = x end # :nodoc: 
+
   def initialize
     @script_lines__ = SCRIPT_LINES__
-    super
+    super(:install_coverage_hook, :remove_coverage_hook,
+          :reset_coverage)
   end
   
   # Return an array with the names of the files whose code was executed inside
@@ -669,8 +681,14 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
 end # CodeCoverageAnalyzer
 
 class CallSiteAnalyzer < DifferentialAnalyzer
+  @hook_level = 0
+  # defined this way instead of attr_accessor so that it's covered
+  def self.hook_level; @hook_level end         # :nodoc:
+  def self.hook_level=(x); @hook_level = x end # :nodoc: 
+
   def initialize
-    super
+    super(:install_callsite_hook, :remove_callsite_hook,
+          :reset_callsite)
   end
 
   def analyzed_classes

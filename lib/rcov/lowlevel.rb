@@ -51,40 +51,66 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
   end
 
   if pure_ruby_impl_needed
-    methods = %w[install_hook remove_hook reset generate_coverage_info
-                 generate_callsite_info]
+    methods = %w[install_coverage_hook remove_coverage_hook reset_coverage 
+                 install_callsite_hook remove_callsite_hook reset_callsite 
+                 generate_coverage_info generate_callsite_info]
     sklass = class << self; self end
     (methods & sklass.instance_methods).each do |meth|
       sklass.class_eval{ remove_method meth }
     end
+    
+    @coverage_hook_activated = @callsite_hook_activated = false
 
-    def self.install_hook # :nodoc:
+    def self.install_coverage_hook # :nodoc:
+      install_common_hook
+      @coverage_hook_activated = true
+    end
+    
+    def self.install_callsite_hook # :nodoc:
+      install_common_hook
+      @callsite_hook_activated = true
+    end
+    
+    def self.install_common_hook # :nodoc:
       set_trace_func lambda {|event, file, line, id, binding, klass|
         next unless SCRIPT_LINES__.has_key? file
         case event
         when 'call'
-          caller_arr = caller[1,1]
-          begin
-            hash = CALLSITES[[klass.to_s, id.to_s]] ||= {}
-            hash[caller_arr] ||= 0
-            hash[caller_arr] += 1
-          rescue Exception
+          if @callsite_hook_activated
+            caller_arr = caller[1,1]
+            begin
+              hash = CALLSITES[[klass.to_s, id.to_s]] ||= {}
+              hash[caller_arr] ||= 0
+              hash[caller_arr] += 1
+            rescue Exception
+            end
           end
         when 'c-call', 'c-return', 'class'
           return
         end
-        COVER[file] ||= Array.new(SCRIPT_LINES__[file].size, 0)
-        COVER[file][line - 1] ||= 0
-        COVER[file][line - 1] += 1
+        if @coverage_hook_activated
+          COVER[file] ||= Array.new(SCRIPT_LINES__[file].size, 0)
+          COVER[file][line - 1] ||= 0
+          COVER[file][line - 1] += 1
+        end
       }
     end
 
-    def self.remove_hook # :nodoc:
-      set_trace_func(nil)
+    def self.remove_coverage_hook # :nodoc:
+      @coverage_hook_activated = false
+      set_trace_func(nil) if !@callsite_hook_activated
+    end
+    
+    def self.remove_callsite_hook # :nodoc:
+      @callsite_hook_activated = false
+      set_trace_func(nil) if !@coverage_hook_activated
     end
 
-    def self.reset # :nodoc:
+    def self.reset_coverage # :nodoc:
       COVER.replace({})
+    end
+
+    def self.reset_callsite # :nodoc:
       CALLSITES.replace({})
     end
 

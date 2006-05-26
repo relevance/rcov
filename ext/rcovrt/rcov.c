@@ -4,8 +4,8 @@
 #include <st.h>
 #include <stdlib.h>
 
-#define RCOVRT_VERSION_MAJOR 0
-#define RCOVRT_VERSION_MINOR 2
+#define RCOVRT_VERSION_MAJOR 1
+#define RCOVRT_VERSION_MINOR 0
 #define RCOVRT_VERSION_REV   0
 
 static VALUE mRcov;
@@ -14,7 +14,8 @@ static VALUE oSCRIPT_LINES__;
 static ID id_cover;
 static VALUE id_caller = 0;
 static st_table* coverinfo = 0;
-static char hook_set_p;
+static char coverage_hook_set_p;
+static char callsite_hook_set_p;
 
 struct cov_array {
         unsigned int len;
@@ -28,8 +29,14 @@ static VALUE caller_info = 0;
 
 static caller_stack_len = 1;
 
+/*
+ *
+ * callsite hook and associated functions
+ *
+ * */
+
 static VALUE
-record_call_trace_info(VALUE args)
+record_callsite_info(VALUE args)
 {
   VALUE caller_ary;
   VALUE curr_meth;
@@ -55,32 +62,91 @@ record_call_trace_info(VALUE args)
 }
 
 static void
-coverage_event_hook(rb_event_t event, NODE *node, VALUE self, 
+coverage_event_callsite_hook(rb_event_t event, NODE *node, VALUE self, 
+                ID mid, VALUE klass)
+{
+ VALUE caller_ary;
+ VALUE aref_args[2];
+ VALUE curr_meth;
+ VALUE args[2];
+
+ caller_ary = rb_funcall(rb_mKernel, id_caller, 0);
+ aref_args[0] = INT2FIX(0);
+ aref_args[1] = INT2NUM(caller_stack_len);
+ caller_ary = rb_ary_aref(2, aref_args, caller_ary);
+
+ curr_meth = rb_ary_new();
+ rb_ary_push(curr_meth, klass);
+ rb_ary_push(curr_meth, ID2SYM(mid));
+
+ args[0] = caller_ary;
+ args[1] = curr_meth;
+ rb_protect(record_callsite_info, (VALUE)args, 0);
+}
+
+
+static VALUE
+cov_install_callsite_hook(VALUE self)
+{
+  if(!callsite_hook_set_p) {
+          if(TYPE(caller_info) != T_HASH)
+                  caller_info = rb_hash_new();
+          callsite_hook_set_p = 1;
+          rb_add_event_hook(coverage_event_callsite_hook, 
+                          RUBY_EVENT_CALL);
+          
+          return Qtrue;
+  } else
+          return Qfalse;
+}
+
+
+static VALUE
+cov_remove_callsite_hook(VALUE self)
+{
+ if(!callsite_hook_set_p) 
+         return Qfalse;
+ else {
+         rb_remove_event_hook(coverage_event_callsite_hook);
+         callsite_hook_set_p = 0;
+         return Qtrue;
+ }
+}
+
+
+static VALUE
+cov_generate_callsite_info(VALUE self)
+{
+  return caller_info;
+}
+
+
+static VALUE
+cov_reset_callsite(VALUE self)
+{
+  if(callsite_hook_set_p) {
+	  rb_raise(rb_eRuntimeError, 
+		  "Cannot reset the callsite info in the middle of a traced run.");
+	  return Qnil;
+  }
+
+  caller_info = rb_hash_new();
+  return Qnil;
+}
+
+/* 
+ *
+ * coverage hook and associated functions 
+ *
+ * */
+
+static void
+coverage_event_coverage_hook(rb_event_t event, NODE *node, VALUE self, 
                 ID mid, VALUE klass)
 {
  char *sourcefile;
  unsigned int sourceline;
  
- if(event == RUBY_EVENT_CALL) {
-         VALUE caller_ary;
-         VALUE aref_args[2];
-         VALUE curr_meth;
-         VALUE args[2];
-
-         caller_ary = rb_funcall(rb_mKernel, id_caller, 0);
-         aref_args[0] = INT2FIX(0);
-         aref_args[1] = INT2NUM(caller_stack_len);
-         caller_ary = rb_ary_aref(2, aref_args, caller_ary);
-
-         curr_meth = rb_ary_new();
-         rb_ary_push(curr_meth, klass);
-         rb_ary_push(curr_meth, ID2SYM(mid));
-
-         args[0] = caller_ary;
-         args[1] = curr_meth;
-         rb_protect(record_call_trace_info, (VALUE)args, 0);
- }
-
  if(event & (RUBY_EVENT_C_CALL | RUBY_EVENT_C_RETURN | RUBY_EVENT_CLASS))
          return;
  
@@ -116,13 +182,13 @@ coverage_event_hook(rb_event_t event, NODE *node, VALUE self,
 
 
 static VALUE
-cov_install_hook(VALUE self)
+cov_install_coverage_hook(VALUE self)
 {
-  if(!hook_set_p) {
+  if(!coverage_hook_set_p) {
 	  if(!coverinfo)
 		  coverinfo = st_init_strtable();
-          hook_set_p = 1;
-          rb_add_event_hook(coverage_event_hook, 
+          coverage_hook_set_p = 1;
+          rb_add_event_hook(coverage_event_coverage_hook, 
                        RUBY_EVENT_ALL & ~RUBY_EVENT_C_CALL &
                        ~RUBY_EVENT_C_RETURN & ~RUBY_EVENT_CLASS);
           
@@ -171,13 +237,13 @@ free_table(st_data_t key, st_data_t value, st_data_t ignored)
 
 
 static VALUE
-cov_remove_hook(VALUE self)
+cov_remove_coverage_hook(VALUE self)
 {
- if(!hook_set_p) 
+ if(!coverage_hook_set_p) 
          return Qfalse;
  else {
-         rb_remove_event_hook(coverage_event_hook);
-         hook_set_p = 0;
+         rb_remove_event_hook(coverage_event_coverage_hook);
+         coverage_hook_set_p = 0;
          return Qtrue;
  }
 }
@@ -200,18 +266,13 @@ cov_generate_coverage_info(VALUE self)
   return cover;
 }
 
-static VALUE
-cov_generate_callsite_info(VALUE self)
-{
-  return caller_info;
-}
 
 static VALUE
-cov_reset(VALUE self)
+cov_reset_coverage(VALUE self)
 {
-  if(hook_set_p) {
+  if(coverage_hook_set_p) {
 	  rb_raise(rb_eRuntimeError, 
-		  "Cannot reset the coverate info in the middle of a traced run.");
+		  "Cannot reset the coverage info in the middle of a traced run.");
 	  return Qnil;
   }
 
@@ -221,9 +282,9 @@ cov_reset(VALUE self)
   st_free_table(coverinfo);
   coverinfo = 0;
 
-  caller_info = rb_hash_new();
   return Qnil;
 }
+
 
 static VALUE
 cov_ABI(VALUE self)
@@ -237,6 +298,7 @@ cov_ABI(VALUE self)
 
   return ret;
 }
+
 
 void
 Init_rcovrt()
@@ -268,15 +330,22 @@ Init_rcovrt()
  caller_info = rb_hash_new();
  rb_gc_register_address(&caller_info);
 
- hook_set_p = 0;
+ coverage_hook_set_p = 0;
 
- rb_define_singleton_method(mRCOV__, "install_hook", cov_install_hook, 0);
- rb_define_singleton_method(mRCOV__, "remove_hook", cov_remove_hook, 0);
+ rb_define_singleton_method(mRCOV__, "install_coverage_hook", 
+                 cov_install_coverage_hook, 0);
+ rb_define_singleton_method(mRCOV__, "remove_coverage_hook", 
+                 cov_remove_coverage_hook, 0);
+ rb_define_singleton_method(mRCOV__, "install_callsite_hook", 
+                 cov_install_callsite_hook, 0);
+ rb_define_singleton_method(mRCOV__, "remove_callsite_hook", 
+                 cov_remove_callsite_hook, 0);
  rb_define_singleton_method(mRCOV__, "generate_coverage_info", 
 		 cov_generate_coverage_info, 0);
  rb_define_singleton_method(mRCOV__, "generate_callsite_info", 
 		 cov_generate_callsite_info, 0);
- rb_define_singleton_method(mRCOV__, "reset", cov_reset, 0);
+ rb_define_singleton_method(mRCOV__, "reset_coverage", cov_reset_coverage, 0);
+ rb_define_singleton_method(mRCOV__, "reset_callsite", cov_reset_callsite, 0);
  rb_define_singleton_method(mRCOV__, "ABI", cov_ABI, 0);
 }
 /* vim: set sw=8 expandtab: */
