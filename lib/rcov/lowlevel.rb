@@ -78,6 +78,8 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
         case event
         when 'call'
           if @callsite_hook_activated
+            receiver = eval("self", binding)
+            klass = class << klass; self end unless klass === receiver
             begin
               DEFSITES[[klass.to_s, id.to_s]] = [file, line]
             rescue Exception
@@ -87,6 +89,8 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
               hash = CALLSITES[[klass.to_s, id.to_s]] ||= {}
               hash[caller_arr] ||= 0
               hash[caller_arr] += 1
+              #puts "#{event} #{file} #{line} #{klass.inspect} " +
+              #     "#{klass.object_id} #{id} #{eval('self', binding)}"
             rescue Exception
             end
           end
