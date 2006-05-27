@@ -16,10 +16,11 @@ ENV["RCOVPATH"] = "bin/rcov"
 # The following task is largely equivalent to:
 #   Rcov::RcovTask.new
 # (really!)
-desc "Analyze code coverage of the unit tests."
+desc "Create a cross-referenced code coverage report."
 Rcov::RcovTask.new do |t|
   t.libs << "ext/rcovrt"
   t.test_files = FileList['test/test*.rb']
+  t.rcov_opts << "--callsites"  # comment to disable cross-references
   t.verbose = true
 end
 
