@@ -125,6 +125,8 @@ coverage_event_callsite_hook(rb_event_t event, NODE *node, VALUE self,
          args.curr_meth = curr_meth;
          rb_protect(record_method_def_site, (VALUE)&args, 0);
  }
+ if(status)
+         rb_gv_set("$!", Qnil);
 }
 
 
