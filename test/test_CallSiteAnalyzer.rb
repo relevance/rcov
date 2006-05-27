@@ -42,6 +42,8 @@ class Test_CallSiteAnalyzer < Test::Unit::TestCase
                  @a.defsite("Rcov::Test::Temporary::Sample03", "f1"))
     assert_equal(["./test/sample_03.rb", 7], 
                  @a.defsite("Rcov::Test::Temporary::Sample03", "f2"))
+    assert_equal(["./test/sample_03.rb", 7], 
+                 @a.defsite("Rcov::Test::Temporary::Sample03#f2"))
   end
 
   def test_basic_callsite_recording
@@ -50,7 +52,20 @@ class Test_CallSiteAnalyzer < Test::Unit::TestCase
     assert_equal(%w[f1 f2], @a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
     assert_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
+    assert_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
+                 @a.callsites("Rcov::Test::Temporary::Sample03#f2"))
   end
+  
+  def test_basic_callsite_recording_with_singleton_classes
+    @a.run_hooked{ @o.class.g1 }
+    assert(@a.analyzed_classes.include?("#<Class:Rcov::Test::Temporary::Sample03>"))
+    assert_equal(%w[g1 g2], @a.analyzed_methods("#<Class:Rcov::Test::Temporary::Sample03>"))
+    assert_equal({["./test/sample_03.rb:15:in `g1'"] => 10}, 
+                 @a.callsites("Rcov::Test::Temporary::Sample03.g2"))
+    assert_equal({["./test/sample_03.rb:15:in `g1'"] => 10}, 
+                 @a.callsites("#<Class:Rcov::Test::Temporary::Sample03>","g2"))
+  end
+
 
   def test_differential_callsite_recording
     @a.run_hooked{ @o.f1 }
@@ -110,5 +125,14 @@ class Test_CallSiteAnalyzer < Test::Unit::TestCase
     assert_equal({["./test/sample_03.rb:4:in `f1'"] => 110,
                   ["./test/sample_03.rb:11:in `f3'"]=>100 },
                  b.callsites("Rcov::Test::Temporary::Sample03", "f2"))
+  end
+
+  def test_expand_name
+    assert_equal(["Foo", "foo"], @a.instance_eval{ expand_name("Foo#foo") })
+    assert_equal(["Foo", "foo"], @a.instance_eval{ expand_name("Foo", "foo") })
+    assert_equal(["#<Class:Foo>", "foo"], 
+                 @a.instance_eval{ expand_name("Foo.foo") })
+    assert_equal(["#<Class:Foo>", "foo"], 
+                 @a.instance_eval{ expand_name("#<Class:Foo>", "foo") })
   end
 end

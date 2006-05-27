@@ -709,15 +709,30 @@ class CallSiteAnalyzer < DifferentialAnalyzer
   end
   alias_method :analyzed_methods, :methods_for_class
 
-  def callsites(classname, methodname)
-    raw_data_relative.first[[classname, methodname]]
+  def callsites(classname_or_fullname, methodname = nil)
+    raw_data_relative.first[expand_name(classname_or_fullname, methodname)]
   end
 
-  def defsite(classname, methodname)
-    raw_data_relative[1][[classname, methodname]]
+  def defsite(classname_or_fullname, methodname = nil)
+    raw_data_relative[1][expand_name(classname_or_fullname, methodname)]
   end
 
   private
+
+  def expand_name(classname_or_fullname, methodname = nil)
+    if methodname.nil?
+      case classname_or_fullname
+      when /(.*)#(.*)/: classname, methodname = $1, $2
+      when /(.*)\.(.*)/: classname, methodname = "#<Class:#{$1}>", $2
+      else
+        raise ArgumentError, "Incorrect method name"
+      end
+
+      return [classname, methodname]
+    end
+
+    [classname_or_fullname, methodname]
+  end
 
   def data_default; [{}, {}] end
 
