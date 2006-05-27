@@ -37,7 +37,8 @@ class Formatter
     ignore_files = [/\A#{Regexp.escape(Config::CONFIG["libdir"])}/, /\btc_[^.]*.rb/,
         /_test\.rb\z/, /\btest\//, /\bvendor\//, /\A#{Regexp.escape(__FILE__)}\z/]
     DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false,
-                    :output_threshold => 101, :dont_ignore => []}
+                    :output_threshold => 101, :dont_ignore => [], 
+                    :callsite_analyzer => nil}
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
         @files = {}
@@ -50,11 +51,13 @@ class Formatter
         end
         @sort_reverse = options[:sort_reverse]
         @output_threshold = options[:output_threshold]
+        @callsite_analyzer = options[:callsite_analyzer]
+        @callsite_index = nil
     end
 
     def add_file(filename, lines, coverage, counts)
         old_filename = filename
-        filename = File.expand_path(filename).gsub(/^#{Regexp.escape(Dir.getwd)}\//, '')
+        filename = normalize_filename(filename)
         SCRIPT_LINES__[filename] = SCRIPT_LINES__[old_filename]
         if @ignore_files.any?{|x| x === filename} && 
            !@dont_ignore_files.any?{|x| x === filename}
@@ -65,6 +68,10 @@ class Formatter
         else
             @files[filename] = FileStatistics.new filename, lines, counts
         end
+    end
+
+    def normalize_filename(filename)
+        File.expand_path(filename).gsub(/^#{Regexp.escape(Dir.getwd)}\//, '')
     end
 
     def each_file_pair_sorted(&b)
@@ -112,7 +119,27 @@ class Formatter
         @files.each{|k, f| lines += f.num_lines }
         lines
     end
+
+    private
+    def cross_references_for(filename, lineno)
+        return nil unless @callsite_analyzer
+        @callsite_index ||= build_callsite_index
+        @callsite_index[normalize_filename(filename)][lineno]
+    end
+
+    def build_callsite_index
+        index = Hash.new{|h,k| h[k] = {}}
+        @callsite_analyzer.analyzed_classes.each do |classname|
+            @callsite_analyzer.analyzed_methods(classname).each do |methname|
+                file, line = @callsite_analyzer.defsite(classname, methname)
+                index[normalize_filename(file)][line] = 
+                    @callsite_analyzer.callsites(classname, methname)
+            end
+        end
+        index
+    end
 end
+
 class TextSummary < Formatter
     def execute
         puts summary
@@ -190,6 +217,33 @@ class HTMLCoverage < Formatter
     include XX::XHTML
     include XX::XMLish
     require 'fileutils'
+    JAVASCRIPT_PROLOG = <<-EOS
+
+// <![CDATA[
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make cross-references hidden by default
+  document.writeln( "<style type=\\"text/css\\">div.cross-ref { display: none }</style>" )
+  
+  // ]]>
+    EOS
 
     CSS_PROLOG = <<-EOS
 span.marked0 {
@@ -325,11 +379,11 @@ EOS
         FileUtils.mkdir_p @dest
         create_index(File.join(@dest, "index.html"))
         each_file_pair_sorted do |filename, fileinfo|
-            create_file(File.join(@dest, file_name(filename)), fileinfo)
+            create_file(File.join(@dest, mangle_filename(filename)), fileinfo)
         end
     end
 
-    def file_name(base)
+    def mangle_filename(base)
         base.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".html"
     end
 
@@ -382,7 +436,7 @@ EOS
                                 when "TOTAL": 
                                     t_ { "TOTAL" }
                                 else
-                                    a_(:href => file_name(f.name)){ t_ { f.name } } 
+                                    a_(:href => mangle_filename(f.name)){ t_ { f.name } } 
                                 end
                             }
                             [f.num_lines, f.num_code_lines].each do |value| 
@@ -435,6 +489,7 @@ EOS
                 title_{ title }
                 style_(:type => "text/css") { t_{ "body { background-color: #{default_color}; }" }  }
                 style_(:type => "text/css") { CSS_PROLOG }
+                script_(:type => "text/javascript") { h_{ JAVASCRIPT_PROLOG } }
             }
             body_ {
                 h3_{
@@ -485,15 +540,44 @@ EOS
                 when nil
                     end_of_span = ""
                 else
-                    result += "<span class=\"#{spanclass}\">"
+                    result += %[<span class="#{spanclass}">]
                     end_of_span = "</span>"
                 end
             end
-            result += (format_line % (i+1)) + " " + CGI.escapeHTML(line) + "\n"
+            result += %[<a name="line#{i+1}" />] + (format_line % (i+1)) + 
+                " " + create_cross_refs(file.name, i+1, CGI.escapeHTML(line)) + "\n"
             last = spanclass
         end
         result += end_of_span
         "<pre>#{result}</pre>"
+    end
+
+    def create_cross_refs(filename, lineno, linetext)
+        return linetext unless @callsite_analyzer
+        @cross_ref_idx ||= 0
+        ret = ""
+        refs = cross_references_for(filename, lineno)
+        return linetext unless refs
+        refs = refs.sort_by{|k,count| count}
+        ret << %[<a class="crossref-toggle" href="#" onclick="toggleCode('XREF-#{@cross_ref_idx+=1}'); return false;">#{linetext}</a>]
+        ret << %[<div class="cross-ref" id="XREF-#{@cross_ref_idx}">]
+        ret << %[\nThis method was called by:\n\n]
+        known_files = sorted_file_pairs.map{|fname, finfo| normalize_filename(fname)}
+        refs.reverse_each do |dst, count|
+            #./test/sample_03.rb:15:in `g1'"         
+            dstfile = normalize_filename(dst.first[/[^:]*/])
+            dstline = dst.first[/:(\d+):/, 1]
+            calling_method = dst.first[/:in `(.+)'/, 1]
+            label = "%7d   %s" % 
+                [count, CGI.escapeHTML("#{dstfile}:#{dstline} in '#{calling_method}'")]
+            if known_files.include? dstfile
+                ret << %[<a href="#{mangle_filename(dstfile)}#line#{dstline}">#{label}</a>]
+            else
+                ret << label
+            end
+            ret << "\n"
+        end
+        ret << "</div>"
     end
 
     def span_class(sourceinfo, marked, count)
@@ -518,6 +602,7 @@ EOS
                 title_{ title } 
                 style_(:type => "text/css") { t_{ "body { background-color: #{default_color}; }" }  }
                 style_(:type => "text/css") { CSS_PROLOG }
+                script_(:type => "text/javascript") { h_ { JAVASCRIPT_PROLOG } }
                 style_(:type => "text/css") { h_ { colorscale } }
             }
             body_ {
@@ -694,6 +779,7 @@ options.sort = :name
 options.sort_reverse = false
 options.output_threshold = 101
 options.replace_prog_name = false
+options.callsites = false
 
 EXTRA_HELP = <<-EOF
 
@@ -766,6 +852,9 @@ EOF
             end
     opts.on("--rails", "Skip config/, environment/ and vendor/.") do 
         options.skip.concat [%r{\bvendor/},%r{\bconfig/},%r{\benvironment/}]
+    end
+    opts.on("--[no-]callsites", "Show callsites in generated XHTML report.") do |val|
+        options.callsites = val
     end
     opts.on("-p", "--profile", "Generate bogo-profiling info.") do
         options.profiling = true
@@ -863,14 +952,32 @@ unless ARGV[0]
     puts opts
     exit
 end
+
+# {{{ set loadpath
+options.loadpaths.reverse_each{|x| $:.unshift x}
+
+#{{{ require 'rcov': do it only now in order to be able to run rcov on itself
+# since we need to set $: before.
+
+require 'rcov'
+
+if options.callsites 
+    $rcov_callsite_analyzer = Rcov::CallSiteAnalyzer.new
+    $rcov_callsite_analyzer.install_hook
+else
+    $rcov_callsite_analyzer = nil
+end
+
+# {{{ create formatters
 formatters = []
 make_formatter = lambda do |klass| 
-klass.new(:destdir => options.destdir, :color => options.color, 
-          :fsr => options.range, :textmode => options.textmode,
-          :ignore => options.skip, :dont_ignore => options.include, 
-          :sort => options.sort, 
-          :sort_reverse => options.sort_reverse, 
-          :output_threshold => options.output_threshold)
+    klass.new(:destdir => options.destdir, :color => options.color, 
+              :fsr => options.range, :textmode => options.textmode,
+              :ignore => options.skip, :dont_ignore => options.include, 
+              :sort => options.sort, 
+              :sort_reverse => options.sort_reverse, 
+              :output_threshold => options.output_threshold,
+              :callsite_analyzer => $rcov_callsite_analyzer)
 end
 
 unless options.nohtml
@@ -886,17 +993,13 @@ textual_formatters = {:counts => Rcov::TextCoverage, :coverage => Rcov::TextCove
 if textual_formatters[options.textmode]
     formatters << make_formatter[textual_formatters[options.textmode]]
 end
-options.loadpaths.reverse_each{|x| $:.unshift x}
-
-#{{{ require 'rcov': do it only now in order to be able to run rcov on itself
-# since we need to set $: before.
-require 'rcov'
 
 $rcov_code_coverage_analyzer = Rcov::CodeCoverageAnalyzer.new
 
 # must be registered before test/unit puts its own
 END {
     $rcov_code_coverage_analyzer.remove_hook
+    $rcov_callsite_analyzer.remove_hook if $rcov_callsite_analyzer
     $rcov_code_coverage_analyzer.dump_coverage_info(formatters)
     if formatters.all?{|formatter| formatter.sorted_file_pairs.empty? }
         require 'pp'
