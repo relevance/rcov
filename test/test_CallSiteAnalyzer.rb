@@ -22,7 +22,7 @@ class Test_CallSiteAnalyzer < Test::Unit::TestCase
   end
 
   def verify_defsite_equal(expected, actual)
-    assert_equal(Rcov::CallSiteAnalyzer::Site.new(*expected), actual)
+    assert_equal(Rcov::CallSiteAnalyzer::DefSite.new(*expected), actual)
   end
 
   def test_callsite_compute_raw_difference

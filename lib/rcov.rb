@@ -688,23 +688,76 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
 
 end # CodeCoverageAnalyzer
 
+# A CallSiteAnalyzer can be used to obtain information about:
+# * where a method is defined ("+defsite+")
+# * where a method was called from ("+callsite+")
+#
+# == Example
+# <tt>example.rb</tt>:
+#  class X
+#    def f1; f2 end
+#    def f2; 1 + 1 end
+#    def f3; f1 end
+#  end
+#
+#  analyzer = Rcov::CallSiteAnalyzer.new
+#  x = X.new
+#  analyzer.run_hooked do 
+#    x.f1 
+#  end
+#  # ....
+#  
+#  analyzer.run_hooked do 
+#    x.f3
+#    # the information generated in this run is aggregated
+#    # to the previously recorded one
+#  end
+#
+#  analyzer.analyzed_classes        # => ["X", ... ]
+#  analyzer.methods_for_class("X")  # => ["f1", "f2", "f3"]
+#  analyzer.defsite("X#f1")         # => DefSite object
+#  analyzer.callsites("X#f2")       # => hash with CallSite => count
+#                                   #    associations
+#  defsite = analyzer.defsite("X#f1")
+#  defsite.file                     # => "example.rb"
+#  defsite.line                     # => 2
+#
+# You can have several CallSiteAnalyzer objects at a time, and it is
+# possible to nest the #run_hooked / #install_hook/#remove_hook blocks: each
+# analyzer will manage its data separately. Note however that no special
+# provision is taken to ignore code executed "inside" the CallSiteAnalyzer
+# class. 
+#
+# +defsite+ information is only available for methods that were called under
+# the inspection of the CallSiteAnalyzer, i.o.w. you will only have +defsite+
+# information for those methods for which callsite information is
+# available.
 class CallSiteAnalyzer < DifferentialAnalyzer
-  Site = Struct.new(:file, :line)
+  # A method definition site
+  DefSite = Struct.new(:file, :line)
+  # Object representing a method call site.
+  # It corresponds to a part of the callstack starting from the context that
+  # called the method.   
   class CallSite < Struct.new(:description)
-    def level
+    # The depth of a CallSite is the number of stack frames
+    # whose information is included in the CallSite object.
+    def depth
       description.size
     end
     
+    # File where the method call originated.
     def file(level = 0)
       desc = description[level]
       desc ? desc[/[^:]*/] : nil
     end
 
+    # Line where the method call originated.
     def line(level = 0)
       desc = description[level]
       desc ? desc[/:(\d+):/, 1].to_i : nil
     end
 
+    # Name of the method where the call originated.
     def calling_method(level = 0)
       desc = description[level]
       desc ? desc[/:in `(.*)'/, 1] : nil
@@ -721,16 +774,29 @@ class CallSiteAnalyzer < DifferentialAnalyzer
           :reset_callsite)
   end
 
+  # Classes whose methods have been called.
+  # Returns an array of strings describing the classes (just klass.to_s for
+  # each of them). Singleton classes are rendered as:
+  #   #<Class:MyNamespace::MyClass>
   def analyzed_classes
     raw_data_relative.first.keys.map{|klass, meth| klass}.uniq.sort
   end
 
+  # Methods that were called for the given class. See #analyzed_classes for
+  # the notation used for singleton classes.
   def methods_for_class(classname)
     a = raw_data_relative.first.keys.select{|kl,_| kl == classname}.map{|_,meth| meth}.sort
     a.empty? ? nil : a
   end
   alias_method :analyzed_methods, :methods_for_class
 
+  # Returns a hash with <tt>CallSite => call count</tt> associations.
+  # Can be called in two ways:
+  #   analyzer.callsites("Foo#f1")         # instance method
+  #   analyzer.callsites("Foo.g1")         # singleton method of the class
+  # or
+  #   analyzer.callsites("Foo", "f1")
+  #   analyzer.callsites("#<class:Foo>", "g1")
   def callsites(classname_or_fullname, methodname = nil)
     rawsites = raw_data_relative.first[expand_name(classname_or_fullname, methodname)]
     ret = {}
@@ -739,8 +805,15 @@ class CallSiteAnalyzer < DifferentialAnalyzer
     ret
   end
 
+  # Returns a DefSite object corresponding to the given method
+  # Can be called in two ways:
+  #   analyzer.defsite("Foo#f1")         # instance method
+  #   analyzer.defsite("Foo.g1")         # singleton method of the class
+  # or
+  #   analyzer.defsite("Foo", "f1")
+  #   analyzer.defsite("#<class:Foo>", "g1")
   def defsite(classname_or_fullname, methodname = nil)
-    Site.new(*raw_data_relative[1][expand_name(classname_or_fullname, methodname)])
+    DefSite.new(*raw_data_relative[1][expand_name(classname_or_fullname, methodname)])
   end
 
   private
