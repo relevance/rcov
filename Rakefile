@@ -66,13 +66,13 @@ task :test => [:test_rcovrt, :test_pure_ruby]
 desc "Generate rdoc documentation for the rcov library"
 Rake::RDocTask.new("rdoc") { |rdoc|
   rdoc.rdoc_dir = 'doc'
-  rdoc.title    = "rcov task for rake"
+  rdoc.title    = "rcov"
   rdoc.options << "--line-numbers" << "--inline-source"
   rdoc.rdoc_files.include('README.API')
   rdoc.rdoc_files.include('README.rake')
+  rdoc.rdoc_files.include('README.rant')
   rdoc.rdoc_files.include('lib/**/*.rb')
 }
-
 
 task :default => :test
 

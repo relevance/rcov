@@ -10,8 +10,9 @@ If you want to use the command line tool, the output from
  rcov -h
 is self-explicative.
 
-If you want to automate the execution of +rcov+ via Rake, take a look at
-README.rake[link:files/README_rake.html].
+If you want to automate the execution of +rcov+ via Rake or Rant, take a look at
+README.rake[link:files/README_rake.html] or
+README.rant[link:files/README_rant.html], respectively.
 
 If you want to use the associated library, read on.
 
