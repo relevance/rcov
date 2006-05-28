@@ -526,8 +526,12 @@ end
 class CodeCoverageAnalyzer < DifferentialAnalyzer
   @hook_level = 0
   # defined this way instead of attr_accessor so that it's covered
-  def self.hook_level; @hook_level end         # :nodoc:
-  def self.hook_level=(x); @hook_level = x end # :nodoc: 
+  def self.hook_level      # :nodoc:
+    @hook_level 
+  end   
+  def self.hook_level=(x)  # :nodoc: 
+    @hook_level = x 
+  end 
 
   def initialize
     @script_lines__ = SCRIPT_LINES__
@@ -769,8 +773,12 @@ class CallSiteAnalyzer < DifferentialAnalyzer
 
   @hook_level = 0
   # defined this way instead of attr_accessor so that it's covered
-  def self.hook_level; @hook_level end         # :nodoc:
-  def self.hook_level=(x); @hook_level = x end # :nodoc: 
+  def self.hook_level      # :nodoc:
+    @hook_level 
+  end   
+  def self.hook_level=(x)  # :nodoc: 
+    @hook_level = x 
+  end 
 
   def initialize
     super(:install_callsite_hook, :remove_callsite_hook,
