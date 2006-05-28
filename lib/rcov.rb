@@ -733,8 +733,10 @@ end # CodeCoverageAnalyzer
 # information for those methods for which callsite information is
 # available.
 class CallSiteAnalyzer < DifferentialAnalyzer
-  # A method definition site
-  DefSite = Struct.new(:file, :line)
+  # A method definition site.
+  class DefSite < Struct.new(:file, :line)
+  end
+  
   # Object representing a method call site.
   # It corresponds to a part of the callstack starting from the context that
   # called the method.   
