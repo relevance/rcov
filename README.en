@@ -12,7 +12,7 @@ rcov README
   * fairly accurate coverage information through code linkage inference using 
     simple heuristics
   * cross-referenced XHTML and several kinds of text reports
-  * easy automation with Rake via a RcovTask 
+  * support for easy automation with Rake and Rant
   * colorblind-friendliness
 
 Requirements

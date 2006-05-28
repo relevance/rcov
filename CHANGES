@@ -5,9 +5,12 @@ Since 0.4.0 (2006-05-22)
 ========================
 Features
 --------
+* ability to create cross-referenced reports, indicating where methods are
+  called from (--callsites)
 * more refinements in the heuristics: now several kinds of multi-line quoted
   strings are handled properly
 * --include-file to specify files not to be ignored in the report(s)
+* implemented a task generator for Rant
 
 Bugfixes
 --------
@@ -22,6 +25,8 @@ Minor enhancements
 * slightly more readable XHTML reports, esp. for IE
 * text reports fit in 79 columns so they look OK with cmd.exe
 * try to guide the user when all files were considered "uninteresting" by rcov
+* the output_dir is preserved in RcovTasks when the user specifies --profile
+  via the RCOVOPTS env. var.
 
 Since 0.3.0 (2006-05-05)
 ========================
