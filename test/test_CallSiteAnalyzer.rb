@@ -48,6 +48,15 @@ class Test_CallSiteAnalyzer < Test::Unit::TestCase
                  @a.instance_eval{ compute_raw_data_difference(src, dst) } )
   end
 
+  def test_return_values_when_no_match
+    @a.run_hooked{ @o.f1 }
+    assert_equal(nil, @a.defsite("Foobar#bogus"))
+    assert_equal(nil, @a.defsite("Foobar", "bogus"))
+    assert_equal(nil, @a.callsites("Foobar", "bogus"))
+    assert_equal(nil, @a.callsites("Foobar.bogus"))
+    assert_equal(nil, @a.callsites("<Class:Foobar>", "bogus"))
+  end
+
   def test_basic_defsite_recording
     @a.run_hooked{ @o.f1 }
     verify_defsite_equal(["./test/sample_03.rb", 3], 

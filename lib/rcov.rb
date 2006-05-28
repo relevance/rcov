@@ -756,10 +756,11 @@ class CallSiteAnalyzer < DifferentialAnalyzer
     # Line where the method call originated.
     def line(level = 0)
       desc = description[level]
-      desc ? desc[/:(\d+):/, 1].to_i : nil
+      desc ? desc[/:(\d+)/, 1].to_i : nil
     end
 
     # Name of the method where the call originated.
+    # Returns +nil+ if the call originated in +toplevel+.
     def calling_method(level = 0)
       desc = description[level]
       desc ? desc[/:in `(.*)'/, 1] : nil
@@ -786,13 +787,14 @@ class CallSiteAnalyzer < DifferentialAnalyzer
 
   # Methods that were called for the given class. See #analyzed_classes for
   # the notation used for singleton classes.
+  # Returns an array of strings or +nil+
   def methods_for_class(classname)
     a = raw_data_relative.first.keys.select{|kl,_| kl == classname}.map{|_,meth| meth}.sort
     a.empty? ? nil : a
   end
   alias_method :analyzed_methods, :methods_for_class
 
-  # Returns a hash with <tt>CallSite => call count</tt> associations.
+  # Returns a hash with <tt>CallSite => call count</tt> associations or +nil+
   # Can be called in two ways:
   #   analyzer.callsites("Foo#f1")         # instance method
   #   analyzer.callsites("Foo.g1")         # singleton method of the class
@@ -801,6 +803,7 @@ class CallSiteAnalyzer < DifferentialAnalyzer
   #   analyzer.callsites("#<class:Foo>", "g1")
   def callsites(classname_or_fullname, methodname = nil)
     rawsites = raw_data_relative.first[expand_name(classname_or_fullname, methodname)]
+    return nil unless rawsites
     ret = {}
     # could be a job for inject but it's slow and I don't mind the extra loc
     rawsites.each_pair{|csite_info, count| ret[CallSite.new(csite_info)] = count }
@@ -815,7 +818,9 @@ class CallSiteAnalyzer < DifferentialAnalyzer
   #   analyzer.defsite("Foo", "f1")
   #   analyzer.defsite("#<class:Foo>", "g1")
   def defsite(classname_or_fullname, methodname = nil)
-    DefSite.new(*raw_data_relative[1][expand_name(classname_or_fullname, methodname)])
+    raw = raw_data_relative[1][expand_name(classname_or_fullname, methodname)]
+    return nil unless raw
+    DefSite.new(*raw)
   end
 
   private
