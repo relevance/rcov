@@ -13,6 +13,18 @@ class Test_CallSiteAnalyzer < Test::Unit::TestCase
     @o = Rcov::Test::Temporary::Sample03.new
   end
 
+  def verify_callsites_equal(expected, actual)
+    callsites = expected.inject({}) do |s,(desc, count)| 
+      s[Rcov::CallSiteAnalyzer::CallSite.new(desc)] = count
+      s
+    end
+    assert_equal(callsites, actual)
+  end
+
+  def verify_defsite_equal(expected, actual)
+    assert_equal(Rcov::CallSiteAnalyzer::Site.new(*expected), actual)
+  end
+
   def test_callsite_compute_raw_difference
     src = [ 
             { ["Foo", "foo"] => {"bar" => 1},
@@ -38,11 +50,11 @@ class Test_CallSiteAnalyzer < Test::Unit::TestCase
 
   def test_basic_defsite_recording
     @a.run_hooked{ @o.f1 }
-    assert_equal(["./test/sample_03.rb", 3], 
+    verify_defsite_equal(["./test/sample_03.rb", 3], 
                  @a.defsite("Rcov::Test::Temporary::Sample03", "f1"))
-    assert_equal(["./test/sample_03.rb", 7], 
+    verify_defsite_equal(["./test/sample_03.rb", 7], 
                  @a.defsite("Rcov::Test::Temporary::Sample03", "f2"))
-    assert_equal(["./test/sample_03.rb", 7], 
+    verify_defsite_equal(["./test/sample_03.rb", 7], 
                  @a.defsite("Rcov::Test::Temporary::Sample03#f2"))
   end
 
@@ -50,19 +62,32 @@ class Test_CallSiteAnalyzer < Test::Unit::TestCase
     @a.run_hooked{ @o.f1 }
     assert(@a.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
     assert_equal(%w[f1 f2], @a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-    assert_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
+    verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
-    assert_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
+    verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
                  @a.callsites("Rcov::Test::Temporary::Sample03#f2"))
+  end
+
+  def test_basic_callsite_recording_API
+    @a.run_hooked{ @o.f1 }
+    assert(@a.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
+    assert_equal(%w[f1 f2], @a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
+    verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
+                 @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
+    callsites = @a.callsites("Rcov::Test::Temporary::Sample03", "f2")
+    callsite = callsites.keys[0]
+    assert_equal("./test/sample_03.rb", callsite.file)
+    assert_equal(4, callsite.line)
+    assert_equal("f1", callsite.calling_method)
   end
   
   def test_basic_callsite_recording_with_singleton_classes
     @a.run_hooked{ @o.class.g1 }
     assert(@a.analyzed_classes.include?("#<Class:Rcov::Test::Temporary::Sample03>"))
     assert_equal(%w[g1 g2], @a.analyzed_methods("#<Class:Rcov::Test::Temporary::Sample03>"))
-    assert_equal({["./test/sample_03.rb:15:in `g1'"] => 10}, 
+    verify_callsites_equal({["./test/sample_03.rb:15:in `g1'"] => 10}, 
                  @a.callsites("Rcov::Test::Temporary::Sample03.g2"))
-    assert_equal({["./test/sample_03.rb:15:in `g1'"] => 10}, 
+    verify_callsites_equal({["./test/sample_03.rb:15:in `g1'"] => 10}, 
                  @a.callsites("#<Class:Rcov::Test::Temporary::Sample03>","g2"))
   end
 
@@ -71,18 +96,18 @@ class Test_CallSiteAnalyzer < Test::Unit::TestCase
     @a.run_hooked{ @o.f1 }
     assert(@a.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
     assert_equal(%w[f1 f2], @a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-    assert_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
+    verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
 
     @a.run_hooked{ @o.f1 }
     assert(@a.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
     assert_equal(%w[f1 f2], @a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-    assert_equal({["./test/sample_03.rb:4:in `f1'"] => 20}, 
+    verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 20}, 
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
     
     @a.run_hooked{ @o.f3 }
     assert_equal(%w[f1 f2 f3], @a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-    assert_equal({["./test/sample_03.rb:4:in `f1'"] => 120,
+    verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 120,
                   ["./test/sample_03.rb:11:in `f3'"]=>100 },
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
   end
@@ -95,7 +120,7 @@ class Test_CallSiteAnalyzer < Test::Unit::TestCase
     end
     assert(@a.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
     assert_equal(%w[f1 f2], @a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-    assert_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
+    verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
 
   end
@@ -107,22 +132,22 @@ class Test_CallSiteAnalyzer < Test::Unit::TestCase
       b.run_hooked { @o.f1 }
       assert(b.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
       assert_equal(%w[f1 f2], b.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-      assert_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
+      verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
                    b.callsites("Rcov::Test::Temporary::Sample03", "f2"))
 
       @o.f1
       assert_equal(%w[f1 f2], b.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-      assert_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
+      verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
                    b.callsites("Rcov::Test::Temporary::Sample03", "f2"))
       
       assert(a.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
       assert_equal(%w[f1 f2], a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-      assert_equal({["./test/sample_03.rb:4:in `f1'"] => 20}, 
+      verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 20}, 
                    a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
     end
     b.run_hooked{ @o.f3 }
     assert_equal(%w[f1 f2 f3], b.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-    assert_equal({["./test/sample_03.rb:4:in `f1'"] => 110,
+    verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 110,
                   ["./test/sample_03.rb:11:in `f3'"]=>100 },
                  b.callsites("Rcov::Test::Temporary::Sample03", "f2"))
   end

@@ -689,6 +689,28 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
 end # CodeCoverageAnalyzer
 
 class CallSiteAnalyzer < DifferentialAnalyzer
+  Site = Struct.new(:file, :line)
+  class CallSite < Struct.new(:description)
+    def level
+      description.size
+    end
+    
+    def file(level = 0)
+      desc = description[level]
+      desc ? desc[/[^:]*/] : nil
+    end
+
+    def line(level = 0)
+      desc = description[level]
+      desc ? desc[/:(\d+):/, 1].to_i : nil
+    end
+
+    def calling_method(level = 0)
+      desc = description[level]
+      desc ? desc[/:in `(.*)'/, 1] : nil
+    end
+  end
+
   @hook_level = 0
   # defined this way instead of attr_accessor so that it's covered
   def self.hook_level; @hook_level end         # :nodoc:
@@ -710,11 +732,15 @@ class CallSiteAnalyzer < DifferentialAnalyzer
   alias_method :analyzed_methods, :methods_for_class
 
   def callsites(classname_or_fullname, methodname = nil)
-    raw_data_relative.first[expand_name(classname_or_fullname, methodname)]
+    rawsites = raw_data_relative.first[expand_name(classname_or_fullname, methodname)]
+    ret = {}
+    # could be a job for inject but it's slow and I don't mind the extra loc
+    rawsites.each_pair{|csite_info, count| ret[CallSite.new(csite_info)] = count }
+    ret
   end
 
   def defsite(classname_or_fullname, methodname = nil)
-    raw_data_relative[1][expand_name(classname_or_fullname, methodname)]
+    Site.new(*raw_data_relative[1][expand_name(classname_or_fullname, methodname)])
   end
 
   private

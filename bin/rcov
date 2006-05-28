@@ -131,8 +131,8 @@ class Formatter
         index = Hash.new{|h,k| h[k] = {}}
         @callsite_analyzer.analyzed_classes.each do |classname|
             @callsite_analyzer.analyzed_methods(classname).each do |methname|
-                file, line = @callsite_analyzer.defsite(classname, methname)
-                index[normalize_filename(file)][line] = 
+                defsite = @callsite_analyzer.defsite(classname, methname)
+                index[normalize_filename(defsite.file)][defsite.line] = 
                     @callsite_analyzer.callsites(classname, methname)
             end
         end
@@ -564,10 +564,9 @@ EOS
         ret << %[\nThis method was called by:\n\n]
         known_files = sorted_file_pairs.map{|fname, finfo| normalize_filename(fname)}
         refs.reverse_each do |dst, count|
-            #./test/sample_03.rb:15:in `g1'"         
-            dstfile = normalize_filename(dst.first[/[^:]*/])
-            dstline = dst.first[/:(\d+):/, 1]
-            calling_method = dst.first[/:in `(.+)'/, 1]
+            dstfile = normalize_filename(dst.file)
+            dstline = dst.line
+            calling_method = dst.calling_method
             label = "%7d   %s" % 
                 [count, CGI.escapeHTML("#{dstfile}:#{dstline} in '#{calling_method}'")]
             if known_files.include? dstfile
