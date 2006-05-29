@@ -50,12 +50,12 @@ have several rcov tasks:
 === Options specified passed to the generator 
 
 The +Rcov+ generator recognizes the following options:
-+libs+: directories to be added to the <tt>$LOAD_PATH</tt>
-+rcov_opts+: array of options to be passed to rcov
-+test_files+: files to execute
-+test_dirs+: directories where to look for test files automatically
-+pattern+: pattern for automatic discovery of unit tests to be executed
-+output_dir+: directory where to leave the generated reports
++libs+:: directories to be added to the <tt>$LOAD_PATH</tt>
++rcov_opts+:: array of options to be passed to rcov
++test_files+:: files to execute
++test_dirs+:: directories where to look for test files automatically
++pattern+:: pattern for automatic discovery of unit tests to be executed
++output_dir+:: directory where to leave the generated reports
 
 +test_files+ overrides the combination of +test_dirs+ and +pattern+.
 
