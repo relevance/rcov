@@ -852,7 +852,8 @@ EOF
     opts.on("--rails", "Skip config/, environment/ and vendor/.") do 
         options.skip.concat [%r{\bvendor/},%r{\bconfig/},%r{\benvironment/}]
     end
-    opts.on("--[no-]callsites", "Show callsites in generated XHTML report.") do |val|
+    opts.on("--[no-]callsites", "Show callsites in generated XHTML report.",
+            "(much slower; disabled by default)") do |val|
         options.callsites = val
     end
     opts.on("-p", "--profile", "Generate bogo-profiling info.") do
