@@ -218,8 +218,10 @@ class TextCoverageDiff < Formatter
                     :coverage_diff_file => "coverage.info",
                     :diff_cmd => "diff"}
     def SERIALIZER
-        require 'yaml'
-        YAML
+        # mfp> this was going to be YAML but I caught it failing at basic
+        # round-tripping, turning "\n" into "" and corrupting the data, so
+        # it must be Marshal for now
+        Marshal
     end
 
     def initialize(opts = {})
@@ -246,12 +248,9 @@ class TextCoverageDiff < Formatter
     def record_state
         state = {}
         each_file_pair_sorted do |filename, fileinfo|
-            lines = ""
-            SCRIPT_LINES__[filename].each_with_index do |line, i|
-                prefix = fileinfo.coverage[i] ? "   " : "!! "
-                lines << "#{prefix}#{line}"
-            end
-            state[filename] = lines
+            state[filename] = {:lines    => SCRIPT_LINES__[filename],
+                               :coverage => fileinfo.coverage, 
+                               :counts   => fileinfo.counts}
         end
         File.open(@state_file, "w") do |f|
             self.SERIALIZER.dump(state, f)
@@ -266,7 +265,11 @@ class TextCoverageDiff < Formatter
             old_data = Tempfile.new("#{filename}.old")
             new_data = Tempfile.new("#{filename}.new")
             if prev_state.has_key? filename
-                old_data.write prev_state[filename]
+                old_code, old_cov = prev_state[filename].values_at(:lines, :coverage)
+                old_code.each_with_index do |line, i|
+                    prefix = old_cov[i] ? "   " : "!! "
+                    old_data.write "#{prefix}#{line}"
+                end
             else
                 old_data.write ""
             end
