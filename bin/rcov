@@ -356,6 +356,7 @@ EOF
     def process_unified_diff(filename, diff)
         current_hunk = []
         current_hunk_start = 0
+        keep_current_hunk = false
         state = :init
         interesting_hunks = []
         diff.each_with_index do |line, i|
@@ -371,15 +372,17 @@ EOF
                 case line
                 when HUNK_HEADER
                     new_start = $1.to_i
-                    unless current_hunk.empty?
-                        if current_hunk.any?{|l| /^!! /.match(l)}
-                            interesting_hunks << [current_hunk_start, current_hunk]
-                        end
+                    if keep_current_hunk
+                        interesting_hunks << [current_hunk_start, current_hunk]
                     end
                     current_hunk_start = new_start
                     current_hunk = []
+                    keep_current_hunk = false
                 when /^-/
                     # ignore
+                when /^\+!! /
+                    keep_current_hunk = true
+                    current_hunk << line[1..-1]
                 else
                     current_hunk << line[1..-1]
                 end
