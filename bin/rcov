@@ -307,10 +307,12 @@ EOF
 
     def verify_diff_available
         old_stderr = STDERR.dup
+        old_stdout = STDOUT.dup
         # TODO: should use /dev/null or NUL(?), but I don't want to add the
         # win32 check right now
         new_stderr = Tempfile.new("rcov_check_diff")
         STDERR.reopen new_stderr.path
+        STDOUT.reopen new_stderr.path
 
         retval = system "#{@diff_cmd} --version"
         unless retval
@@ -326,6 +328,7 @@ EOF
         end
         true
     ensure
+        STDOUT.reopen old_stdout
         STDERR.reopen old_stderr
         new_stderr.close!
     end
