@@ -940,6 +940,7 @@ options.replace_prog_name = false
 options.callsites = false
 options.coverage_diff_file = "coverage.info"
 options.coverage_diff_mode = :compare
+options.coverage_diff_save = false
 options.diff_cmd = "diff"
 
 EXTRA_HELP = <<-EOF
@@ -1044,13 +1045,19 @@ EOF
             "Compare code coverage with saved state",
             "in FILE, defaults to coverage.info.") do |file|
         options.textmode = :coverage_diff
+        if options.coverage_diff_save
+            raise "You shouldn't use --save and --text-coverage-diff at a time."
+        end
         options.coverage_diff_mode = :compare
         options.coverage_diff_file = file if file && !file.empty?
     end
-    opts.on("--save-info [FILE]", "Save coverage data to FILE.",
+    opts.on("--save [FILE]", "Save coverage data to FILE.",
             "(default: coverage.info)") do |file|
-        options.textmode = :coverage_diff
+        options.coverage_diff_save = true
         options.coverage_diff_mode = :record
+        if options.textmode == :coverage_diff
+            raise "You shouldn't use --save and --text-coverage-diff at a time."
+        end
         options.coverage_diff_file = file if file && !file.empty?
     end
     opts.on("--no-html", "Don't generate HTML output.",
@@ -1177,6 +1184,8 @@ textual_formatters = {:counts => Rcov::TextCoverage, :coverage => Rcov::TextCove
 if textual_formatters[options.textmode]
     formatters << make_formatter[textual_formatters[options.textmode]]
 end
+
+formatters << make_formatter[Rcov::TextCoverageDiff] if options.coverage_diff_save
 
 $rcov_code_coverage_analyzer = Rcov::CodeCoverageAnalyzer.new
 
