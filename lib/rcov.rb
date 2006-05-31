@@ -648,7 +648,7 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
     marked_info = []
     count_info = []
     0.upto(lines.size - 1) do |c|
-      line = lines[c].chomp
+      line = lines[c]
       marked = false
       marked = true if covers[c] && covers[c] > 0
       line_info << line

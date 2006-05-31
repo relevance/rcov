@@ -693,7 +693,7 @@ EOS
         end_of_span = ""
         format_line = "%#{file.num_lines.to_s.size}d"
         file.num_lines.times do |i|
-            line = file.lines[i]
+            line = file.lines[i].chomp
             marked = file.coverage[i]
             count = file.counts[i]
             spanclass = span_class(file, marked, count)

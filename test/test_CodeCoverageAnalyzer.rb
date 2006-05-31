@@ -28,7 +28,7 @@ EOF
     cover = [1, 1, nil, nil, 0, 5, 5, 5, 0]
     line_info, marked_info, 
       count_info = analyzer.instance_eval{ refine_coverage_info(LINES, cover) }
-    assert_equal(LINES.map{|l| l.chomp}, line_info)
+    assert_equal(LINES, line_info)
     assert_equal([true] * 2 + [false] * 3 + [true] * 3 + [false], marked_info)
     assert_equal([1, 1, 0, 0, 0, 5, 5, 5, 0], count_info)
   end
@@ -47,7 +47,7 @@ EOF
     assert_equal(lines, SCRIPT_LINES__[sample_file][0, lines.size])
     assert(analyzer.analyzed_files.include?(sample_file))
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    assert_equal(lines.map{|l| l.chomp}, line_info)
+    assert_equal(lines, line_info)
     assert_equal([true, true, false, false, true, false, true], cov_info)
     assert_equal([1, 2, 0, 0, 1, 0, 11], count_info)
     analyzer.reset
