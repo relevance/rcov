@@ -74,6 +74,10 @@ class Formatter
         File.expand_path(filename).gsub(/^#{Regexp.escape(Dir.getwd)}\//, '')
     end
 
+    def mangle_filename(base)
+        base.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".html"
+    end
+
     def each_file_pair_sorted(&b)
         return sorted_file_pairs unless block_given?
         sorted_file_pairs.each(&b)
@@ -262,8 +266,8 @@ class TextCoverageDiff < Formatter
         return unless verify_diff_available
         prev_state = File.open(@state_file){|f| self.SERIALIZER.load(f) }
         each_file_pair_sorted do |filename, fileinfo|
-            old_data = Tempfile.new("#{filename}.old")
-            new_data = Tempfile.new("#{filename}.new")
+            old_data = Tempfile.new("#{mangle_filename(filename)}-old")
+            new_data = Tempfile.new("#{mangle_filename(filename)}-new")
             if prev_state.has_key? filename
                 old_code, old_cov = prev_state[filename].values_at(:lines, :coverage)
                 old_code.each_with_index do |line, i|
@@ -544,10 +548,6 @@ EOS
         each_file_pair_sorted do |filename, fileinfo|
             create_file(File.join(@dest, mangle_filename(filename)), fileinfo)
         end
-    end
-
-    def mangle_filename(base)
-        base.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".html"
     end
 
     private
