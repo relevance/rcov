@@ -203,7 +203,7 @@ class TextCoverage < Formatter
                         prefix = fileinfo.coverage[i] ? "\e[32;40m" : "\e[31;40m"
                         puts "#{prefix}%s\e[37;40m" % line.chomp
                     else
-                        prefix = fileinfo.coverage[i] ? "   " : "## "
+                        prefix = fileinfo.coverage[i] ? "   " : "!! "
                         puts "#{prefix}#{line}"
                     end
                 end
