@@ -253,7 +253,7 @@ class TextCoverageDiff < Formatter
         state = {}
         each_file_pair_sorted do |filename, fileinfo|
             state[filename] = {:lines    => SCRIPT_LINES__[filename],
-                               :coverage => fileinfo.coverage, 
+                               :coverage => fileinfo.coverage.to_a, 
                                :counts   => fileinfo.counts}
         end
         File.open(@state_file, "w") do |f|
