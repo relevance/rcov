@@ -289,6 +289,7 @@ class TextCoverageDiff < Formatter
     end
 
     def display_hunks(filename, hunks)
+        return if hunks.empty?
         puts 
         puts "=" * 80
         puts <<EOF
