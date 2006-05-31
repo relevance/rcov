@@ -259,12 +259,23 @@ class TextCoverageDiff < Formatter
         File.open(@state_file, "w") do |f|
             self.SERIALIZER.dump(state, f)
         end
+    rescue
+        $stderr.puts <<-EOF
+Couldn't save coverage data to #{@state_file}.
+EOF
     end
 
     require 'tempfile'
     def compare_state
         return unless verify_diff_available
-        prev_state = File.open(@state_file){|f| self.SERIALIZER.load(f) }
+        begin
+            prev_state = File.open(@state_file){|f| self.SERIALIZER.load(f) }
+        rescue
+            $stderr.puts <<-EOF
+Couldn't load coverage data from #{@state_file}.
+EOF
+            return
+        end
         each_file_pair_sorted do |filename, fileinfo|
             old_data = Tempfile.new("#{mangle_filename(filename)}-old")
             new_data = Tempfile.new("#{mangle_filename(filename)}-new")
