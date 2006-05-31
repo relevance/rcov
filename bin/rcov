@@ -212,6 +212,162 @@ class TextCoverage < Formatter
     end
 end
 
+class TextCoverageDiff < Formatter
+    DEFAULT_OPTS = {:textmode => :coverage_diff, 
+                    :coverage_diff_mode => :record,
+                    :coverage_diff_file => "coverage.info",
+                    :diff_cmd => "diff"}
+    def SERIALIZER
+        require 'yaml'
+        YAML
+    end
+
+    def initialize(opts = {})
+        options = DEFAULT_OPTS.clone.update(opts)
+        @textmode = options[:textmode]
+        @color = options[:color]
+        @mode = options[:coverage_diff_mode]
+        @state_file = options[:coverage_diff_file]
+        @diff_cmd = options[:diff_cmd]
+        super(options)
+    end
+
+    def execute
+        case @mode
+        when :record
+            record_state
+        when :compare
+            compare_state
+        else
+            raise "Unknown TextCoverageDiff mode: #{mode.inspect}."
+        end
+    end
+
+    def record_state
+        state = {}
+        each_file_pair_sorted do |filename, fileinfo|
+            lines = ""
+            SCRIPT_LINES__[filename].each_with_index do |line, i|
+                prefix = fileinfo.coverage[i] ? "   " : "!! "
+                lines << "#{prefix}#{line}"
+            end
+            state[filename] = lines
+        end
+        File.open(@state_file, "w") do |f|
+            self.SERIALIZER.dump(state, f)
+        end
+    end
+
+    require 'tempfile'
+    def compare_state
+        return unless verify_diff_available
+        prev_state = File.open(@state_file){|f| self.SERIALIZER.load(f) }
+        each_file_pair_sorted do |filename, fileinfo|
+            old_data = Tempfile.new("#{filename}.old")
+            new_data = Tempfile.new("#{filename}.new")
+            if prev_state.has_key? filename
+                old_data.write prev_state[filename]
+            else
+                old_data.write ""
+            end
+            old_data.close
+            SCRIPT_LINES__[filename].each_with_index do |line, i|
+                prefix = fileinfo.coverage[i] ? "   " : "!! "
+                new_data.write "#{prefix}#{line}"
+            end
+            new_data.close
+
+            diff = `#{@diff_cmd} -u #{old_data.path} #{new_data.path}`
+            new_uncovered_hunks = process_unified_diff(filename, diff)
+            old_data.close!
+            new_data.close!
+            display_hunks(filename, new_uncovered_hunks)
+        end
+    end
+
+    def display_hunks(filename, hunks)
+        puts 
+        puts "=" * 80
+        puts <<EOF
+!!!!! Uncovered code introduced in #{filename}
+
+EOF
+        hunks.each do |offset, lines|
+            puts "### #{filename}:#{offset}"
+            if @color
+                lines.each do |line| 
+                    prefix = (/^!! / !~ line) ? "\e[32;40m" : "\e[31;40m"
+                    puts "#{prefix}#{line[3..-1].chomp}\e[37;40m"
+                end
+            else
+                puts lines
+            end
+        end
+    end
+
+    def verify_diff_available
+        old_stderr = STDERR.dup
+        # TODO: should use /dev/null or NUL(?), but I don't want to add the
+        # win32 check right now
+        new_stderr = Tempfile.new("rcov_check_diff")
+        STDERR.reopen new_stderr.path
+
+        retval = system "#{@diff_cmd} --version"
+        unless retval
+            old_stderr.puts <<EOF
+
+The '#{@diff_cmd}' executable seems not to be available.
+You can specify which diff executable should be used with --diff-cmd.
+If your system doesn't have one, you might want to use Diff::LCS's:
+  gem install diff-lcs
+and use --diff-cmd=ldiff.
+EOF
+            return false
+        end
+        true
+    ensure
+        STDERR.reopen old_stderr
+        new_stderr.close!
+    end
+
+    HUNK_HEADER = /@@ -\d+,\d+ \+(\d+),(\d+) @@/
+    def process_unified_diff(filename, diff)
+        current_hunk = []
+        current_hunk_start = 0
+        state = :init
+        interesting_hunks = []
+        diff.each_with_index do |line, i|
+            #puts "#{state} %5d #{line}" % i
+            case state
+            when :init
+                if md = HUNK_HEADER.match(line)
+                    current_hunk = []
+                    current_hunk_start = md[1].to_i
+                    state = :body
+                end
+            when :body
+                case line
+                when HUNK_HEADER
+                    new_start = $1.to_i
+                    unless current_hunk.empty?
+                        if current_hunk.any?{|l| /^!! /.match(l)}
+                            interesting_hunks << [current_hunk_start, current_hunk]
+                        end
+                    end
+                    current_hunk_start = new_start
+                    current_hunk = []
+                when /^-/
+                    # ignore
+                else
+                    current_hunk << line[1..-1]
+                end
+            end
+        end
+
+        interesting_hunks
+    end
+end
+
 
 class HTMLCoverage < Formatter
     include XX::XHTML
@@ -779,6 +935,9 @@ options.sort_reverse = false
 options.output_threshold = 101
 options.replace_prog_name = false
 options.callsites = false
+options.coverage_diff_file = "coverage.info"
+options.coverage_diff_mode = :compare
+options.diff_cmd = "diff"
 
 EXTRA_HELP = <<-EOF
 
@@ -878,6 +1037,19 @@ EOF
             "ANSI color sequences unless -n.") do
         options.textmode = :coverage
     end
+    opts.on("-D [FILE]", "--text-coverage-diff [FILE]",
+            "Compare code coverage with saved state",
+            "in FILE, defaults to coverage.info.") do |file|
+        options.textmode = :coverage_diff
+        options.coverage_diff_mode = :compare
+        options.coverage_diff_file = file if file && !file.empty?
+    end
+    opts.on("--save-info [FILE]", "Save coverage data to FILE.",
+            "(default: coverage.info)") do |file|
+        options.textmode = :coverage_diff
+        options.coverage_diff_mode = :record
+        options.coverage_diff_file = file if file && !file.empty?
+    end
     opts.on("--no-html", "Don't generate HTML output.",
             "(no output unless text output specified)") do
         options.nohtml = true
@@ -912,6 +1084,10 @@ EOF
     opts.on("--no-rcovrt", "Do not use the optimized C runtime.",
             "(will run 30-300 times slower)") do 
         $rcov_do_not_use_rcovrt = true
+    end
+    opts.on("--diff-cmd PROGNAME", "Use PROGNAME for --text-coverage-diff.",
+            "(default: diff)") do |cmd|
+        options.diff_cmd = cmd
     end
     opts.separator ""
     opts.on_tail("-h", "--help", "Show help message") do
@@ -977,7 +1153,11 @@ make_formatter = lambda do |klass|
               :sort => options.sort, 
               :sort_reverse => options.sort_reverse, 
               :output_threshold => options.output_threshold,
-              :callsite_analyzer => $rcov_callsite_analyzer)
+              :callsite_analyzer => $rcov_callsite_analyzer,
+              :coverage_diff_mode => options.coverage_diff_mode,
+              :coverage_diff_file => options.coverage_diff_file,
+              :diff_cmd => options.diff_cmd
+             )
 end
 
 unless options.nohtml
@@ -988,7 +1168,8 @@ unless options.nohtml
     end
 end
 textual_formatters = {:counts => Rcov::TextCoverage, :coverage => Rcov::TextCoverage,
-                      :summary => Rcov::TextSummary, :report => Rcov::TextReport}
+                      :summary => Rcov::TextSummary, :report => Rcov::TextReport,
+                      :coverage_diff => Rcov::TextCoverageDiff}
 
 if textual_formatters[options.textmode]
     formatters << make_formatter[textual_formatters[options.textmode]]
