@@ -5,6 +5,7 @@ Since 0.5.0 (2006-05-30)
 ========================
 Features
 --------
+* differential coverage report: --text-coverage-diff (-D) and --save
 
 Bugfixes
 --------
@@ -16,6 +17,7 @@ Bugfixes
 
 Minor enhancements
 ------------------
+* more readable --text-coverage
 
 Since 0.4.0 (2006-05-22)
 ========================
