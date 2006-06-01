@@ -27,3 +27,7 @@ John-Mason Shackelford:
 
 Dave Burt:
 * reported an issue with text reports under cmd.exe (should use < 80 cols)
+
+Alex Wayne:
+* reported problem with heredocs: they were not being marked as a whole if
+  the "header" wasn't reported by Ruby.

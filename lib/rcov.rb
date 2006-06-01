@@ -253,6 +253,8 @@ class FileStatistics
       loop do
         scanned_text = scanner.search_full(/<<(-?)(?:(['"`])((?:(?!\2).)+)\2|([A-Z_a-z]\w*))/, 
                                            true, true)
+        # k is the first line after the end delimiter for the last heredoc
+        # scanned so far
         unless scanner.matched?
           i = k
           break
@@ -265,23 +267,25 @@ class FileStatistics
           i = k
           break
         end
-        if @coverage[i]
-          must_mark = []
-          end_of_heredoc = (scanner[1] == "-") ? /^\s*#{Regexp.escape(term)}$/ :
-            /^#{Regexp.escape(term)}$/
-            loop do
-            break if j == @lines.size
-            must_mark << j
-            if end_of_heredoc =~ @lines[j]
-              must_mark.each do |n|
-                @heredoc_start[n] = i
-                @coverage[n] ||= :inferred
-              end
-              k = (j += 1)
-              break
+        must_mark = []
+        end_of_heredoc = (scanner[1] == "-") ? 
+               /^\s*#{Regexp.escape(term)}$/ : /^#{Regexp.escape(term)}$/
+        loop do
+          break if j == @lines.size
+          must_mark << j
+          if end_of_heredoc =~ @lines[j]
+            must_mark.each do |n|
+              @heredoc_start[n] = i
             end
-            j += 1
+            if (must_mark + [i]).any?{|lineidx| @coverage[lineidx]}
+              @coverage[i] ||= :inferred
+              must_mark.each{|lineidx| @coverage[lineidx] ||= :inferred}
             end
+            # move the "first line after heredocs" index
+            k = (j += 1)
+            break
+          end
+          j += 1
         end
       end
 

@@ -209,6 +209,19 @@ class Test_FileStatistics < Test::Unit::TestCase
     EOF
   end
 
+  def test_heredocs_with_interpolation_alone_in_method
+    verify_everything_marked "lonely heredocs with interpolation", <<-'EOS'
+      1 def to_s
+      0  <<-EOF               
+      1    #{name}
+      0    #{street}          
+      0    #{city}, #{state}  
+      0    #{zip}             
+      0  EOF
+      0 end
+    EOS
+  end
+
   def test_handle_multiline_expressions
     verify_everything_marked "expression", <<-EOF
       1 puts 1, 2.
