@@ -31,6 +31,8 @@ Dave Burt:
 Alex Wayne:
 * reported problem with heredocs: they were not being marked as a whole if
   the "header" wasn't reported by Ruby.
+* reported problem with the last line of literal data structs not being
+  covered if there was stuff after the end delimiter
 
 Coda Hale:
 * reported problem with blocks were the first line is not being marked

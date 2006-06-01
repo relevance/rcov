@@ -287,6 +287,23 @@ class Test_FileStatistics < Test::Unit::TestCase
     EOF
   end
 
+  def handle_multiline_data_with_trailing_stuff_on_last_line
+    verify_everything_marked "multiline data hash", <<-'EOF'
+      1    @review = Review.new({
+      0      :product_id => params[:id],
+      0      :user       => current_user
+      0    }.merge(params[:review]))      #red
+      1    @review.save
+    EOF
+    verify_everything_marked "multiline data array", <<-'EOF'
+      1    @review = Review.new([
+      0    true,
+      0    false
+      0    ].concat(params[:review]))      #red
+      1    @review.save
+    EOF
+  end
+  
   def test_handle_multiline_expression_1st_line_ends_in_block_header
     # excerpt taken from mongrel/handlers.rb
     verify_everything_marked "multiline with block starting on 1st", <<-EOF
