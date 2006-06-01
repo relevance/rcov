@@ -207,6 +207,15 @@ class FileStatistics
 
   def precompute_coverage(comments_run_by_default = true)
     changed = false
+    lastidx = lines.size - 1
+    if (!is_code?(lastidx) || /^__END__$/ =~ @lines[-1]) && !@coverage[lastidx]
+      # mark the last block of comments
+      @coverage[lastidx] ||= :inferred
+      (lastidx-1).downto(0) do |i|
+        break if is_code?(i)
+        @coverage[i] ||= :inferred
+      end
+    end
     (0...lines.size).each do |i|
       next if @coverage[i]
       line = @lines[i]

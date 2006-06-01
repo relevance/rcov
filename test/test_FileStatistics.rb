@@ -116,6 +116,32 @@ class Test_FileStatistics < Test::Unit::TestCase
     assert_equal([2, 2, 1, 0, 1, 0, 0, 13], sf.counts)
   end
 
+  def test_last_comment_block_is_marked
+    verify_everything_marked "last comment block", <<-EOF
+      1 a = 1
+      1 b = 1
+      0 # foo
+      0 # bar baz
+    EOF
+    verify_everything_marked "last comment block, =begin/=end", <<-EOF
+      1 a = 1
+      2 b = 1
+      0 # fooo
+      0 =begin
+      0  bar baz
+      0 =end
+    EOF
+    verify_everything_marked "last comment block, __END__", <<-EOF
+      1 a = 1
+      2 b = 1
+      0 # fooo
+      0 =begin
+      0  bar baz
+      0 =end
+      __END__
+    EOF
+  end
+
   def test_heredocs_basic
     verify_everything_marked "heredocs-basic.rb", <<-EOF
       1 puts 1 + 1
