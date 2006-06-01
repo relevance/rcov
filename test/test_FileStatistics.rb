@@ -266,6 +266,17 @@ class Test_FileStatistics < Test::Unit::TestCase
     EOF
   end
 
+  def test_handle_multiline_blocks_first_not_marked
+    verify_everything_marked "multiline block first not marked", <<-'EOF'
+      1 blah = Array.new
+      1 10.times do
+      0   blah << lambda do |f|
+      1     puts "I should say #{f}!"
+      0   end
+      0 end
+    EOF
+  end
+
   def test_handle_multiline_expression_1st_line_ends_in_block_header
     # excerpt taken from mongrel/handlers.rb
     verify_everything_marked "multiline with block starting on 1st", <<-EOF

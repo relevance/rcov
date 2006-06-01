@@ -213,6 +213,7 @@ class FileStatistics
       if /^\s*(begin|ensure|else|case)\s*(?:#.*)?$/ =~ line && next_expr_marked?(i) or
         /^\s*(?:end|\})\s*(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
         /^\s*rescue\b/ =~ line && next_expr_marked?(i) or
+        /(do|\{)\s*(\|[^|]*\|\s*)?(?:#.*)?$/ =~ line && next_expr_marked?(i) or
         prev_expr_continued?(i) && prev_expr_marked?(i) or
         comments_run_by_default && !is_code?(i) or 
         /^\s*((\)|\]|\})\s*)+(?:#.*)?$/ =~ line && prev_expr_marked?(i) or

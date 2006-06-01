@@ -31,3 +31,6 @@ Dave Burt:
 Alex Wayne:
 * reported problem with heredocs: they were not being marked as a whole if
   the "header" wasn't reported by Ruby.
+
+Coda Hale:
+* reported problem with blocks were the first line is not being marked
