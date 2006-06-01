@@ -277,6 +277,16 @@ class Test_FileStatistics < Test::Unit::TestCase
     EOF
   end
 
+  def test_handle_multiline_blocks_last_line_not_marked
+    verify_everything_marked "multiline block last not marked", <<-'EOF'
+      1 blee = [1, 2, 3]
+      0 blee.map! do |e|
+      1   [e, e]
+      0 end.flatten!
+      1 p blee
+    EOF
+  end
+
   def test_handle_multiline_expression_1st_line_ends_in_block_header
     # excerpt taken from mongrel/handlers.rb
     verify_everything_marked "multiline with block starting on 1st", <<-EOF

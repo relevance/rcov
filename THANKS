@@ -34,3 +34,4 @@ Alex Wayne:
 
 Coda Hale:
 * reported problem with blocks were the first line is not being marked
+  and ditto for the last line when end/} is followed by more stuff

@@ -212,6 +212,7 @@ class FileStatistics
       line = @lines[i]
       if /^\s*(begin|ensure|else|case)\s*(?:#.*)?$/ =~ line && next_expr_marked?(i) or
         /^\s*(?:end|\})\s*(?:#.*)?$/ =~ line && prev_expr_marked?(i) or
+        /^\s*(?:end\b|\})/ =~ line && prev_expr_marked?(i) && next_expr_marked?(i) or
         /^\s*rescue\b/ =~ line && next_expr_marked?(i) or
         /(do|\{)\s*(\|[^|]*\|\s*)?(?:#.*)?$/ =~ line && next_expr_marked?(i) or
         prev_expr_continued?(i) && prev_expr_marked?(i) or
