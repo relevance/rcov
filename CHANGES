@@ -9,6 +9,10 @@ Features
 Bugfixes
 --------
 * comments at EOF are marked now
+* better handling of multiline hashes/arrays
+* better handling of end/}: support chained method calls and more expressions
+  on the same line
+* better handling of heredocs with interpolation
 
 Minor enhancements
 ------------------
