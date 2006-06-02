@@ -288,7 +288,8 @@ unless options.nohtml
         formatters << make_formatter[Rcov::HTMLCoverage]
     end
 end
-textual_formatters = {:counts => Rcov::TextCoverage, :coverage => Rcov::TextCoverage,
+textual_formatters = {:counts => Rcov::FullTextReport, 
+                      :coverage => Rcov::FullTextReport,
                       :summary => Rcov::TextSummary, :report => Rcov::TextReport,
                       :coverage_diff => Rcov::TextCoverageDiff}
 

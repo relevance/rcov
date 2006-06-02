@@ -154,7 +154,7 @@ class TextReport < TextSummary
     end
 end
 
-class TextCoverage < Formatter
+class FullTextReport < Formatter
     DEFAULT_OPTS = {:textmode => :coverage}
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
