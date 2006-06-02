@@ -952,3 +952,5 @@ class HTMLProfiling < HTMLCoverage
 end
 
 end # Rcov
+
+# vi: set sw=4:
