@@ -49,6 +49,7 @@ options.sort_reverse = false
 options.output_threshold = 101
 options.replace_prog_name = false
 options.callsites = false
+options.crossrefs = false
 options.coverage_diff_file = "coverage.info"
 options.coverage_diff_mode = :compare
 options.coverage_diff_save = false
@@ -129,6 +130,11 @@ EOF
     opts.on("--[no-]callsites", "Show callsites in generated XHTML report.",
             "(much slower; disabled by default)") do |val|
         options.callsites = val
+    end
+    opts.on("--[no-]xrefs", "Generate fully cross-referenced report.",
+            "(includes --callsites)") do |val|
+        options.crossrefs = val
+        options.callsites ||= val
     end
     opts.on("-p", "--profile", "Generate bogo-profiling info.") do
         options.profiling = true
@@ -277,6 +283,8 @@ make_formatter = lambda do |klass|
               :callsite_analyzer => $rcov_callsite_analyzer,
               :coverage_diff_mode => options.coverage_diff_mode,
               :coverage_diff_file => options.coverage_diff_file,
+              :callsites => options.callsites, 
+              :cross_references => options.crossrefs,
               :diff_cmd => options.diff_cmd
              )
 end

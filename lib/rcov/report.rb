@@ -101,6 +101,12 @@ class Formatter
         @callsite_index[normalize_filename(filename)][lineno]
     end
 
+    def reverse_cross_references_for(filename, lineno)
+        return nil unless @callsite_analyzer
+        @callsite_reverse_index ||= build_reverse_callsite_index
+        @callsite_reverse_index[normalize_filename(filename)][lineno]
+    end
+
     def build_callsite_index
         index = Hash.new{|h,k| h[k] = {}}
         @callsite_analyzer.analyzed_classes.each do |classname|
@@ -108,6 +114,20 @@ class Formatter
                 defsite = @callsite_analyzer.defsite(classname, methname)
                 index[normalize_filename(defsite.file)][defsite.line] = 
                     @callsite_analyzer.callsites(classname, methname)
+            end
+        end
+        index
+    end
+    
+    def build_reverse_callsite_index
+        index = Hash.new{|h,k| h[k] = {}}
+        @callsite_analyzer.analyzed_classes.each do |classname|
+            @callsite_analyzer.analyzed_methods(classname).each do |methname|
+                callsites = @callsite_analyzer.callsites(classname, methname)
+                defsite = @callsite_analyzer.defsite(classname, methname)
+                callsites.each_key do |callsite|
+                    (index[normalize_filename(callsite.file)][callsite.line] ||= []) << [classname, methname, defsite]
+                end
             end
         end
         index
@@ -515,13 +535,16 @@ table.report tr.dark {
 }
 EOS
 
-    DEFAULT_OPTS = {:color => false, :fsr => 30, :destdir => "coverage"}
+    DEFAULT_OPTS = {:color => false, :fsr => 30, :destdir => "coverage",
+                    :callsites => false, :cross_references => false}
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
         super(options)
         @dest = options[:destdir]
         @color = options[:color]
         @fsr = options[:fsr]
+        @do_callsites = options[:callsites]
+        @do_cross_references = options[:cross_references]
         @span_class_index = 0
     end
 
@@ -699,24 +722,47 @@ EOS
         "<pre>#{result}</pre>"
     end
 
+    class XRefHelper < Struct.new(:file, :line, :klass, :mid, :count) # :nodoc:
+    end
+
     def create_cross_refs(filename, lineno, linetext)
-        return linetext unless @callsite_analyzer
-        @cross_ref_idx ||= 0
+        return linetext unless @callsite_analyzer && @do_callsites
         ret = ""
+        if @do_cross_references and 
+           (rev_xref = reverse_cross_references_for(filename, lineno))
+            refs = rev_xref.map do |classname, methodname, defsite|
+                XRefHelper.new(defsite.file, defsite.line, classname, methodname, 0)
+            end
+            return create_cross_reference_block(linetext, refs, "Calls:") do |ref|
+                CGI.escapeHTML("  #{ref.klass}##{ref.mid} at #{ref.file}:#{ref.line}")
+            end
+        end
         refs = cross_references_for(filename, lineno)
         return linetext unless refs
-        refs = refs.sort_by{|k,count| count}
+        refs = refs.sort_by{|k,count| count}.map do |ref, count|
+            XRefHelper.new(ref.file, ref.line, nil, ref.calling_method, count)
+        end
+        
+        create_cross_reference_block(linetext, refs, 
+                                     "Called by:") do |ref|
+            r = "%7d   %s" % [ref.count, 
+                              "#{ref.file}:#{ref.line} in '#{ref.mid}'"]
+            CGI.escapeHTML(r)
+        end
+    end
+
+    def create_cross_reference_block(linetext, refs, toplabel = "", &block)
+        ret = ""
+        @cross_ref_idx ||= 0
+        @known_files ||= sorted_file_pairs.map{|fname, finfo| normalize_filename(fname)}
         ret << %[<a class="crossref-toggle" href="#" onclick="toggleCode('XREF-#{@cross_ref_idx+=1}'); return false;">#{linetext}</a>]
         ret << %[<span class="cross-ref" id="XREF-#{@cross_ref_idx}">]
-        ret << %[\nThis method was called by:\n\n]
-        known_files = sorted_file_pairs.map{|fname, finfo| normalize_filename(fname)}
-        refs.reverse_each do |dst, count|
+        ret << %[\n#{toplabel}#{toplabel.empty? ? "" : "\n\n"}]
+        refs.each do |dst|
             dstfile = normalize_filename(dst.file)
             dstline = dst.line
-            calling_method = dst.calling_method
-            label = "%7d   %s" % 
-                [count, CGI.escapeHTML("#{dstfile}:#{dstline} in '#{calling_method}'")]
-            if known_files.include? dstfile
+            label = yield(dst)
+            if @known_files.include? dstfile
                 ret << %[<a href="#{mangle_filename(dstfile)}#line#{dstline}">#{label}</a>]
             else
                 ret << label
