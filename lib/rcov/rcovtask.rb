@@ -112,9 +112,9 @@ module Rcov
             else %!"#{rcov_path}"!
 	    end
           ruby_opts = @ruby_opts.clone
-          ruby_opts.unshift run_code
-          ruby_opts.unshift( "-I#{lib_path}" )
-	  ruby_opts.unshift( "-w" ) if @warning
+          ruby_opts.push run_code
+          ruby_opts.push( "-I#{lib_path}" )
+	  ruby_opts.push( "-w" ) if @warning
 	  ruby ruby_opts.join(" ") + " " + option_list +
             %[ -o "#{@output_dir}" ] +
 	    file_list.collect { |fn| %["#{fn}"] }.join(' ')
