@@ -421,6 +421,9 @@ class HTMLCoverage < Formatter
 span.cross-ref-title {
     font-size: 140%;
 }
+span.cross-ref a {
+  text-decoration: none;
+}
 span.cross-ref {
     background-color:#f3f7fa;
     border: 1px dashed #333;
