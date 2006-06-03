@@ -659,19 +659,15 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
 
 
   def refine_coverage_info(lines, covers)
-    line_info = []
     marked_info = []
     count_info = []
-    0.upto(lines.size - 1) do |c|
-      line = lines[c]
-      marked = false
-      marked = true if covers[c] && covers[c] > 0
-      line_info << line
-      marked_info << marked
-      count_info << (covers[c] || 0)
+    lines.size.times do |i|
+      c = covers[i]
+      marked_info << ((c && c > 0) ? true : false)
+      count_info << (c || 0)
     end
 
-    script_lines_workaround(line_info, marked_info, count_info)
+    script_lines_workaround(lines, marked_info, count_info)
   end
 
   # Try to detect repeated data, based on observed repetitions in line_info:
