@@ -736,7 +736,7 @@ EOS
                 XRefHelper.new(defsite.file, defsite.line, classname, methodname, 0)
             end
             return create_cross_reference_block(linetext, refs, "Calls:") do |ref|
-                CGI.escapeHTML("  #{ref.klass}##{ref.mid} at #{ref.file}:#{ref.line}")
+                CGI.escapeHTML("  #{ref.klass}##{ref.mid} at #{normalize_filename(ref.file)}:#{ref.line}")
             end
         end
         refs = cross_references_for(filename, lineno)
@@ -748,7 +748,7 @@ EOS
         create_cross_reference_block(linetext, refs, 
                                      "Called by:") do |ref|
             r = "%7d   %s" % [ref.count, 
-                              "#{ref.file}:#{ref.line} in '#{ref.mid}'"]
+                              "#{normalize_filename(ref.file)}:#{ref.line} in '#{ref.mid}'"]
             CGI.escapeHTML(r)
         end
     end
