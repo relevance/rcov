@@ -414,11 +414,20 @@ class HTMLCoverage < Formatter
   
   // Make cross-references hidden by default
   document.writeln( "<style type=\\"text/css\\">span.cross-ref { display: none }</style>" )
-  
   // ]]>
     EOS
 
     CSS_PROLOG = <<-EOS
+span.cross-ref {
+    background-color:#f3f7fa;
+    border: 1px dashed #333;
+    margin: 1em;
+    padding: 0.5em;
+    overflow: hidden;
+}
+a.crossref-toggle {
+  text-decoration: none;
+}
 span.marked0 {
   background-color: rgb(185, 210, 200);
   display: block;
@@ -759,7 +768,8 @@ EOS
         @known_files ||= sorted_file_pairs.map{|fname, finfo| normalize_filename(fname)}
         ret << %[<a class="crossref-toggle" href="#" onclick="toggleCode('XREF-#{@cross_ref_idx+=1}'); return false;">#{linetext}</a>]
         ret << %[<span class="cross-ref" id="XREF-#{@cross_ref_idx}">]
-        ret << %[\n#{toplabel}#{toplabel.empty? ? "" : "\n\n"}]
+        ret << "\n"
+        ret << "<h3>#{toplabel}</h3>\n" unless !toplabel || toplabel.empty?
         refs.each do |dst|
             dstfile = normalize_filename(dst.file)
             dstline = dst.line
