@@ -80,6 +80,7 @@ end
 class FileStatistics
   attr_reader :name, :lines, :coverage, :counts
   def initialize(name, lines, counts)
+    @is_code_cache = {}
     @name = name
     @lines = lines
     initial_coverage = counts.map{|x| (x || 0) > 0 ? true : false }
@@ -148,6 +149,7 @@ class FileStatistics
   # Returns true if the given line number corresponds to code, as opposed to a
   # comment (either # or =begin/=end blocks).
   def is_code?(lineno)
+    return @is_code_cache[lineno] if @is_code_cache.has_key? lineno
     unless @is_begin_comment
       @is_begin_comment = Array.new(@lines.size, false)
       pending = []
@@ -169,8 +171,8 @@ class FileStatistics
         end
       end
     end
-    @lines[lineno] && !@is_begin_comment[lineno] && 
-      @lines[lineno] !~ /^\s*(#|$)/ 
+    @is_code_cache[lineno] = @lines[lineno] && !@is_begin_comment[lineno] && 
+                             @lines[lineno] !~ /^\s*(#|$)/ 
   end
 
   private
