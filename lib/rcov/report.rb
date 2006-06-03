@@ -126,7 +126,9 @@ class Formatter
                 callsites = @callsite_analyzer.callsites(classname, methname)
                 defsite = @callsite_analyzer.defsite(classname, methname)
                 callsites.each_key do |callsite|
-                    (index[normalize_filename(callsite.file)][callsite.line] ||= []) << [classname, methname, defsite]
+                    next unless callsite.file
+                    fname = normalize_filename(callsite.file)
+                    (index[fname][callsite.line] ||= []) << [classname, methname, defsite]
                 end
             end
         end
