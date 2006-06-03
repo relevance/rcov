@@ -749,9 +749,13 @@ EOS
                 XRefHelper.new(defsite.file, defsite.line, classname, methodname, count)
             end.sort_by{|r| r.count}.reverse
             format_call_ref = lambda do |ref|
+                if ref.file
+                    where = "at #{normalize_filename(ref.file)}:#{ref.line}"
+                else
+                    where = "(C extension/core)"
+                end
                 CGI.escapeHTML("%7d   %s" % 
-                               [ref.count, "#{ref.klass}##{ref.mid} at " +
-                                "#{normalize_filename(ref.file)}:#{ref.line}"])
+                               [ref.count, "#{ref.klass}##{ref.mid} " + where])
             end
             ref_blocks << [refs, "Calls", format_call_ref]
         end
@@ -762,7 +766,7 @@ EOS
             end.reverse
             format_called_ref = lambda do |ref|
                 r = "%7d   %s" % [ref.count, 
-                    "#{normalize_filename(ref.file)}:#{ref.line} in '#{ref.mid}'"]
+                    "#{normalize_filename(ref.file||'C code')}:#{ref.line} in '#{ref.mid}'"]
                 CGI.escapeHTML(r)
             end
             ref_blocks << [refs, "Called by", format_called_ref]
@@ -784,10 +788,10 @@ EOS
                 ret << %!<span class="cross-ref-title">#{toplabel}</span>\n!
             end
             refs.each do |dst|
-                dstfile = normalize_filename(dst.file)
+                dstfile = normalize_filename(dst.file) if dst.file
                 dstline = dst.line
                 label = label_proc.call(dst)
-                if @known_files.include? dstfile
+                if dst.file && @known_files.include?(dstfile)
                     ret << %[<a href="#{mangle_filename(dstfile)}#line#{dstline}">#{label}</a>]
                 else
                     ret << label
