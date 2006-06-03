@@ -125,10 +125,10 @@ class Formatter
             @callsite_analyzer.analyzed_methods(classname).each do |methname|
                 callsites = @callsite_analyzer.callsites(classname, methname)
                 defsite = @callsite_analyzer.defsite(classname, methname)
-                callsites.each_key do |callsite|
+                callsites.each_pair do |callsite, count|
                     next unless callsite.file
                     fname = normalize_filename(callsite.file)
-                    (index[fname][callsite.line] ||= []) << [classname, methname, defsite]
+                    (index[fname][callsite.line] ||= []) << [classname, methname, defsite, count]
                 end
             end
         end
@@ -745,12 +745,13 @@ EOS
         ref_blocks = []
         if @do_cross_references and 
            (rev_xref = reverse_cross_references_for(filename, lineno))
-            refs = rev_xref.map do |classname, methodname, defsite|
-                XRefHelper.new(defsite.file, defsite.line, classname, methodname, 0)
-            end
+            refs = rev_xref.map do |classname, methodname, defsite, count|
+                XRefHelper.new(defsite.file, defsite.line, classname, methodname, count)
+            end.sort_by{|r| r.count}.reverse
             format_call_ref = lambda do |ref|
-                CGI.escapeHTML("  #{ref.klass}##{ref.mid} at " +
-                               "#{normalize_filename(ref.file)}:#{ref.line}")
+                CGI.escapeHTML("%7d   %s" % 
+                               [ref.count, "#{ref.klass}##{ref.mid} at " +
+                                "#{normalize_filename(ref.file)}:#{ref.line}"])
             end
             ref_blocks << [refs, "Calls", format_call_ref]
         end
@@ -758,7 +759,7 @@ EOS
            (refs = cross_references_for(filename, lineno))
             refs = refs.sort_by{|k,count| count}.map do |ref, count|
                 XRefHelper.new(ref.file, ref.line, nil, ref.calling_method, count)
-            end
+            end.reverse
             format_called_ref = lambda do |ref|
                 r = "%7d   %s" % [ref.count, 
                     "#{normalize_filename(ref.file)}:#{ref.line} in '#{ref.mid}'"]
