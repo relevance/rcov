@@ -418,6 +418,9 @@ class HTMLCoverage < Formatter
     EOS
 
     CSS_PROLOG = <<-EOS
+span.cross-ref-title {
+    font-size: 140%;
+}
 span.cross-ref {
     background-color:#f3f7fa;
     border: 1px dashed #333;
@@ -776,7 +779,9 @@ EOS
         ret << %[<span class="cross-ref" id="XREF-#{@cross_ref_idx}">]
         ret << "\n"
         ref_blocks.each do |refs, toplabel, label_proc|
-            ret << "<h3>#{toplabel}</h3>\n" unless !toplabel || toplabel.empty?
+            unless !toplabel || toplabel.empty?
+                ret << %!<span class="cross-ref-title">#{toplabel}</span>\n!
+            end
             refs.each do |dst|
                 dstfile = normalize_filename(dst.file)
                 dstline = dst.line
