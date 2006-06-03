@@ -739,47 +739,55 @@ EOS
     def create_cross_refs(filename, lineno, linetext)
         return linetext unless @callsite_analyzer && @do_callsites
         ret = ""
+        ref_blocks = []
         if @do_cross_references and 
            (rev_xref = reverse_cross_references_for(filename, lineno))
             refs = rev_xref.map do |classname, methodname, defsite|
                 XRefHelper.new(defsite.file, defsite.line, classname, methodname, 0)
             end
-            return create_cross_reference_block(linetext, refs, "Calls:") do |ref|
-                CGI.escapeHTML("  #{ref.klass}##{ref.mid} at #{normalize_filename(ref.file)}:#{ref.line}")
+            format_call_ref = lambda do |ref|
+                CGI.escapeHTML("  #{ref.klass}##{ref.mid} at " +
+                               "#{normalize_filename(ref.file)}:#{ref.line}")
             end
+            ref_blocks << [refs, "Calls", format_call_ref]
         end
-        refs = cross_references_for(filename, lineno)
-        return linetext unless refs
-        refs = refs.sort_by{|k,count| count}.map do |ref, count|
-            XRefHelper.new(ref.file, ref.line, nil, ref.calling_method, count)
+        if @do_callsites and
+           (refs = cross_references_for(filename, lineno))
+            refs = refs.sort_by{|k,count| count}.map do |ref, count|
+                XRefHelper.new(ref.file, ref.line, nil, ref.calling_method, count)
+            end
+            format_called_ref = lambda do |ref|
+                r = "%7d   %s" % [ref.count, 
+                    "#{normalize_filename(ref.file)}:#{ref.line} in '#{ref.mid}'"]
+                CGI.escapeHTML(r)
+            end
+            ref_blocks << [refs, "Called by", format_called_ref]
         end
         
-        create_cross_reference_block(linetext, refs, 
-                                     "Called by:") do |ref|
-            r = "%7d   %s" % [ref.count, 
-                              "#{normalize_filename(ref.file)}:#{ref.line} in '#{ref.mid}'"]
-            CGI.escapeHTML(r)
-        end
+        create_cross_reference_block(linetext, ref_blocks)
     end
 
-    def create_cross_reference_block(linetext, refs, toplabel = "", &block)
+    def create_cross_reference_block(linetext, ref_blocks)
+        return linetext if ref_blocks.empty?
         ret = ""
         @cross_ref_idx ||= 0
         @known_files ||= sorted_file_pairs.map{|fname, finfo| normalize_filename(fname)}
         ret << %[<a class="crossref-toggle" href="#" onclick="toggleCode('XREF-#{@cross_ref_idx+=1}'); return false;">#{linetext}</a>]
         ret << %[<span class="cross-ref" id="XREF-#{@cross_ref_idx}">]
         ret << "\n"
-        ret << "<h3>#{toplabel}</h3>\n" unless !toplabel || toplabel.empty?
-        refs.each do |dst|
-            dstfile = normalize_filename(dst.file)
-            dstline = dst.line
-            label = yield(dst)
-            if @known_files.include? dstfile
-                ret << %[<a href="#{mangle_filename(dstfile)}#line#{dstline}">#{label}</a>]
-            else
-                ret << label
+        ref_blocks.each do |refs, toplabel, label_proc|
+            ret << "<h3>#{toplabel}</h3>\n" unless !toplabel || toplabel.empty?
+            refs.each do |dst|
+                dstfile = normalize_filename(dst.file)
+                dstline = dst.line
+                label = label_proc.call(dst)
+                if @known_files.include? dstfile
+                    ret << %[<a href="#{mangle_filename(dstfile)}#line#{dstline}">#{label}</a>]
+                else
+                    ret << label
+                end
+                ret << "\n"
             end
-            ret << "\n"
         end
         ret << "</span>"
     end
