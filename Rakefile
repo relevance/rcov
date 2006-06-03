@@ -20,7 +20,7 @@ desc "Create a cross-referenced code coverage report."
 Rcov::RcovTask.new do |t|
   t.libs << "ext/rcovrt"
   t.test_files = FileList['test/test*.rb']
-  t.rcov_opts << "--callsites"  # comment to disable cross-references
+  t.rcov_opts << "--xrefs"  # comment to disable cross-references
   t.verbose = true
 end
 
