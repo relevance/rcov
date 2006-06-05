@@ -390,6 +390,9 @@ EOF
                 end
             end
         end
+        if keep_current_hunk
+            interesting_hunks << [current_hunk_start, current_hunk]
+        end
 
         interesting_hunks
     end
