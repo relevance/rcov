@@ -765,12 +765,14 @@ class CallSiteAnalyzer < DifferentialAnalyzer
     end
     
     # File where the method call originated.
+    # Might return +nil+ or "" if it is not meaningful (C extensions, etc).
     def file(level = 0)
       stack_frame = backtrace[level]
       stack_frame ? stack_frame[2] : nil
     end
 
     # Line where the method call originated.
+    # Might return +nil+ or 0 if it is not meaningful (C extensions, etc).
     def line(level = 0)
       stack_frame = backtrace[level]
       stack_frame ? stack_frame[3] : nil
@@ -778,11 +780,14 @@ class CallSiteAnalyzer < DifferentialAnalyzer
 
     # Name of the method where the call originated.
     # Returns +nil+ if the call originated in +toplevel+.
+    # Might return +nil+ if it could not be determined.
     def calling_method(level = 0)
       stack_frame = backtrace[level]
       stack_frame ? stack_frame[1] : nil
     end
 
+    # Name of the class holding the method where the call originated.
+    # Might return +nil+ if it could not be determined.
     def calling_class(level = 0)
       stack_frame = backtrace[level]
       stack_frame ? stack_frame[0] : nil
