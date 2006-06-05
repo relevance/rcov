@@ -765,11 +765,12 @@ EOS
         if @do_callsites and
            (refs = cross_references_for(filename, lineno))
             refs = refs.sort_by{|k,count| count}.map do |ref, count|
-                XRefHelper.new(ref.file, ref.line, nil, ref.calling_method, count)
+                XRefHelper.new(ref.file, ref.line, ref.calling_class, ref.calling_method, count)
             end.reverse
             format_called_ref = lambda do |ref|
                 r = "%7d   %s" % [ref.count, 
-                    "#{normalize_filename(ref.file||'C code')}:#{ref.line} in '#{ref.mid}'"]
+                    "#{normalize_filename(ref.file||'C code')}:#{ref.line} " +
+                    "in '#{ref.klass}##{ref.mid}'"]
                 CGI.escapeHTML(r)
             end
             ref_blocks << [refs, "Called by", format_called_ref]

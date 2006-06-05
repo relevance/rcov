@@ -84,7 +84,7 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
               DEFSITES[[klass.to_s, id.to_s]] = [file, line]
             rescue Exception
             end
-            caller_arr = caller[1,1]
+            caller_arr = self.format_backtrace_array(caller[1,1])
             begin
               hash = CALLSITES[[klass.to_s, id.to_s]] ||= {}
               hash[caller_arr] ||= 0
@@ -130,6 +130,14 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
 
     def self.generate_callsite_info # :nodoc:
       [CALLSITES, DEFSITES]
+    end
+
+    def self.format_backtrace_array(backtrace)
+      backtrace.map do |line|
+        md = /^([^:]*)(?::(\d+)(?::in `(.*)'))?/.match(line)
+        raise "Bad backtrace format" unless md
+        [nil, md[3] ? md[3].to_sym : nil, md[1], (md[2] || '').to_i]
+      end
     end
   end
 end # RCOV__

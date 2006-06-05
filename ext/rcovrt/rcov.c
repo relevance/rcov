@@ -96,34 +96,44 @@ record_method_def_site(VALUE args)
 }
 
 static VALUE
-callsite_custom_backtrace(lev)
-    int lev;
+callsite_custom_backtrace(int lev)
 {
-    struct FRAME *frame = ruby_frame;
-    char buf[BUFSIZ];
-    VALUE ary;
-    NODE *n;
+  struct FRAME *frame = ruby_frame;
+  VALUE ary;
+  NODE *n;
+  VALUE level;
+  VALUE klass;
 
-    ary = rb_ary_new();
-    if (frame->last_func == ID_ALLOCATOR) {
-	frame = frame->prev;
-    }
-    for (; frame && (n = frame->node); frame = frame->prev) {
-	if (frame->prev && frame->prev->last_func) {
-	    if (frame->prev->node == n) continue;
-	    snprintf(buf, BUFSIZ, "%s:%d:in `%s'",
-		     n->nd_file, nd_line(n),
-		     rb_id2name(frame->prev->last_func));
-	}
-	else {
-	    snprintf(buf, BUFSIZ, "%s:%d", n->nd_file, nd_line(n));
-	}
-	rb_ary_push(ary, rb_str_new2(buf));
-        if(--lev == 0)
-                break;
-    }
+  ary = rb_ary_new();
+  if (frame->last_func == ID_ALLOCATOR) {
+          frame = frame->prev;
+  }
+  for (; frame && (n = frame->node); frame = frame->prev) {
+          if (frame->prev && frame->prev->last_func) {
+                  if (frame->prev->node == n) continue;
+                  level = rb_ary_new();
+                  klass = frame->prev->last_class ? frame->prev->last_class : Qnil;
+                  if(TYPE(klass) == T_ICLASS) {
+                          klass = CLASS_OF(klass);
+                  }
+                  rb_ary_push(level, klass);
+                  rb_ary_push(level, ID2SYM(frame->prev->last_func));
+                  rb_ary_push(level, rb_str_new2(n->nd_file));
+                  rb_ary_push(level, INT2NUM(nd_line(n)));
+          }
+          else {
+                  level = rb_ary_new();
+                  rb_ary_push(level, Qnil);
+                  rb_ary_push(level, Qnil);
+                  rb_ary_push(level, rb_str_new2(n->nd_file));
+                  rb_ary_push(level, INT2NUM(nd_line(n)));
+          }
+          rb_ary_push(ary, level);
+          if(--lev == 0)
+                  break;
+  }
 
-    return ary;
+  return ary;
 }
   
 static void

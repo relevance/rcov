@@ -755,30 +755,35 @@ class CallSiteAnalyzer < DifferentialAnalyzer
   # Object representing a method call site.
   # It corresponds to a part of the callstack starting from the context that
   # called the method.   
-  class CallSite < Struct.new(:description)
+  class CallSite < Struct.new(:backtrace)
     # The depth of a CallSite is the number of stack frames
     # whose information is included in the CallSite object.
     def depth
-      description.size
+      backtrace.size
     end
     
     # File where the method call originated.
     def file(level = 0)
-      desc = description[level]
-      desc ? desc[/[^:]*/] : nil
+      stack_frame = backtrace[level]
+      stack_frame ? stack_frame[2] : nil
     end
 
     # Line where the method call originated.
     def line(level = 0)
-      desc = description[level]
-      desc ? desc[/:(\d+)/, 1].to_i : nil
+      stack_frame = backtrace[level]
+      stack_frame ? stack_frame[3] : nil
     end
 
     # Name of the method where the call originated.
     # Returns +nil+ if the call originated in +toplevel+.
     def calling_method(level = 0)
-      desc = description[level]
-      desc ? desc[/:in `(.*)'/, 1] : nil
+      stack_frame = backtrace[level]
+      stack_frame ? stack_frame[1] : nil
+    end
+
+    def calling_class(level = 0)
+      stack_frame = backtrace[level]
+      stack_frame ? stack_frame[0] : nil
     end
   end
 
@@ -825,7 +830,9 @@ class CallSiteAnalyzer < DifferentialAnalyzer
     return nil unless rawsites
     ret = {}
     # could be a job for inject but it's slow and I don't mind the extra loc
-    rawsites.each_pair{|csite_info, count| ret[CallSite.new(csite_info)] = count }
+    rawsites.each_pair do |backtrace, count|
+      ret[CallSite.new(backtrace)] = count
+    end
     ret
   end
 
@@ -837,9 +844,9 @@ class CallSiteAnalyzer < DifferentialAnalyzer
   #   analyzer.defsite("Foo", "f1")
   #   analyzer.defsite("#<class:Foo>", "g1")
   def defsite(classname_or_fullname, methodname = nil)
-    raw = raw_data_relative[1][expand_name(classname_or_fullname, methodname)]
-    return nil unless raw
-    DefSite.new(*raw)
+    file, line = raw_data_relative[1][expand_name(classname_or_fullname, methodname)]
+    return nil unless file && line
+    DefSite.new(file, line)
   end
 
   private
@@ -868,9 +875,9 @@ class CallSiteAnalyzer < DifferentialAnalyzer
     raw.each_pair do |(klass, method), hash|
       begin  
         key = [klass.to_s, method.to_s]
-        ret1[key] = hash.clone # no deep cloning needed
+        ret1[key] = hash.clone #Marshal.load(Marshal.dump(hash))
         ret2[key] = method_def_site[[klass, method]]
-      rescue Exception
+      #rescue Exception
       end
     end
     
