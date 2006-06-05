@@ -9,6 +9,8 @@ rcov README
   * fast execution: 20-300 times faster than previous tools
   * multiple analysis modes: standard, bogo-profile, "intentional testing",
     dependency analysis...
+  * detection of uncovered code introduced since the last run ("differential
+    code coverage")
   * fairly accurate coverage information through code linkage inference using 
     simple heuristics
   * cross-referenced XHTML and several kinds of text reports
