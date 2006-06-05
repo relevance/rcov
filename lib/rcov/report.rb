@@ -209,6 +209,7 @@ class FullTextReport < Formatter
 end
 
 class TextCoverageDiff < Formatter
+    FORMAT_VERSION = [0, 1, 0]
     DEFAULT_OPTS = {:textmode => :coverage_diff, 
                     :coverage_diff_mode => :record,
                     :coverage_diff_file => "coverage.info",
@@ -249,7 +250,7 @@ class TextCoverageDiff < Formatter
                                :counts   => fileinfo.counts}
         end
         File.open(@state_file, "w") do |f|
-            self.SERIALIZER.dump(state, f)
+            self.SERIALIZER.dump([FORMAT_VERSION, state], f)
         end
     rescue
         $stderr.puts <<-EOF
@@ -261,10 +262,19 @@ EOF
     def compare_state
         return unless verify_diff_available
         begin
-            prev_state = File.open(@state_file){|f| self.SERIALIZER.load(f) }
+            format, prev_state = File.open(@state_file){|f| self.SERIALIZER.load(f) }
         rescue
             $stderr.puts <<-EOF
 Couldn't load coverage data from #{@state_file}.
+EOF
+            return
+        end
+        if !(Array === format) or
+            FORMAT_VERSION[0] != format[0] || FORMAT_VERSION[1] < format[1]
+            $stderr.puts <<-EOF
+Couldn't load coverage data from #{@state_file}.
+The file is saved in the format  #{format.inspect[0..20]}.
+This rcov executable understands #{FORMAT_VERSION.inspect}.
 EOF
             return
         end
