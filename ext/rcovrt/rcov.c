@@ -231,6 +231,70 @@ cov_reset_callsite(VALUE self)
  *
  * */
 
+static struct cov_array *
+coverage_increase_counter_uncached(char *sourcefile, int sourceline,
+                                   char mark_only)
+{
+  struct cov_array *carray;
+  
+  if(!st_lookup(coverinfo, (st_data_t)sourcefile, (st_data_t*)&carray)) {
+          VALUE arr;
+
+          arr = rb_hash_aref(oSCRIPT_LINES__, rb_str_new2(sourcefile));
+          if(NIL_P(arr)) 
+                  return 0;
+          rb_check_type(arr, T_ARRAY);
+          carray = calloc(1, sizeof(struct cov_array));
+          carray->ptr = calloc(RARRAY(arr)->len, sizeof(unsigned int));
+          carray->len = RARRAY(arr)->len;
+          st_insert(coverinfo, (st_data_t)strdup(sourcefile), 
+                          (st_data_t) carray);
+  }
+  if(mark_only) {
+          if(!carray->ptr[sourceline])
+                  carray->ptr[sourceline] = 1;
+  } else {
+          carray->ptr[sourceline]++;
+  }
+
+  return carray;
+}
+
+
+static void
+coverage_mark_caller()
+{
+  struct FRAME *frame = ruby_frame;
+  NODE *n;
+
+  if (frame->last_func == ID_ALLOCATOR) {
+          frame = frame->prev;
+  }
+  for (; frame && (n = frame->node); frame = frame->prev) {
+          if (frame->prev && frame->prev->last_func) {
+                  if (frame->prev->node == n) continue;
+                  coverage_increase_counter_uncached(n->nd_file, nd_line(n), 1);
+          }
+          else {
+                  coverage_increase_counter_uncached(n->nd_file, nd_line(n), 1);
+          }
+          break;
+  }
+}
+
+
+static void
+coverage_increase_counter_cached(char *sourcefile, int sourceline)
+{
+ if(cached_file == sourcefile && cached_array) {
+         cached_array->ptr[sourceline]++;
+         return;
+ }
+ cached_file = sourcefile;
+ cached_array = coverage_increase_counter_uncached(sourcefile, sourceline, 0);
+}
+
+
 static void
 coverage_event_coverage_hook(rb_event_t event, NODE *node, VALUE self, 
                 ID mid, VALUE klass)
@@ -247,28 +311,9 @@ coverage_event_coverage_hook(rb_event_t event, NODE *node, VALUE self,
  sourcefile = node->nd_file;
  sourceline = nd_line(node) - 1;
 
-
- if(cached_file == sourcefile && cached_array) {
-         cached_array->ptr[sourceline]++;
-         return;
- }
- 
-
- if(!st_lookup(coverinfo, (st_data_t)sourcefile, (st_data_t*)&cached_array)) {
-         VALUE arr;
-
-         arr = rb_hash_aref(oSCRIPT_LINES__, rb_str_new2(sourcefile));
-         if(NIL_P(arr)) 
-                 return;
-         rb_check_type(arr, T_ARRAY);
-         cached_array = calloc(1, sizeof(struct cov_array));
-         cached_array->ptr = calloc(RARRAY(arr)->len, sizeof(unsigned int));
-         cached_array->len = RARRAY(arr)->len;
-         st_insert(coverinfo, (st_data_t)strdup(sourcefile), 
-                   (st_data_t) cached_array);
- }
- cached_file = sourcefile;
- cached_array->ptr[sourceline]++;
+ coverage_increase_counter_cached(sourcefile, sourceline);
+ if(event == RUBY_EVENT_CALL)
+         coverage_mark_caller();
 }
 
 
