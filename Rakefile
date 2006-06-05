@@ -18,26 +18,26 @@ ENV["RCOVPATH"] = "bin/rcov"
 # (really!)
 desc "Create a cross-referenced code coverage report."
 Rcov::RcovTask.new do |t|
-  t.libs << "ext/rcovrt"
   t.test_files = FileList['test/test*.rb']
+  t.ruby_opts << "-Ilib:ext/rcovrt" # in order to use this rcov
   t.rcov_opts << "--xrefs"  # comment to disable cross-references
   t.verbose = true
 end
 
 desc "Analyze code coverage for the FileStatistics class."
 Rcov::RcovTask.new(:rcov_sourcefile) do |t|
-  t.libs << "ext/rcovrt"
   t.test_files = FileList['test/test_FileStatistics.rb']
   t.verbose = true
   t.rcov_opts << "--test-unit-only"
+  t.ruby_opts << "-Ilib:ext/rcovrt" # in order to use this rcov
   t.output_dir = "coverage.sourcefile"
 end
 
 Rcov::RcovTask.new(:rcov_ccanalyzer) do |t|
-  t.libs << "ext/rcovrt"
   t.test_files = FileList['test/test_CodeCoverageAnalyzer.rb']
   t.verbose = true
   t.rcov_opts << "--test-unit-only"
+  t.ruby_opts << "-Ilib:ext/rcovrt" # in order to use this rcov
   t.output_dir = "coverage.ccanalyzer"
 end
 
