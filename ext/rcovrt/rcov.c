@@ -1,5 +1,6 @@
 
 #include <ruby.h>
+#include <env.h>
 #include <node.h>
 #include <st.h>
 #include <stdlib.h>
@@ -94,21 +95,47 @@ record_method_def_site(VALUE args)
   return Qnil;
 }
 
+static VALUE
+callsite_custom_backtrace(lev)
+    int lev;
+{
+    struct FRAME *frame = ruby_frame;
+    char buf[BUFSIZ];
+    VALUE ary;
+    NODE *n;
+
+    ary = rb_ary_new();
+    if (frame->last_func == ID_ALLOCATOR) {
+	frame = frame->prev;
+    }
+    for (; frame && (n = frame->node); frame = frame->prev) {
+	if (frame->prev && frame->prev->last_func) {
+	    if (frame->prev->node == n) continue;
+	    snprintf(buf, BUFSIZ, "%s:%d:in `%s'",
+		     n->nd_file, nd_line(n),
+		     rb_id2name(frame->prev->last_func));
+	}
+	else {
+	    snprintf(buf, BUFSIZ, "%s:%d", n->nd_file, nd_line(n));
+	}
+	rb_ary_push(ary, rb_str_new2(buf));
+        if(--lev == 0)
+                break;
+    }
+
+    return ary;
+}
   
 static void
 coverage_event_callsite_hook(rb_event_t event, NODE *node, VALUE self, 
                 ID mid, VALUE klass)
 {
  VALUE caller_ary;
- VALUE aref_args[2];
  VALUE curr_meth;
  VALUE args[2];
  int status;
 
- caller_ary = rb_funcall(rb_mKernel, id_caller, 0);
- aref_args[0] = INT2FIX(0);
- aref_args[1] = INT2NUM(caller_stack_len);
- caller_ary = rb_ary_aref(2, aref_args, caller_ary);
+ caller_ary = callsite_custom_backtrace(caller_stack_len);
 
  curr_meth = rb_ary_new();
  rb_ary_push(curr_meth, klass);
