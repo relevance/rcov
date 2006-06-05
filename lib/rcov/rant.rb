@@ -1,8 +1,9 @@
 
 require 'rant/rantlib'
 
-module Rant # :nodoc:
-  class Generators::Rcov
+module Rant          # :nodoc:
+  module Generators  # :nodoc:
+  class Rcov         # :nodoc:
     def self.rant_gen(app, ch, args, &block)
       if !args || args.empty?
         self.new(app, ch, &block)
@@ -81,5 +82,6 @@ module Rant # :nodoc:
       end
       filelist
     end
-  end	# class Generators::RubyTest
+  end	# class Rcov
+  end   # module Generators
 end	# module Rant

@@ -3,7 +3,7 @@
 
 module Rcov
 
-class Formatter
+class Formatter # :nodoc:
     ignore_files = [/\A#{Regexp.escape(Config::CONFIG["libdir"])}/, /\btc_[^.]*.rb/,
         /_test\.rb\z/, /\btest\//, /\bvendor\//, /\A#{Regexp.escape(__FILE__)}\z/]
     DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false,
@@ -136,7 +136,7 @@ class Formatter
     end
 end
 
-class TextSummary < Formatter
+class TextSummary < Formatter # :nodoc:
     def execute
         puts summary
     end
@@ -147,7 +147,7 @@ class TextSummary < Formatter
     end
 end
 
-class TextReport < TextSummary
+class TextReport < TextSummary # :nodoc:
     def execute
         print_lines
         print_header
@@ -176,7 +176,7 @@ class TextReport < TextSummary
     end
 end
 
-class FullTextReport < Formatter
+class FullTextReport < Formatter # :nodoc:
     DEFAULT_OPTS = {:textmode => :coverage}
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
@@ -208,7 +208,7 @@ class FullTextReport < Formatter
     end
 end
 
-class TextCoverageDiff < Formatter
+class TextCoverageDiff < Formatter # :nodoc:
     FORMAT_VERSION = [0, 1, 0]
     DEFAULT_OPTS = {:textmode => :coverage_diff, 
                     :coverage_diff_mode => :record,
@@ -396,7 +396,7 @@ EOF
 end
 
 
-class HTMLCoverage < Formatter
+class HTMLCoverage < Formatter # :nodoc:
     include XX::XHTML
     include XX::XMLish
     require 'fileutils'
@@ -670,7 +670,7 @@ EOS
         table_text.pretty
     end
 
-    class SummaryFileInfo 
+    class SummaryFileInfo  # :nodoc:
         def initialize(obj); @o = obj end
         %w[num_lines num_code_lines code_coverage total_coverage].each do |m|
             define_method(m){ @o.send(m) }
@@ -945,7 +945,7 @@ EOF
     end
 end
 
-class HTMLProfiling < HTMLCoverage
+class HTMLProfiling < HTMLCoverage # :nodoc:
 
     DEFAULT_OPTS = {:destdir => "profiling"}
     def initialize(opts = {})
