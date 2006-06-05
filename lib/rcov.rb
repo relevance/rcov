@@ -108,8 +108,10 @@ class FileStatistics
   def merge(lines, coverage, counts)
     coverage.each_with_index do |v, idx|
       case @coverage[idx]
-      when :inferred : @coverage[idx] = v || @coverage[idx]
-      when false : @coverage[idx] ||= v
+      when :inferred 
+        @coverage[idx] = v || @coverage[idx]
+      when false 
+        @coverage[idx] ||= v
       end
     end
     counts.each_with_index{|v, idx| @counts[idx] += v }

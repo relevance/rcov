@@ -92,7 +92,7 @@ class Test_FileStatistics < Test::Unit::TestCase
       1 if bar
       0   b = 2
       0 end
-      0 puts <<EOF
+      1 puts <<EOF
       0  bleh
       0 EOF
       3 c.times{ i += 1}
@@ -113,7 +113,7 @@ class Test_FileStatistics < Test::Unit::TestCase
     assert_equal(expected, sf2.coverage.to_a)
     sf.merge(sf2.lines, sf2.coverage, sf2.counts)
     assert_equal(expected, sf.coverage.to_a)
-    assert_equal([2, 2, 1, 0, 1, 0, 0, 13], sf.counts)
+    assert_equal([2, 2, 1, 0, 2, 0, 0, 13], sf.counts)
   end
 
   def test_last_comment_block_is_marked
