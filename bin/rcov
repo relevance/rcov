@@ -128,7 +128,7 @@ EOF
         options.skip.concat [%r{\bvendor/},%r{\bconfig/},%r{\benvironment/}]
     end
     opts.on("--[no-]callsites", "Show callsites in generated XHTML report.",
-            "(much slower; disabled by default)") do |val|
+            "(somewhat slower; disabled by default)") do |val|
         options.callsites = val
     end
     opts.on("--[no-]xrefs", "Generate fully cross-referenced report.",

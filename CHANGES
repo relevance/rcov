@@ -6,6 +6,10 @@ Since 0.5.0 (2006-05-30)
 Features
 --------
 * differential coverage report: --text-coverage-diff (-D) and --save
+* fully cross-referenced reports, indicating where methods are called from
+  and which methods were called for each line (--xrefs)
+* cross-referenced report generation is now over 4 times faster for
+  applications with deep call stacks (such as Rails apps)
 
 Bugfixes
 --------
