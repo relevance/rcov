@@ -137,6 +137,9 @@ coverage_event_callsite_hook(rb_event_t event, NODE *node, VALUE self,
 
  caller_ary = callsite_custom_backtrace(caller_stack_len);
 
+ if(TYPE(klass) == T_ICLASS) {
+         klass = CLASS_OF(klass);
+ }
  curr_meth = rb_ary_new();
  rb_ary_push(curr_meth, klass);
  rb_ary_push(curr_meth, ID2SYM(mid));
