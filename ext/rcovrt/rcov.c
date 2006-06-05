@@ -5,7 +5,7 @@
 #include <st.h>
 #include <stdlib.h>
 
-#define RCOVRT_VERSION_MAJOR 1
+#define RCOVRT_VERSION_MAJOR 2
 #define RCOVRT_VERSION_MINOR 0
 #define RCOVRT_VERSION_REV   0
 
