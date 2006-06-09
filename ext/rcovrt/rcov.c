@@ -13,7 +13,6 @@ static VALUE mRcov;
 static VALUE mRCOV__;
 static VALUE oSCRIPT_LINES__;
 static ID id_cover;
-static VALUE id_caller = 0;
 static st_table* coverinfo = 0;
 static char coverage_hook_set_p;
 static char callsite_hook_set_p;
@@ -444,7 +443,6 @@ Init_rcovrt()
  ID id_script_lines__ = rb_intern("SCRIPT_LINES__");
  
  id_cover = rb_intern("COVER");
- id_caller = rb_intern("caller");
 
  if(rb_const_defined(rb_cObject, id_rcov)) 
          mRcov = rb_const_get(rb_cObject, id_rcov);
