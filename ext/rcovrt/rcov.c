@@ -162,7 +162,7 @@ coverage_event_callsite_hook(rb_event_t event, NODE *node, VALUE self,
          args.sourcefile = node->nd_file;
          args.sourceline = nd_line(node) - 1;
          args.curr_meth = curr_meth;
-         rb_protect(record_method_def_site, (VALUE)&args, 0);
+         rb_protect(record_method_def_site, (VALUE)&args, NULL);
  }
  if(status)
          rb_gv_set("$!", Qnil);
@@ -304,7 +304,7 @@ coverage_event_coverage_hook(rb_event_t event, NODE *node, VALUE self,
  if(event & (RUBY_EVENT_C_CALL | RUBY_EVENT_C_RETURN | RUBY_EVENT_CLASS))
          return;
  
- if(!node)
+ if(node == NULL)
          return;
 
  sourcefile = node->nd_file;
