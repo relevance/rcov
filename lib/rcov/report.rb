@@ -8,7 +8,7 @@ class Formatter # :nodoc:
         /_test\.rb\z/, /\btest\//, /\bvendor\//, /\A#{Regexp.escape(__FILE__)}\z/]
     DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false,
                     :output_threshold => 101, :dont_ignore => [], 
-                    :callsite_analyzer => nil}
+                    :callsite_analyzer => nil, :comments_run_by_default => false}
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
         @files = {}
@@ -22,6 +22,7 @@ class Formatter # :nodoc:
         @sort_reverse = options[:sort_reverse]
         @output_threshold = options[:output_threshold]
         @callsite_analyzer = options[:callsite_analyzer]
+        @comments_run_by_default = options[:comments_run_by_default]
         @callsite_index = nil
     end
 
@@ -36,7 +37,8 @@ class Formatter # :nodoc:
         if @files[filename]
             @files[filename].merge(lines, coverage, counts)
         else
-            @files[filename] = FileStatistics.new filename, lines, counts
+            @files[filename] = FileStatistics.new(filename, lines, counts, 
+                                                  @comments_run_by_default)
         end
     end
 
@@ -213,7 +215,7 @@ class TextCoverageDiff < Formatter # :nodoc:
     DEFAULT_OPTS = {:textmode => :coverage_diff, 
                     :coverage_diff_mode => :record,
                     :coverage_diff_file => "coverage.info",
-                    :diff_cmd => "diff"}
+                    :diff_cmd => "diff", :comments_run_by_default => true}
     def SERIALIZER
         # mfp> this was going to be YAML but I caught it failing at basic
         # round-tripping, turning "\n" into "" and corrupting the data, so

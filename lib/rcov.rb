@@ -79,7 +79,7 @@ end
 # counts would normally be obtained from a Rcov::CodeCoverageAnalyzer.
 class FileStatistics
   attr_reader :name, :lines, :coverage, :counts
-  def initialize(name, lines, counts)
+  def initialize(name, lines, counts, comments_run_by_default = false)
     @name = name
     @lines = lines
     initial_coverage = counts.map{|x| (x || 0) > 0 ? true : false }
@@ -92,7 +92,7 @@ class FileStatistics
     @multiline_string_start = Array.new(lines.size, false)
     extend_heredocs
     find_multiline_strings
-    precompute_coverage false
+    precompute_coverage comments_run_by_default
   end
 
   # Merge code coverage and execution count information.

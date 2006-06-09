@@ -22,6 +22,8 @@ Bugfixes
 Minor enhancements
 ------------------
 * more readable --text-coverage
+* set whether comments are "run" by default instead of attaching them to
+  the following block of code (--[no-]comments)
 
 Since 0.4.0 (2006-05-22)
 ========================
