@@ -42,7 +42,7 @@ options.loadpaths = []
 options.textmode = false
 options.skip = Rcov::Formatter::DEFAULT_OPTS[:ignore]
 options.include = []
-options.nohtml = false
+options.html = true
 options.test_unit_only = false
 options.sort = :name
 options.sort_reverse = false
@@ -177,9 +177,9 @@ EOF
         end
         options.coverage_diff_file = file if file && !file.empty?
     end
-    opts.on("--no-html", "Don't generate HTML output.",
-            "(no output unless text output specified)") do
-        options.nohtml = true
+    opts.on("--[no-]html", "Generate HTML output.",
+            "(default: --html)") do |val|
+        options.html = val
     end
     opts.on("--sort CRITERION", [:name, :loc, :coverage],
             "Sort files in the output by the specified",
@@ -289,7 +289,7 @@ make_formatter = lambda do |klass|
              )
 end
 
-unless options.nohtml
+if options.html
     if options.profiling
         formatters << make_formatter[Rcov::HTMLProfiling]
     else
