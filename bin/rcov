@@ -226,7 +226,7 @@ EOF
         options.diff_cmd = cmd
     end
     opts.separator ""
-    opts.on_tail("-h", "--help", "Show help message") do
+    opts.on_tail("-h", "--help", "Show extended help message") do
         require 'pp'
         puts opts
         puts <<EOF
