@@ -7,7 +7,8 @@ Features
 --------
 * differential coverage report: --text-coverage-diff (-D) and --save
   Tells you when you've added new code that was not covered by the tests and
-  when code that used to be covered isn't anymore.
+  when code that used to be covered isn't anymore. Integration with vim
+  (contributions for other editors/IDEs welcome).
 * fully cross-referenced reports, indicating where methods are called from
   and which methods were called for each line (--xrefs)
 * cross-referenced report generation is now over 4 times faster for
