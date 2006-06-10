@@ -24,6 +24,7 @@ Minor enhancements
 * more readable --text-coverage
 * set whether comments are "run" by default instead of attaching them to
   the following block of code (--[no-]comments)
+* --report-cov-bug can be used to report bugs in the coverage analysis 
 
 Since 0.4.0 (2006-05-22)
 ========================

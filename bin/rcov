@@ -55,6 +55,7 @@ options.coverage_diff_file = "coverage.info"
 options.coverage_diff_mode = :compare
 options.coverage_diff_save = false
 options.diff_cmd = "diff"
+options.report_cov_bug_for = nil
 
 EXTRA_HELP = <<-EOF
 
@@ -236,12 +237,26 @@ EOF
         puts EXTRA_HELP
         exit
     end
+    opts.on_tail("--report-cov-bug SELECTOR", 
+                 "Report coverage analysis bug for the",
+                 "method specified by SELECTOR",
+                 "(format: Foo::Bar#method, A::B.method)") do |selector|
+        case selector
+        when /([^.]+)(#|\.)(.*)/: options.report_cov_bug_for = selector
+        else
+            raise OptionParser::InvalidArgument, selector
+        end
+        options.textmode = nil
+        options.html = false
+        options.callsites = true
+    end
     opts.on_tail("--version", "Show version") do
         puts "rcov " + Rcov::VERSION + " " + Rcov::RELEASE_DATE
         exit
     end
 end
 
+$ORIGINAL_ARGV = ARGV.clone
 if (idx = ARGV.index("--"))
     extra_args = ARGV[idx+1..-1]
     ARGV.replace(ARGV[0,idx])
@@ -271,6 +286,8 @@ options.loadpaths.reverse_each{|x| $:.unshift x}
 # since we need to set $: before.
 
 require 'rcov'
+
+options.callsites = true if options.report_cov_bug_for
 
 if options.callsites 
     $rcov_callsite_analyzer = Rcov::CallSiteAnalyzer.new
@@ -323,6 +340,49 @@ END {
     $rcov_code_coverage_analyzer.remove_hook
     $rcov_callsite_analyzer.remove_hook if $rcov_callsite_analyzer
     $rcov_code_coverage_analyzer.dump_coverage_info(formatters)
+    if options.report_cov_bug_for
+        defsite = $rcov_callsite_analyzer.defsite(options.report_cov_bug_for)
+        if !defsite
+            $stderr.puts <<-EOF
+Couldn't find definition site of #{options.report_cov_bug_for}.
+Was it executed at all?
+EOF
+            exit(-1)
+        end
+        lines, mark_info, count_info = $rcov_code_coverage_analyzer.data(defsite.file)
+        puts <<EOF
+
+Please fill in the blanks in the following report.
+
+You can report the bug via the Ruby-Talk ML, send it directly to 
+<mfp at acm dot org> (include "rcov" in the subject to get past the spam filters),
+or post it to 
+  http://eigenclass.org/hiki.rb?rcov+#{VERSION}
+
+Thank you!
+        
+=============================================================================
+Bug report generated on #{Time.new}
+
+Ruby version:              #{RUBY_VERSION} (#{RUBY_RELEASE_DATE})
+Platform:                  #{RUBY_PLATFORM}
+rcov version:              #{Rcov::VERSION}
+rcovrt loaded?             #{$".any?{|x| /\brcovrt\b/ =~ x} }
+using RubyGems?            #{$".any?{|x| /\brubygems\b/ =~ x} }
+Command-line arguments:    #{$ORIGINAL_ARGV.inspect}
+Coverage analysis bug in:  #{options.report_cov_bug_for}
+
+Line(s) ____________ should be ______ (red/green).
+        
+Raw coverage information (feel free to remove useless data, but please leave
+some context around the faulty lines):
+
+EOF
+        defsite.line.upto(SCRIPT_LINES__[defsite.file].size) do |i|
+            puts "%7d:%5d:%s" % [count_info[i-1], i, lines[i-1]]
+        end
+        exit
+    end
     if formatters.all?{|formatter| formatter.sorted_file_pairs.empty? }
         require 'pp'
         $stderr.puts <<-EOF
