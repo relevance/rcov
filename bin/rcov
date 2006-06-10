@@ -404,7 +404,6 @@ You can solve this by doing one or more of the following:
   to test/test_*.rb, or running rcov via a Rakefile (read the RDoc
   documentation or README.rake in the source distribution).
 EOF
-        exit(-1)
     end
 }
 
