@@ -71,6 +71,7 @@ Rake::RDocTask.new("rdoc") { |rdoc|
   rdoc.rdoc_files.include('README.API')
   rdoc.rdoc_files.include('README.rake')
   rdoc.rdoc_files.include('README.rant')
+  rdoc.rdoc_files.include('README.vim')
   rdoc.rdoc_files.include('lib/**/*.rb')
 }
 

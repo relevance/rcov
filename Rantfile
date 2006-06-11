@@ -64,7 +64,8 @@ desc "Generate documentation."
 gen RubyDoc, :rdoc do |g|
     g.verbose = true
     g.dir = "doc"
-    g.files = sys["README.API", "README.rake", "README.rant", "lib/**/*.rb"]
+    g.files = sys["README.API", "README.rake", "README.rant", "README.vim", 
+                  "lib/**/*.rb"]
     g.opts = %w(--line-numbers --inline-source --title rcov --main README.API)
 end
 
