@@ -272,10 +272,10 @@ coverage_mark_caller()
   for (; frame && (n = frame->node); frame = frame->prev) {
           if (frame->prev && frame->prev->last_func) {
                   if (frame->prev->node == n) continue;
-                  coverage_increase_counter_uncached(n->nd_file, nd_line(n), 1);
+                  coverage_increase_counter_uncached(n->nd_file, nd_line(n) - 1, 1);
           }
           else {
-                  coverage_increase_counter_uncached(n->nd_file, nd_line(n), 1);
+                  coverage_increase_counter_uncached(n->nd_file, nd_line(n) - 1, 1);
           }
           break;
   }
