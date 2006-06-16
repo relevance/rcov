@@ -48,7 +48,7 @@ Rake::TestTask.new(:test_rcovrt => ["ext/rcovrt/rcovrt.so"]) do |t|
   t.verbose = true
 end
 
-file "ext/rcovrt/rcovrt.so" => "ext/rcovrt/rcov.c" do
+file "ext/rcovrt/rcovrt.so" => FileList["ext/rcovrt/*.c"] do
   ruby "setup.rb config"
   ruby "setup.rb setup"
 end
