@@ -5,6 +5,8 @@
 #include <st.h>
 #include <stdlib.h>
 
+#define COVERAGE_DEBUG_EVENTS 0
+
 #define RCOVRT_VERSION_MAJOR 2
 #define RCOVRT_VERSION_MINOR 0
 #define RCOVRT_VERSION_REV   0
@@ -300,19 +302,56 @@ coverage_event_coverage_hook(rb_event_t event, NODE *node, VALUE self,
 {
  char *sourcefile;
  unsigned int sourceline;
+ static unsigned int in_hook = 0;
  
- if(event & (RUBY_EVENT_C_CALL | RUBY_EVENT_C_RETURN | RUBY_EVENT_CLASS))
+ if(in_hook) {
          return;
+ }
+
+ in_hook++;
+
+#if COVERAGE_DEBUG_EVENTS
+ do {
+         int status;
+         VALUE old_exception;
+         old_exception = rb_gv_get("$!");
+         rb_protect(rb_inspect, klass, &status);
+         if(!status) {
+                 printf("EVENT: %d %s %s %s %d\n", event,
+                                 klass ? RSTRING(rb_inspect(klass))->ptr : "", 
+                                 mid ? (mid == ID_ALLOCATOR ? "ID_ALLOCATOR" : rb_id2name(mid))
+                                 : "unknown",
+                                 node ? node->nd_file : "", node ? nd_line(node) : 0);
+         } else {
+                 printf("EVENT: %d %s %s %d\n", event,
+                                 mid ? (mid == ID_ALLOCATOR ? "ID_ALLOCATOR" : rb_id2name(mid)) 
+                                 : "unknown",
+                                 node ? node->nd_file : "", node ? nd_line(node) : 0);
+         }
+         rb_gv_set("$!", old_exception);
+ } while (0); 
+#endif
+
+ if(event & RUBY_EVENT_C_CALL) {
+         coverage_mark_caller();
+ }
+ if(event & (RUBY_EVENT_C_CALL | RUBY_EVENT_C_RETURN | RUBY_EVENT_CLASS)) {
+         in_hook--;
+         return;
+ }
  
- if(node == NULL)
+ if(node == NULL) {
+         in_hook--;
          return;
+ }
 
  sourcefile = node->nd_file;
  sourceline = nd_line(node) - 1;
 
  coverage_increase_counter_cached(sourcefile, sourceline);
- if(event == RUBY_EVENT_CALL)
+ if(event & RUBY_EVENT_CALL)
          coverage_mark_caller();
+ in_hook--;
 }
 
 
@@ -323,6 +362,8 @@ cov_install_coverage_hook(VALUE self)
 	  if(!coverinfo)
 		  coverinfo = st_init_strtable();
           coverage_hook_set_p = 1;
+          /* TODO: allow C_CALL too, since it's supported already
+           * the overhead is around ~30%, tested on typo */
           rb_add_event_hook(coverage_event_coverage_hook, 
                        RUBY_EVENT_ALL & ~RUBY_EVENT_C_CALL &
                        ~RUBY_EVENT_C_RETURN & ~RUBY_EVENT_CLASS);
