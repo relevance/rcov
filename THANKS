@@ -41,3 +41,6 @@ Coda Hale:
 Tim Shadel:
 * reported that the last comment block was not being marked even when
   it was the last thing in the file
+
+Thomas Leitner:
+* reported that the SCRIPT_LINES__ workaround did not always work

@@ -690,8 +690,19 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
       ! different
     end
 
-    # FIXME find all prime factors, try them all
-    factors = (2..10).to_a.reverse
+    # Doesn't even factorize into prime factors (some are repeated), but it's
+    # good enough for the workaround.
+    factors = []
+    n = Math.sqrt(line_info.size).ceil
+    size = line_info.size
+    while n > 1
+      if size % n == 0
+        size /= n
+        factors << n
+      else
+        n -= 1
+      end
+    end
     factors.each do |n|
       if is_repeated[n]
         line_info = line_info[0, line_info.size / n]
