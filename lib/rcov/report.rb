@@ -4,8 +4,14 @@
 module Rcov
 
 class Formatter # :nodoc:
-    ignore_files = [/\A#{Regexp.escape(Config::CONFIG["libdir"])}/, /\btc_[^.]*.rb/,
-        /_test\.rb\z/, /\btest\//, /\bvendor\//, /\A#{Regexp.escape(__FILE__)}\z/]
+    require 'pathname'
+    ignore_files = [
+        /\A#{Regexp.escape(Pathname.new(Config::CONFIG["libdir"]).cleanpath.to_s)}/,
+        /\btc_[^.]*.rb/,
+        /_test\.rb\z/,
+        /\btest\//,
+        /\bvendor\//,
+        /\A#{Regexp.escape(__FILE__)}\z/]
     DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false,
                     :output_threshold => 101, :dont_ignore => [], 
                     :callsite_analyzer => nil, :comments_run_by_default => false}
