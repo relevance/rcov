@@ -690,28 +690,38 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
       ! different
     end
 
-    # Doesn't even factorize into prime factors (some are repeated), but it's
-    # good enough for the workaround.
-    factors = []
-    n = Math.sqrt(line_info.size).ceil
-    size = line_info.size
-    while n > 1
-      if size % n == 0
-        size /= n
-        factors << n
-      else
-        n -= 1
-      end
-    end
+    factors = braindead_factorize(line_info.size)
     factors.each do |n|
       if is_repeated[n]
         line_info = line_info[0, line_info.size / n]
         coverage_info = coverage_info[0, coverage_info.size / n]
         count_info = count_info[0, count_info.size / n]
       end
-    end
+    end if factors.size > 1   # don't even try if it's prime
     
     [line_info, coverage_info, count_info]
+  end
+
+  def braindead_factorize(num)
+    return [0] if num == 0
+    return [-1] + braindead_factorize(-num) if num < 0
+    factors = []
+    while num % 2 == 0
+      factors << 2
+      num /= 2
+    end
+    size = num
+    n = 3
+    max = Math.sqrt(num)
+    while n <= max && n <= size
+      while size % n == 0
+        size /= n
+        factors << n
+      end
+      n += 2
+    end
+    factors << size if size != 1
+    factors
   end
 
 end # CodeCoverageAnalyzer
