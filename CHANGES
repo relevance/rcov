@@ -5,6 +5,7 @@ Since 0.6.0 (2006-06-12)
 ========================
 Features
 --------
+* coverage/callsite data from multiple runs can be aggregated (--aggregate) 
 
 Bugfixes
 --------

@@ -56,6 +56,7 @@ options.coverage_diff_mode = :compare
 options.coverage_diff_save = false
 options.diff_cmd = "diff"
 options.report_cov_bug_for = nil
+options.aggregate_file = nil
 
 EXTRA_HELP = <<-EOF
 
@@ -165,6 +166,12 @@ EOF
             "ANSI color sequences unless -n.") do
         options.textmode = :coverage
     end
+    opts.on("--aggregate FILE", "Aggregate data from previous runs",
+                                "in FILE. Overwrites FILE with the",
+                                "merged data. FILE is created if",
+                                "necessary.") do |file|
+      options.aggregate_file = file
+    end
     opts.on("-D [FILE]", "--text-coverage-diff [FILE]",
             "Compare code coverage with saved state",
             "in FILE, defaults to coverage.info.",
@@ -177,7 +184,8 @@ EOF
         options.coverage_diff_mode = :compare
         options.coverage_diff_file = file if file && !file.empty?
     end
-    opts.on("--save [FILE]", "Save coverage data to FILE.",
+    opts.on("--save [FILE]", "Save coverage data to FILE,",
+            "for later use with rcov -D.",
             "(default: coverage.info)") do |file|
         options.coverage_diff_save = true
         options.coverage_diff_mode = :record
@@ -289,8 +297,33 @@ require 'rcov'
 
 options.callsites = true if options.report_cov_bug_for
 
+def rcov_load_aggregate_data(file)
+    require 'zlib'
+    begin
+        old_data = nil
+        Zlib::GzipReader.open(file){|gz| old_data = Marshal.load(gz) }
+    rescue
+        old_data = {}
+    end
+    old_data || {}
+end
+
+def rcov_save_aggregate_data(file)
+    require 'zlib'
+    Zlib::GzipWriter.open(file) do |f|
+        Marshal.dump({:callsites => $rcov_callsite_analyzer, 
+                     :coverage => $rcov_code_coverage_analyzer}, f)
+    end
+end
+
 if options.callsites 
-    $rcov_callsite_analyzer = Rcov::CallSiteAnalyzer.new
+    if options.aggregate_file
+        saved_aggregate_data = rcov_load_aggregate_data(options.aggregate_file)
+        if saved_aggregate_data[:callsites]
+            $rcov_callsite_analyzer = saved_aggregate_data[:callsites]
+        end
+    end
+    $rcov_callsite_analyzer ||= Rcov::CallSiteAnalyzer.new
     $rcov_callsite_analyzer.install_hook
 else
     $rcov_callsite_analyzer = nil
@@ -333,12 +366,19 @@ end
 
 formatters << make_formatter[Rcov::TextCoverageDiff] if options.coverage_diff_save
 
-$rcov_code_coverage_analyzer = Rcov::CodeCoverageAnalyzer.new
+if options.aggregate_file
+    saved_aggregate_data ||= rcov_load_aggregate_data(options.aggregate_file)
+    if saved_aggregate_data[:coverage]
+        $rcov_code_coverage_analyzer = saved_aggregate_data[:coverage]
+    end
+end
+$rcov_code_coverage_analyzer ||= Rcov::CodeCoverageAnalyzer.new
 
 # must be registered before test/unit puts its own
 END {
     $rcov_code_coverage_analyzer.remove_hook
     $rcov_callsite_analyzer.remove_hook if $rcov_callsite_analyzer
+    rcov_save_aggregate_data(options.aggregate_file) if options.aggregate_file
     $rcov_code_coverage_analyzer.dump_coverage_info(formatters)
     if options.report_cov_bug_for
         defsite = $rcov_callsite_analyzer.defsite(options.report_cov_bug_for)
