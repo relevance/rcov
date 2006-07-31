@@ -10,6 +10,11 @@ Features
 Bugfixes
 --------
 * the SCRIPT_LINES__ workaround works better
+* fixed silly bug in coverage data acquisition (line after the correct one
+  marked in some situations)
+* avoid problems with repeated path separators in default ignore list, based
+  on rbconfig's data
+
 
 Minor enhancements
 ------------------
