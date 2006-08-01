@@ -44,3 +44,6 @@ Tim Shadel:
 
 Thomas Leitner:
 * reported that the SCRIPT_LINES__ workaround did not always work
+
+Assaph Mehr:
+* beta-tested 0.7.0 and found a bug in --aggregate (missing files)

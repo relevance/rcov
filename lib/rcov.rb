@@ -559,6 +559,7 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
   # Return an array with the names of the files whose code was executed inside
   # the block given to #run_hooked or between #install_hook and #remove_hook.
   def analyzed_files
+    update_script_lines__
     raw_data_relative.select do |file, lines|
       @script_lines__.has_key?(file)
     end.map{|fname,| fname}
@@ -581,6 +582,7 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
   # reset the data at any time with #reset to start from scratch.
   def data(filename)
     raw_data = raw_data_relative
+    update_script_lines__
     unless @script_lines__.has_key?(filename) && 
            raw_data.has_key?(filename)
       return nil 
@@ -611,6 +613,7 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
   def reset; super end
 
   def dump_coverage_info(formatters) # :nodoc:
+    update_script_lines__
     raw_data_relative.each do |file, lines|
       next if @script_lines__.has_key?(file) == false
       lines = @script_lines__[file]
@@ -722,6 +725,24 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
     end
     factors << size if size != 1
     factors
+  end
+
+  def update_script_lines__
+    @script_lines__ = @script_lines__.merge(SCRIPT_LINES__)
+  end
+
+  public
+  def marshal_dump # :nodoc:
+    # @script_lines__ is updated just before serialization so as to avoid
+    # missing files in SCRIPT_LINES__
+    ivs = {}
+    update_script_lines__
+    instance_variables.each{|iv| ivs[iv] = instance_variable_get(iv)}
+    ivs
+  end
+
+  def marshal_load(ivs) # :nodoc:
+    ivs.each_pair{|iv, val| instance_variable_set(iv, val)}
   end
 
 end # CodeCoverageAnalyzer
