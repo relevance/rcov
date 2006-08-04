@@ -47,3 +47,6 @@ Thomas Leitner:
 
 Assaph Mehr:
 * beta-tested 0.7.0 and found a bug in --aggregate (missing files)
+
+Ryan Kinderman:
+* suggested that -Ipath be passed to ruby instead of rcov in RcovTasks
