@@ -305,7 +305,7 @@ EOF
             end
             new_data.close
 
-            diff = `#{@diff_cmd} -u #{old_data.path} #{new_data.path}`
+            diff = `#{@diff_cmd} -u "#{old_data.path}" "#{new_data.path}"`
             new_uncovered_hunks = process_unified_diff(filename, diff)
             old_data.close!
             new_data.close!

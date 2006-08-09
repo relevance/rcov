@@ -1,6 +1,19 @@
 
 User-visible changes.
 
+Since 0.7.0 (2006-08-04)
+========================
+Features
+--------
+
+Bugfixes
+--------
+* differential code coverage reports work with filenames containing special
+  characters
+
+Minor enhancements
+------------------
+
 Since 0.6.0 (2006-06-12)
 ========================
 Features

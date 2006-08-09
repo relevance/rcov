@@ -44,6 +44,8 @@ Tim Shadel:
 
 Thomas Leitner:
 * reported that the SCRIPT_LINES__ workaround did not always work
+* fixed the bug which broke differential reports for filenames with
+  special characters
 
 Assaph Mehr:
 * beta-tested 0.7.0 and found a bug in --aggregate (missing files)
