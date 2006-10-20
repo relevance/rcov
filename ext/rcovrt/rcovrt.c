@@ -74,7 +74,9 @@ coverage_mark_caller()
   }
   for (; frame && (n = frame->node); frame = frame->prev) {
           if (frame->prev && frame->prev->last_func) {
-                  if (frame->prev->node == n) continue;
+                  if (frame->prev->node == n) {
+                          if (frame->prev->last_func == frame->last_func) continue;
+                  }
                   coverage_increase_counter_uncached(n->nd_file, nd_line(n) - 1, 1);
           }
           else {
