@@ -42,7 +42,7 @@ module Rcov
   #
   class RcovTask < Rake::TaskLib
 
-    # Name of test task. (default is :test)
+    # Name of test task. (default is :rcov)
     attr_accessor :name
 
     # List of directories to added to $LOAD_PATH before running the

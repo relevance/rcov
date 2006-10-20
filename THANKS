@@ -52,3 +52,6 @@ Assaph Mehr:
 
 Ryan Kinderman:
 * suggested that -Ipath be passed to ruby instead of rcov in RcovTasks
+
+Jan Svitok:
+* reported typo in rcovtask.rb's RDoc
