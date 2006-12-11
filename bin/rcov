@@ -166,6 +166,9 @@ EOF
             "ANSI color sequences unless -n.") do
         options.textmode = :coverage
     end
+    opts.on("--gcc", "Dump uncovered line in GCC error format.") do
+        options.textmode = :gcc
+    end
     opts.on("--aggregate FILE", "Aggregate data from previous runs",
                                 "in FILE. Overwrites FILE with the",
                                 "merged data. FILE is created if",
@@ -357,6 +360,7 @@ if options.html
 end
 textual_formatters = {:counts => Rcov::FullTextReport, 
                       :coverage => Rcov::FullTextReport,
+                      :gcc => Rcov::FullTextReport,
                       :summary => Rcov::TextSummary, :report => Rcov::TextReport,
                       :coverage_diff => Rcov::TextCoverageDiff}
 

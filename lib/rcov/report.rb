@@ -202,6 +202,8 @@ class FullTextReport < Formatter # :nodoc:
                 case @textmode
                 when :counts
                     puts "%-70s| %6d" % [line.chomp[0,70], fileinfo.counts[i]]
+                when :gcc
+                    puts "%s:%d:%s" % [filename, i+1, line.chomp] unless fileinfo.coverage[i]
                 when :coverage
                     if @color
                         prefix = fileinfo.coverage[i] ? "\e[32;40m" : "\e[31;40m"
