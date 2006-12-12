@@ -152,6 +152,12 @@ EOF
             "Color scale range for profiling info (dB).") do |val|
         options.range = val
     end
+    opts.on("-a", "--annotate") do
+        options.textmode = :annotate
+        options.crossrefs = true
+        options.callsites = true
+    end
+
     opts.on("-T", "--text-report", "Dump detailed plain-text report to stdout.",
             "(filename, LoC, total lines, coverage)") do
         options.textmode = :report
@@ -361,6 +367,7 @@ end
 textual_formatters = {:counts => Rcov::FullTextReport, 
                       :coverage => Rcov::FullTextReport,
                       :gcc => Rcov::FullTextReport,
+                      :annotate => Rcov::RubyAnnotation,
                       :summary => Rcov::TextSummary, :report => Rcov::TextReport,
                       :coverage_diff => Rcov::TextCoverageDiff}
 
@@ -1262,3 +1269,7 @@ if __FILE__ == $0
 
 end
 # vi: set sw=4: 
+# Here is Emacs setting. DO NOT REMOVE!
+# Local Variables:
+# ruby-indent-level: 4
+# End:

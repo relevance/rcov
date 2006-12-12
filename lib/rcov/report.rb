@@ -1008,6 +1008,196 @@ class HTMLProfiling < HTMLCoverage # :nodoc:
     end
 end
 
+class RubyAnnotation < Formatter # :nodoc:
+    DEFAULT_OPTS = {:color => false, :fsr => 30, :destdir => "coverage",
+                    :callsites => false, :cross_references => false}
+    def SERIALIZER
+        require 'yaml'
+        YAML
+    end
+
+    def initialize(opts = {})
+        options = DEFAULT_OPTS.clone.update(opts)
+        super(options)
+        @dest = options[:destdir]
+        @color = options[:color]
+        @fsr = options[:fsr]
+        @do_callsites = options[:callsites]
+        @do_cross_references = options[:cross_references]
+
+        @defsites = {}
+    end
+
+    def execute
+        return if @files.empty?
+        FileUtils.mkdir_p @dest
+        each_file_pair_sorted do |filename, fileinfo|
+            create_file(File.join(@dest, mangle_filename(filename)), fileinfo)
+        end
+#        save_defsites(File.join(@dest, "defsites"))
+    end
+
+#     def save_defsites(defsites_index_filename)
+#         open(defsites_index_filename, "wb") do |f|
+#             SERIALIZER().dump(@defsites, f)
+#         end
+#     end
+
+    def mangle_filename(base)
+        base.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".rb"
+    end
+
+    def format_lines(file)
+        result = ""
+        format_line = "%#{file.num_lines.to_s.size}d"
+        file.num_lines.times do |i|
+            line = file.lines[i].chomp
+            marked = file.coverage[i]
+            count = file.counts[i]
+            result += create_cross_refs(file.name, i+1, line) + "\n"
+#            result += create_cross_refs(file.name, i+1, CGI.escapeHTML(line)) + "\n"
+        end
+        result
+    end
+
+    def create_cross_refs(filename, lineno, linetext)
+        return linetext unless @callsite_analyzer && @do_callsites
+        ret = ""
+        ref_blocks = []
+        if @do_cross_references and 
+           (rev_xref = reverse_cross_references_for(filename, lineno))
+            refs = rev_xref.map do |classname, methodname, defsite, count|
+                @defsites[ [classname, methodname] ] = [ [defsite.file, defsite.line] ]
+                HTMLCoverage::XRefHelper.new(defsite.file, defsite.line, classname, methodname, count)
+            end.sort_by{|r| r.count}.reverse
+            format_call_ref = lambda do |ref|
+                if ref.file
+                    where = "at #{normalize_filename(ref.file)}:#{ref.line}"
+                else
+                    where = "(C extension/core)"
+                end
+#                 CGI.escapeHTML("%7d   %s" % 
+#                                [ref.count, "#{ref.klass}##{ref.mid} " + where])
+                "[[#{ref.klass}##{ref.mid} " + where + "]]"
+            end
+            ref_blocks << [refs, ">>", format_call_ref]
+#            ref_blocks << [refs, "Calls", format_call_ref]
+        end
+        if @do_callsites and
+           (refs = cross_references_for(filename, lineno))
+            refs = refs.sort_by{|k,count| count}.map do |ref, count|
+                HTMLCoverage::XRefHelper.new(ref.file, ref.line, ref.calling_class, ref.calling_method, count)
+            end.reverse
+            format_called_ref = lambda do |ref|
+                r = "%7d   %s" % [ref.count, 
+                    "#{normalize_filename(ref.file||'C code')}:#{ref.line} " +
+                    "in '#{ref.klass}##{ref.mid}'"]
+#                 CGI.escapeHTML(r)
+                    "[[#{normalize_filename(ref.file||'C code')}:#{ref.line} " +
+                    "in #{ref.klass}##{ref.mid}]]"
+            end
+            ref_blocks << [refs, "<<", format_called_ref]
+#            ref_blocks << [refs, "Called by", format_called_ref]
+        end
+        
+        create_cross_reference_block(linetext, ref_blocks)
+    end
+
+    def create_cross_reference_block(linetext, ref_blocks)
+        return linetext if ref_blocks.empty?
+        ret = ""
+        @cross_ref_idx ||= 0
+        @known_files ||= sorted_file_pairs.map{|fname, finfo| normalize_filename(fname)}
+#         ret << %[<a class="crossref-toggle" href="#" onclick="toggleCode('XREF-#{@cross_ref_idx+=1}'); return false;">#{linetext}</a>]
+#         ret << %[<span class="cross-ref" id="XREF-#{@cross_ref_idx}">]
+#         ret << "\n"
+        ret << "%-75s # " % linetext
+        ref_blocks.each do |refs, toplabel, label_proc|
+            unless !toplabel || toplabel.empty?
+                ret << toplabel << " "
+            end
+            refs.each do |dst|
+                dstfile = normalize_filename(dst.file) if dst.file
+                dstline = dst.line
+                label = label_proc.call(dst)
+# TODO only show known files
+#                 if dst.file && @known_files.include?(dstfile)
+#                     ret << %[<a href="#{mangle_filename(dstfile)}#line#{dstline}">#{label}</a>]
+#                 else
+#                     ret << label
+#                 end
+                ret << label << ", "
+#                 ret << "\n"
+            end
+        end
+#        ret << "</span>"
+        ret
+    end
+    
+    def create_file(destfile, fileinfo)
+        #$stderr.puts "Generating #{destfile.inspect}"
+        body = format_lines(fileinfo)
+#        body = format_overview(fileinfo) + format_lines(fileinfo)
+#         title = fileinfo.name + " - #{default_title}"
+#         do_ctable = output_color_table?
+#         output = xhtml_ { html_ {
+#             head_ { 
+#                 title_{ title } 
+#                 style_(:type => "text/css") { t_{ "body { background-color: #{default_color}; }" }  }
+#                 style_(:type => "text/css") { CSS_PROLOG }
+#                 script_(:type => "text/javascript") { h_ { JAVASCRIPT_PROLOG } }
+#                 style_(:type => "text/css") { h_ { colorscale } }
+#             }
+#             body_ {
+#                 h3_{ t_{ default_title } }
+#                 p_ {
+#                     t_{ "Generated on #{Time.new.to_s} with " }
+#                     a_(:href => Rcov::UPSTREAM_URL){ "rcov #{Rcov::VERSION}" }
+#                 }
+#                 hr_
+#                 if do_ctable
+#                     # this kludge needed to ensure .pretty doesn't mangle it
+#                     x_ { <<EOS
+# <pre><span class='marked0'>Code reported as executed by Ruby looks like this...
+# </span><span class='marked1'>and this: this line is also marked as covered.
+# </span><span class='inferred0'>Lines considered as run by rcov, but not reported by Ruby, look like this,
+# </span><span class='inferred1'>and this: these lines were inferred by rcov (using simple heuristics).
+# </span><span class='uncovered0'>Finally, here&apos;s a line marked as not executed.
+# </span></pre>                       
+# EOS
+#                     }
+#                 end
+#                 x_{ body }
+#                 hr_
+#                 x_ { blurb }
+#                 p_ {
+#                     a_(:href => "http://validator.w3.org/check/referer") {
+#                     img_(:src => "http://www.w3.org/Icons/valid-xhtml10",
+#                          :alt => "Valid XHTML 1.0!", :height => 31, :width => 88)
+#                     }
+#                     a_(:href => "http://jigsaw.w3.org/css-validator/check/referer") {
+#                         img_(:style => "border:0;width:88px;height:31px",
+#                              :src => "http://jigsaw.w3.org/css-validator/images/vcss",
+#                              :alt => "Valid CSS!")
+#                     }
+#                 }
+#             }
+#         } }
+#         # .pretty needed to make sure DOCTYPE is in a separate line
+#         lines = output.pretty.to_a
+#         lines.unshift lines.pop if /DOCTYPE/ =~ lines[-1]
+        lines = body.to_a
+        File.open(destfile, "w") do |f|
+            f.puts lines
+        end
+    end
+end
+
+
 end # Rcov
 
 # vi: set sw=4:
+# Here is Emacs setting. DO NOT REMOVE!
+# Local Variables:
+# ruby-indent-level: 4
+# End:
