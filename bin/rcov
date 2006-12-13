@@ -156,6 +156,7 @@ EOF
         options.textmode = :annotate
         options.crossrefs = true
         options.callsites = true
+        options.skip = [ %r!/test/unit/! ]
     end
 
     opts.on("-T", "--text-report", "Dump detailed plain-text report to stdout.",
