@@ -153,6 +153,7 @@ EOF
         options.range = val
     end
     opts.on("-a", "--annotate") do
+        options.html = false
         options.textmode = :annotate
         options.crossrefs = true
         options.callsites = true
