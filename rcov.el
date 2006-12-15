@@ -1,4 +1,4 @@
-;;; rcov.el -- Ruby Coverage Analyzer Emacs interface
+;;; rcov.el -- Ruby Coverage Analysis Tool
 
 ;;; Copyright (c) 2006 rubikitch <rubikitch@ruby-lang.org>
 ;;;
