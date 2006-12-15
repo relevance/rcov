@@ -1,6 +1,7 @@
 # rcov Copyright (c) 2004-2006 Mauricio Fernandez <mfp@acm.org>
 # See LEGAL and LICENSE for additional licensing information.
 
+require 'pathname'
 module Rcov
 
 class Formatter # :nodoc:
@@ -30,6 +31,10 @@ class Formatter # :nodoc:
         @callsite_analyzer = options[:callsite_analyzer]
         @comments_run_by_default = options[:comments_run_by_default]
         @callsite_index = nil
+
+        @mangle_filename = Hash.new{|h,base|
+            h[base] = Pathname(base).cleanpath.to_s.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".html"
+        }
     end
 
     def add_file(filename, lines, coverage, counts)
@@ -53,7 +58,7 @@ class Formatter # :nodoc:
     end
 
     def mangle_filename(base)
-        base.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".html"
+        @mangle_filename[base]
     end
 
     def each_file_pair_sorted(&b)
@@ -1016,6 +1021,10 @@ class RubyAnnotation < Formatter # :nodoc:
         @dest = options[:destdir]
         @do_callsites = true
         @do_cross_references = true
+
+        @mangle_filename = Hash.new{|h,base|
+            h[base] = Pathname(base).cleanpath.to_s.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".rb"
+        }
     end
 
     def execute
@@ -1027,10 +1036,6 @@ class RubyAnnotation < Formatter # :nodoc:
     end
 
     private
-
-    def mangle_filename(base)
-        base.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".rb"
-    end
 
     def format_lines(file)
         result = ""
