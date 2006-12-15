@@ -78,4 +78,9 @@ Rake::RDocTask.new("rdoc") { |rdoc|
 
 task :default => :test
 
+desc "install by setup.rb"
+task :install do
+  sh "sudo ruby setup.rb install"
+end
+
 # vim: set sw=2 ft=ruby:
