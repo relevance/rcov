@@ -1079,7 +1079,7 @@ class RubyAnnotation < Formatter # :nodoc:
                     "#{mangle_filename(ref.file||'C code')}:#{ref.line} " +
                     "in #{ref.klass}##{ref.mid}"
             end
-            ref_blocks << [refs, "<<", format_called_ref]
+            ref_blocks << [refs, "<<", format_called_ref] # " font-lock hack
         end
         
         create_cross_reference_block(linetext, ref_blocks)
@@ -1114,13 +1114,17 @@ class RubyAnnotation < Formatter # :nodoc:
         body = format_lines(fileinfo)
         File.open(destfile, "w") do |f|
             f.puts body
-            f.puts footer()
+            f.puts footer(fileinfo)
         end
     end
 
-    def footer
+    def footer(fileinfo)
+        s  = "# Total lines    : %d\n" % fileinfo.num_lines
+        s << "# Lines of code  : %d\n" % fileinfo.num_code_lines
+        s << "# Total coverage : %3.1f%%\n" % [ fileinfo.total_coverage*100 ]
+        s << "# Code coverage  : %3.1f%%\n\n" % [ fileinfo.code_coverage*100 ]
         # prevents false positives on Emacs
-        "# Local " "Variables:\n" "# mode: " "rcov-xref\n" "# End:\n"
+        s << "# Local " "Variables:\n" "# mode: " "rcov-xref\n" "# End:\n"
     end
 end
 
