@@ -147,6 +147,29 @@ class Formatter # :nodoc:
         end
         index
     end
+
+    class XRefHelper < Struct.new(:file, :line, :klass, :mid, :count) # :nodoc:
+    end
+
+    def _get_defsites(ref_blocks, filename, lineno, linetext, label, &format_call_ref)
+        if @do_cross_references and 
+           (rev_xref = reverse_cross_references_for(filename, lineno))
+            refs = rev_xref.map do |classname, methodname, defsite, count|
+                XRefHelper.new(defsite.file, defsite.line, classname, methodname, count)
+            end.sort_by{|r| r.count}.reverse
+            ref_blocks << [refs, label, format_call_ref]
+        end
+    end
+
+    def _get_callsites(ref_blocks, filename, lineno, linetext, label, &format_called_ref)
+        if @do_callsites and
+           (refs = cross_references_for(filename, lineno))
+            refs = refs.sort_by{|k,count| count}.map do |ref, count|
+                XRefHelper.new(ref.file, ref.line, ref.calling_class, ref.calling_method, count)
+            end.reverse
+            ref_blocks << [refs, label, format_called_ref]
+        end
+    end
 end
 
 class TextSummary < Formatter # :nodoc:
@@ -767,41 +790,23 @@ EOS
         "<pre>#{result}</pre>"
     end
 
-    class XRefHelper < Struct.new(:file, :line, :klass, :mid, :count) # :nodoc:
-    end
-
     def create_cross_refs(filename, lineno, linetext)
         return linetext unless @callsite_analyzer && @do_callsites
-        ret = ""
         ref_blocks = []
-        if @do_cross_references and 
-           (rev_xref = reverse_cross_references_for(filename, lineno))
-            refs = rev_xref.map do |classname, methodname, defsite, count|
-                XRefHelper.new(defsite.file, defsite.line, classname, methodname, count)
-            end.sort_by{|r| r.count}.reverse
-            format_call_ref = lambda do |ref|
-                if ref.file
-                    where = "at #{normalize_filename(ref.file)}:#{ref.line}"
-                else
-                    where = "(C extension/core)"
-                end
-                CGI.escapeHTML("%7d   %s" % 
+        _get_defsites(ref_blocks, filename, lineno, "Calls", linetext) do |ref|
+            if ref.file
+                where = "at #{normalize_filename(ref.file)}:#{ref.line}"
+            else
+                where = "(C extension/core)"
+            end
+            CGI.escapeHTML("%7d   %s" % 
                                [ref.count, "#{ref.klass}##{ref.mid} " + where])
-            end
-            ref_blocks << [refs, "Calls", format_call_ref]
         end
-        if @do_callsites and
-           (refs = cross_references_for(filename, lineno))
-            refs = refs.sort_by{|k,count| count}.map do |ref, count|
-                XRefHelper.new(ref.file, ref.line, ref.calling_class, ref.calling_method, count)
-            end.reverse
-            format_called_ref = lambda do |ref|
-                r = "%7d   %s" % [ref.count, 
-                    "#{normalize_filename(ref.file||'C code')}:#{ref.line} " +
+        _get_callsites(ref_blocks, filename, lineno, "Called by", linetext) do |ref|
+            r = "%7d   %s" % [ref.count, 
+                "#{normalize_filename(ref.file||'C code')}:#{ref.line} " +
                     "in '#{ref.klass}##{ref.mid}'"]
-                CGI.escapeHTML(r)
-            end
-            ref_blocks << [refs, "Called by", format_called_ref]
+            CGI.escapeHTML(r)
         end
         
         create_cross_reference_block(linetext, ref_blocks)
@@ -1051,35 +1056,20 @@ class RubyAnnotation < Formatter # :nodoc:
 
     def create_cross_refs(filename, lineno, linetext)
         return linetext unless @callsite_analyzer && @do_callsites
-        ret = ""
         ref_blocks = []
-        if @do_cross_references and 
-           (rev_xref = reverse_cross_references_for(filename, lineno))
-            refs = rev_xref.map do |classname, methodname, defsite, count|
-                HTMLCoverage::XRefHelper.new(defsite.file, defsite.line, classname, methodname, count)
-            end.sort_by{|r| r.count}.reverse
-            format_call_ref = lambda do |ref|
-                ref.file.sub!(%r!^./!, '')
-                if ref.file
-                    where = "at #{mangle_filename(ref.file)}:#{ref.line}"
-                else
-                    where = "(C extension/core)"
-                end
-                "#{ref.klass}##{ref.mid} " + where + ""
+        _get_defsites(ref_blocks, filename, lineno, linetext, ">>") do |ref|
+            ref.file.sub!(%r!^./!, '')
+            if ref.file
+                where = "at #{mangle_filename(ref.file)}:#{ref.line}"
+            else
+                where = "(C extension/core)"
             end
-            ref_blocks << [refs, ">>", format_call_ref]
+            "#{ref.klass}##{ref.mid} " + where + ""
         end
-        if @do_callsites and
-           (refs = cross_references_for(filename, lineno))
-            refs = refs.sort_by{|k,count| count}.map do |ref, count|
-                HTMLCoverage::XRefHelper.new(ref.file, ref.line, ref.calling_class, ref.calling_method, count)
-            end.reverse
-            format_called_ref = lambda do |ref|
-                ref.file.sub!(%r!^./!, '')
-                    "#{mangle_filename(ref.file||'C code')}:#{ref.line} " +
-                    "in #{ref.klass}##{ref.mid}"
-            end
-            ref_blocks << [refs, "<<", format_called_ref] # " font-lock hack
+        _get_callsites(ref_blocks, filename, lineno, linetext, "<<") do |ref| # "
+            ref.file.sub!(%r!^./!, '')
+            "#{mangle_filename(ref.file||'C code')}:#{ref.line} " +
+                "in #{ref.klass}##{ref.mid}"
         end
         
         create_cross_reference_block(linetext, ref_blocks)
