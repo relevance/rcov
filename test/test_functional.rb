@@ -14,9 +14,9 @@ class TestFunctional < Test::Unit::TestCase
 
   def run_rcov(opts)
     rcov = @@dir+"../bin/rcov"
-    rcov_opts = "-I../lib:../ext/rcovrt"
+    ruby_opts = "-I../lib:../ext/rcovrt"
     Dir.chdir(@@dir) do
-      `cd #{@@dir}; ruby #{rcov} #{rcov_opts} #{opts} -o actual_coverage sample_04.rb`
+      `cd #{@@dir}; ruby #{ruby_opts} #{rcov} #{opts} -o actual_coverage sample_04.rb`
       yield
     end
   end
