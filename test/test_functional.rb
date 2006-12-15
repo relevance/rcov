@@ -30,7 +30,6 @@ class TestFunctional < Test::Unit::TestCase
 
   def test_html
     run_rcov("") do
-#      cmp "index.html"
       cmp "sample_04_rb.html"
       cmp "sample_03_rb.html"
     end
