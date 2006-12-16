@@ -1,0 +1,11 @@
+
+================================================================================
+!!!!! Uncovered code introduced in sample_05.rb
+
+sample_05.rb-1-def d(x)
+sample_05.rb:2:  4*x
+sample_05.rb:3:end
+sample_05.rb-4-
+sample_05.rb-5-def a
+sample_05.rb-6-  b 10
+sample_05.rb-7-end
