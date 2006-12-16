@@ -266,7 +266,8 @@ class TextCoverageDiff < Formatter # :nodoc:
         @mode = options[:coverage_diff_mode]
         @state_file = options[:coverage_diff_file]
         @diff_cmd = options[:diff_cmd]
-        super(options)
+        @gcc_output = options[:gcc_output]
+       super(options)
     end
 
     def execute
@@ -352,13 +353,21 @@ EOF
 
 EOF
         hunks.each do |offset, lines|
-            puts "### #{filename}:#{offset}"
-            if @color
+            if @gcc_output
+                lines.each_with_index do |line,i|
+                    lineno = offset + i
+                    flag = (/^!! / !~ line) ? "-" : ":"
+                    prefix = "#{filename}#{flag}#{lineno}#{flag}"
+                    puts "#{prefix}#{line[3..-1]}"
+                end
+            elsif @color
+                puts "### #{filename}:#{offset}"
                 lines.each do |line| 
                     prefix = (/^!! / !~ line) ? "\e[32;40m" : "\e[31;40m"
                     puts "#{prefix}#{line[3..-1].chomp}\e[37;40m"
                 end
             else
+                puts "### #{filename}:#{offset}"
                 puts lines
             end
         end

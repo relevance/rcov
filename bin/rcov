@@ -57,6 +57,7 @@ options.coverage_diff_save = false
 options.diff_cmd = "diff"
 options.report_cov_bug_for = nil
 options.aggregate_file = nil
+options.gcc_output = false
 
 EXTRA_HELP = <<-EOF
 
@@ -175,7 +176,7 @@ EOF
         options.textmode = :coverage
     end
     opts.on("--gcc", "Dump uncovered line in GCC error format.") do
-        options.textmode = :gcc
+        options.gcc_output = true
     end
     opts.on("--aggregate FILE", "Aggregate data from previous runs",
                                 "in FILE. Overwrites FILE with the",
@@ -307,6 +308,7 @@ options.loadpaths.reverse_each{|x| $:.unshift x}
 require 'rcov'
 
 options.callsites = true if options.report_cov_bug_for
+options.textmode = :gcc if !options.textmode and options.gcc_output
 
 def rcov_load_aggregate_data(file)
     require 'zlib'
@@ -355,7 +357,8 @@ make_formatter = lambda do |klass|
               :callsites => options.callsites, 
               :cross_references => options.crossrefs,
               :diff_cmd => options.diff_cmd,
-              :comments_run_by_default => options.comments_run_by_default
+              :comments_run_by_default => options.comments_run_by_default,
+              :gcc_output => options.gcc_output
              )
 end
 
