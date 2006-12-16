@@ -11,17 +11,17 @@ module Rcov; module Test; module Temporary; class Sample03
     100.times{ f2 }                                                         # >> [[Rcov::Test::Temporary::Sample03#f2 at sample_03_rb.rb:7]], 
   end                   
   
-  def self.g1                                                               # << [[sample_04_rb.rb:9 in #]], 
-    10.times{ g2 }                                                          # >> [[#<Class:Rcov::Test::Temporary::Sample03>#g2 at sample_03_rb.rb:18]], 
+  def self.g1
+    10.times{ g2 }
   end
 
-  def self.g2; 1 end                                                        # << [[sample_03_rb.rb:15 in #<Class:Rcov::Test::Temporary::Sample03>#g1]], [[sample_04_rb.rb:10 in #]], 
+  def self.g2; 1 end                                                        # << [[sample_04_rb.rb:10 in #]], 
   # safe from here ...
 end end end end
 # Total lines    : 20
 # Lines of code  : 14
-# Total coverage : 90.0%
-# Code coverage  : 92.9%
+# Total coverage : 80.0%
+# Code coverage  : 78.6%
 
 # Local Variables:
 # mode: rcov-xref

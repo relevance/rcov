@@ -6,5 +6,5 @@ obj = klass.new
 obj.f1
 obj.f2
 obj.f3
-klass.g1
+#klass.g1 uncovered
 klass.g2

@@ -12,11 +12,11 @@ class TestFunctional < Test::Unit::TestCase
     assert_equal(content["expected_coverage"], content["actual_coverage"])
   end
 
-  def run_rcov(opts)
+  def run_rcov(opts, opts_tail="")
     rcov = @@dir+"../bin/rcov"
     ruby_opts = "-I../lib:../ext/rcovrt"
     Dir.chdir(@@dir) do
-      `cd #{@@dir}; ruby #{ruby_opts} #{rcov} #{opts} -o actual_coverage sample_04.rb`
+      `cd #{@@dir}; ruby #{ruby_opts} #{rcov} #{opts} -o actual_coverage sample_04.rb #{opts_tail}`
       yield
     end
   end
@@ -32,6 +32,13 @@ class TestFunctional < Test::Unit::TestCase
     run_rcov("") do
       cmp "sample_04_rb.html"
       cmp "sample_03_rb.html"
+    end
+  end
+
+  def test_text_gcc
+    run_rcov("--gcc --include-file=sample --exclude=rcov",
+             "> actual_coverage/gcc-text.out") do
+      cmp "gcc-text.out"
     end
   end
 
