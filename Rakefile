@@ -83,12 +83,4 @@ task :install do
   sh "sudo ruby setup.rb install"
 end
 
-desc "update functional test"
-task :update_functional_test do
-  chdir "test"
-  sh "ruby ../bin/rcov -I../lib:../ext/rcovrt -a -o expected_coverage sample_04.rb"
-  sh "ruby ../bin/rcov -I../lib:../ext/rcovrt -o expected_coverage sample_04.rb"
-
-end
-
 # vim: set sw=2 ft=ruby:

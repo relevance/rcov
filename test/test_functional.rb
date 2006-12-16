@@ -1,5 +1,28 @@
 require 'test/unit'
 require 'pathname'
+require 'fileutils'
+
+=begin
+Updating functional testdata automatically is DANGEROUS, so I do manually.
+
+== update functional test
+cd ~/src/rcov/test
+rcov="ruby ../bin/rcov -I../lib:../ext/rcovrt -o expected_coverage"
+
+$rcov -a sample_04.rb
+$rcov sample_04.rb
+$rcov --gcc --include-file=sample --exclude=rcov sample_04.rb > expected_coverage/gcc-text.out
+
+cp sample_05-old.rb sample_05.rb
+$rcov --no-html --gcc --include-file=sample --exclude=rcov --save=coverage.info sample_05.rb > expected_coverage/diff-gcc-original.out
+cp sample_05-new.rb sample_05.rb
+$rcov --no-html --gcc -D --include-file=sample --exclude=rcov sample_05.rb > expected_coverage/diff-gcc-diff.out
+$rcov --no-html -D --include-file=sample --exclude=rcov sample_05.rb > expected_coverage/diff.out
+$rcov --no-html --no-color -D --include-file=sample --exclude=rcov sample_05.rb > expected_coverage/diff-no-color.out
+$rcov --no-html --gcc --include-file=sample --exclude=rcov sample_05.rb > expected_coverage/diff-gcc-all.out
+  
+=end
+
 class TestFunctional < Test::Unit::TestCase
   @@dir = Pathname(__FILE__).expand_path.dirname
 
