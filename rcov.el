@@ -2,7 +2,7 @@
 
 ;;; Copyright (c) 2006 rubikitch <rubikitch@ruby-lang.org>
 ;;;
-;;; Use and distribution subject to the terms of the Ruby license.
+;;; Use and distribution subject to the terms of the rcov license.
 
 (defvar rcov-xref-before-visit-source-hook nil
   "Hook executed before jump.")
