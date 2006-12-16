@@ -294,7 +294,7 @@ class TextCoverageDiff < Formatter # :nodoc:
         $stderr.puts <<-EOF
 Couldn't save coverage data to #{@state_file}.
 EOF
-    end
+    end                         # '
 
     require 'tempfile'
     def compare_state
@@ -305,7 +305,7 @@ EOF
             $stderr.puts <<-EOF
 Couldn't load coverage data from #{@state_file}.
 EOF
-            return
+            return              # '
         end
         if !(Array === format) or
             FORMAT_VERSION[0] != format[0] || FORMAT_VERSION[1] < format[1]
@@ -314,7 +314,7 @@ Couldn't load coverage data from #{@state_file}.
 The file is saved in the format  #{format.inspect[0..20]}.
 This rcov executable understands #{FORMAT_VERSION.inspect}.
 EOF
-            return
+            return              # '
         end
         each_file_pair_sorted do |filename, fileinfo|
             old_data = Tempfile.new("#{mangle_filename(filename)}-old")
