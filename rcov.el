@@ -8,11 +8,16 @@
   "Hook executed before jump.")
 (defvar rcov-xref-after-visit-source-hook nil
   "Hook executed after jump.")
-(defvar rcov-command-line "rake rcov RCOVOPTS='--gcc'"
+(defvar rcov-command-line "rake rcov RCOVOPTS='--gcc --no-html'"
   "Rcov command line to find uncovered code.
 It is good to use rcov with Rake because it `cd's appropriate directory.
 `--gcc' option is strongly recommended because `rcov' uses compilation-mode.")
+(defvar rcovsave-command-line "rake rcov RCOVOPTS='--gcc --no-html --save=coverage.info'"
+  "Rcov command line to save coverage status. See also `rcov-command-line'.")
+(defvar rcovdiff-command-line "rake rcov RCOVOPTS='-D --gcc --no-html'"
+  "Rcov command line to find new uncovered code. See also `rcov-command-line'.")
 
+;;;; rcov-xref-mode
 (define-derived-mode rcov-xref-mode ruby-mode "Rxref"
   "Major mode for annotated Ruby scripts (coverage/*.rb) by rcov."
   (setq truncate-lines t)
@@ -45,6 +50,7 @@ It is good to use rcov with Rake because it `cd's appropriate directory.
 
 (defvar rcov-xref-link-tempbuffer " *rcov-link*")
 (defun rcov-xref-show-link ()
+  "Follow current LINK."
   (let ((link (match-string 1))
         (eol (point-at-eol)))
     (save-excursion
@@ -101,8 +107,23 @@ It is good to use rcov with Rake because it `cd's appropriate directory.
           (t
            (error "No source location on line.")) )))
 
+;;;; Running rcov with various options.
+(defun rcov-internal (cmdline)
+  "Run rcov with various options."
+  (compile-internal cmdline ""
+                    nil nil nil (lambda (x) "*rcov*")))
+
 (defun rcov ()
   "Run rcov to find uncovered code."
   (interactive)
-  (compile-internal rcov-command-line ""
-                    nil nil nil (lambda (x) "*rcov*")))
+  (rcov-internal rcov-command-line))
+
+(defun rcovsave ()
+  "Run rcov to save coverage status."
+  (interactive)
+  (rcov-internal rcovsave-command-line))
+
+(defun rcovdiff ()
+  "Run rcov to find new uncovered code."
+  (interactive)
+  (rcov-internal rcovdiff-command-line))
