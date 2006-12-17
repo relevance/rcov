@@ -1058,12 +1058,12 @@ class RubyAnnotation < Formatter # :nodoc:
             line = file.lines[i].chomp
             marked = file.coverage[i]
             count = file.counts[i]
-            result << create_cross_refs(file.name, i+1, line) + "\n"
+            result << create_cross_refs(file.name, i+1, line, marked) + "\n"
         end
         result
     end
 
-    def create_cross_refs(filename, lineno, linetext)
+    def create_cross_refs(filename, lineno, linetext, marked)
         return linetext unless @callsite_analyzer && @do_callsites
         ref_blocks = []
         _get_defsites(ref_blocks, filename, lineno, linetext, ">>") do |ref|
@@ -1081,15 +1081,22 @@ class RubyAnnotation < Formatter # :nodoc:
                 "in #{ref.klass}##{ref.mid}"
         end
         
-        create_cross_reference_block(linetext, ref_blocks)
+        create_cross_reference_block(linetext, ref_blocks, marked)
     end
 
-    def create_cross_reference_block(linetext, ref_blocks)
-        return linetext if ref_blocks.empty?
+    def create_cross_reference_block(linetext, ref_blocks, marked)
+        codelen = 75
+        if ref_blocks.empty?
+            if marked
+                return "%-#{codelen}s #o" % linetext
+            else
+                return linetext
+            end
+        end
         ret = ""
         @cross_ref_idx ||= 0
         @known_files ||= sorted_file_pairs.map{|fname, finfo| normalize_filename(fname)}
-        ret << "%-75s # " % linetext # TODO
+        ret << "%-#{codelen}s # " % linetext
         ref_blocks.each do |refs, toplabel, label_proc|
             unless !toplabel || toplabel.empty?
                 ret << toplabel << " "
@@ -1105,6 +1112,7 @@ class RubyAnnotation < Formatter # :nodoc:
                 end
             end
         end
+        
         ret
     end
     
