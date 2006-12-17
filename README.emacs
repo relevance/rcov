@@ -8,6 +8,9 @@
 == Installation
 
 Copy <tt>rcov.el</tt> to the appropriate directory, which is in load-path.
+Then require it.
+  (require 'rcov)
+
 
 == Usage
 
