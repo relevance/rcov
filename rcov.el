@@ -127,3 +127,5 @@ It is good to use rcov with Rake because it `cd's appropriate directory.
   "Run rcov to find new uncovered code."
   (interactive)
   (rcov-internal rcovdiff-command-line))
+
+(provide 'rcov)
