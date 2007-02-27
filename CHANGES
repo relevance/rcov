@@ -5,14 +5,24 @@ Since 0.7.0 (2006-08-04)
 ========================
 Features
 --------
+* --annotate mode, which dumps annotated source code which can be used to
+  follow the control flow (very useful when reading third-party code)
+* --gcc option to display uncovered lines in GCC error format
+* superior Emacs support: running rcov, jumping to uncovered code, navigate
+  through cross-referenced annotated code
+* --[no-]validator-links
 
 Bugfixes
 --------
 * differential code coverage reports work with filenames containing special
   characters
+* fixed recent segfaults happening with rspec
+* more care name mangling
 
 Minor enhancements
 ------------------
+* relevant summary values are identified using separate CSS classes 
+  (microformat-style)
 
 Since 0.6.0 (2006-06-12)
 ========================

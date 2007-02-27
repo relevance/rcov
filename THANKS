@@ -56,5 +56,13 @@ Ryan Kinderman:
 Jan Svitok:
 * reported typo in rcovtask.rb's RDoc
 
+rubikitch:
+* implemented --annotate mode
+* implemented --gcc option
+* superior emacs support
+* testing, refactoring...
+* many other things, see darcs changes
+
+
 Zed A. Shaw:
 * reported and fixed segfault triggered by rspec
