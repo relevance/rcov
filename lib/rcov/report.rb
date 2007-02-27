@@ -600,7 +600,9 @@ table.report td.text {
     border: #d0d0d0 1px solid;
 }
 
-table.report td.value {
+table.report td.value,
+table.report td.lines_total,
+table.report td.lines_code {
     text-align: right;
     border: #d0d0d0 1px solid;
 }
@@ -689,8 +691,9 @@ EOS
                                     a_(:href => mangle_filename(f.name)){ t_ { f.name } } 
                                 end
                             }
-                            [f.num_lines, f.num_code_lines].each do |value| 
-                                td_(:class => "value") { tt_{ value } }
+                            [[f.num_lines, "lines_total"], 
+                             [f.num_code_lines, "lines_code"]].each do |value, css_class| 
+                                td_(:class => css_class) { tt_{ value } }
                             end
                             [f.total_coverage, f.code_coverage].each do |value|
                                 value *= 100

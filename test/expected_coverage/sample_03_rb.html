@@ -110,7 +110,9 @@ table.report td.heading:hover {
 table.report td.text {
  border: #d0d0d0 1px solid;
 }
-table.report td.value {
+table.report td.value,
+table.report td.lines_total,
+table.report td.lines_code {
  text-align: right;
  border: #d0d0d0 1px solid;
 }
@@ -577,10 +579,10 @@ span.run100 {
           <td>
             <a href='sample_03_rb.html'>sample_03.rb</a>
           </td>
-          <td class='value'>
+          <td class='lines_total'>
             <tt>20</tt>
           </td>
-          <td class='value'>
+          <td class='lines_code'>
             <tt>14</tt>
           </td>
           <td>
