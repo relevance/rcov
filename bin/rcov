@@ -58,6 +58,7 @@ options.diff_cmd = "diff"
 options.report_cov_bug_for = nil
 options.aggregate_file = nil
 options.gcc_output = false
+options.show_validator_links = true
 
 EXTRA_HELP = <<-EOF
 
@@ -229,6 +230,10 @@ EOF
         end
         options.output_threshold = threshold
     end
+    opts.on("--[no-]validator-links", "Add link to W3C's validation services.",
+           "(default: true)") do |show_validator_links|
+        options.show_validator_links = show_validator_links
+    end
     opts.on("--only-uncovered", "Same as --threshold 100") do
         options.output_threshold = 100
     end
@@ -359,7 +364,8 @@ make_formatter = lambda do |klass|
               :cross_references => options.crossrefs,
               :diff_cmd => options.diff_cmd,
               :comments_run_by_default => options.comments_run_by_default,
-              :gcc_output => options.gcc_output
+              :gcc_output => options.gcc_output,
+              :validator_links => options.show_validator_links
              )
 end
 
