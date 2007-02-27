@@ -695,13 +695,14 @@ EOS
                              [f.num_code_lines, "lines_code"]].each do |value, css_class| 
                                 td_(:class => css_class) { tt_{ value } }
                             end
-                            [f.total_coverage, f.code_coverage].each do |value|
+                            [[f.total_coverage, "coverage_total"],
+                             [f.code_coverage, "coverage_code"]].each do |value, css_class|
                                 value *= 100
                                 td_ { 
                                     table_(:cellpadding => 0, :cellspacing => 0, :align => "right") { 
                                         tr_ { 
                                             td_ {
-                                                 tt_ { "%3.1f%%" % value } 
+                                                 tt_(:class => css_class) { "%3.1f%%" % value } 
                                                  x_ "&nbsp;"
                                             }
                                             ivalue = value.round
