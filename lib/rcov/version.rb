@@ -4,7 +4,7 @@
 
 module Rcov
 
-VERSION = "0.7.1"
+VERSION = "0.8.0"
 RELEASE_DATE = "unreleased (internal/preliminary)"
 RCOVRT_ABI = [2,0,0]
 UPSTREAM_URL = "http://eigenclass.org/hiki.rb?rcov"
