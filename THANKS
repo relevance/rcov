@@ -55,3 +55,6 @@ Ryan Kinderman:
 
 Jan Svitok:
 * reported typo in rcovtask.rb's RDoc
+
+Zed A. Shaw:
+* reported and fixed segfault triggered by rspec

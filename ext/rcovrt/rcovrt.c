@@ -4,6 +4,7 @@
 #include <node.h>
 #include <st.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #define COVERAGE_DEBUG_EVENTS 0
 
@@ -34,12 +35,15 @@ static char *cached_file = 0;
  * */
 
 static struct cov_array *
-coverage_increase_counter_uncached(char *sourcefile, int sourceline,
+coverage_increase_counter_uncached(char *sourcefile, unsigned int sourceline,
                                    char mark_only)
 {
-  struct cov_array *carray;
-  
-  if(!st_lookup(coverinfo, (st_data_t)sourcefile, (st_data_t*)&carray)) {
+  struct cov_array *carray = NULL;
+ 
+  if(sourcefile == NULL) {
+          /* "can't happen", just ignore and avoid segfault */
+          return NULL;
+  } else if(!st_lookup(coverinfo, (st_data_t)sourcefile, (st_data_t*)&carray)) {
           VALUE arr;
 
           arr = rb_hash_aref(oSCRIPT_LINES__, rb_str_new2(sourcefile));
@@ -51,7 +55,11 @@ coverage_increase_counter_uncached(char *sourcefile, int sourceline,
           carray->len = RARRAY(arr)->len;
           st_insert(coverinfo, (st_data_t)strdup(sourcefile), 
                           (st_data_t) carray);
+  } else {
+          /* recovered carray, sanity check */
+          assert(carray && "failed to create valid carray");
   }
+
   if(mark_only) {
           if(!carray->ptr[sourceline])
                   carray->ptr[sourceline] = 1;
