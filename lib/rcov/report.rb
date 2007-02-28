@@ -1050,7 +1050,7 @@ class RubyAnnotation < Formatter # :nodoc:
         @do_cross_references = true
 
         @mangle_filename = Hash.new{|h,base|
-            h[base] = Pathname(base).cleanpath.to_s.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".rb"
+            h[base] = Pathname.new(base).cleanpath.to_s.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".rb"
         }
     end
 
