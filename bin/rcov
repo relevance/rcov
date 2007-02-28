@@ -743,13 +743,13 @@ module XX
             when ::XX::STRICT
               %r/_$/o
             else
-              super
+              super(m.to_sym, *a, &b)
           end
 
-        super unless m =~ pat
+        super(m.to_sym, *a, &b) unless m =~ pat
 
         if c_method_missing == ::XX::STRICT
-          super unless c_tags.include? tag_name
+          super(m.to_sym, *a, &b) unless c_tags.include? tag_name
         end
 
         ret, defined = nil
