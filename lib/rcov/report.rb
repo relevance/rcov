@@ -33,7 +33,7 @@ class Formatter # :nodoc:
         @callsite_index = nil
 
         @mangle_filename = Hash.new{|h,base|
-            h[base] = Pathname(base).cleanpath.to_s.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".html"
+            h[base] = Pathname.new(base).cleanpath.to_s.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".html"
         }
     end
 
