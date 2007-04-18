@@ -300,7 +300,7 @@ rescue OptionParser::InvalidOption, OptionParser::InvalidArgument,
     exit(-1)
 end
 options.destdir ||= "coverage"
-unless ARGV[0]
+unless ARGV[0] or options.aggregate_file && File.file?(options.aggregate_file)
     puts opts
     exit
 end

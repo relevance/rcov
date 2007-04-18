@@ -1,6 +1,13 @@
 
 User-visible changes.
 
+Since 0.8.0 (2007-02-28)
+========================
+Features
+--------
+* you can use an existent data file to generate coverage reports without
+  having to execute your code again
+
 Since 0.7.0 (2006-08-04)
 ========================
 Features

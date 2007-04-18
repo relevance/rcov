@@ -63,6 +63,9 @@ rubikitch:
 * testing, refactoring...
 * many other things, see darcs changes
 
-
 Zed A. Shaw:
 * reported and fixed segfault triggered by rspec
+
+Lee Marlow:
+* patch allowing to run rcov against a data file with no input code
+
