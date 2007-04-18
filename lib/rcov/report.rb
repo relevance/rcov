@@ -226,7 +226,17 @@ class FullTextReport < Formatter # :nodoc:
             puts "=" * 80
             puts filename
             puts "=" * 80
-            SCRIPT_LINES__[filename].each_with_index do |line, i|
+            lines = SCRIPT_LINES__[filename]
+            unless lines
+                # try to get the source code from the global code coverage
+                # analyzer
+                re = /#{Regexp.escape(filename)}\z/
+                if $rcov_code_coverage_analyzer and 
+                    (data = $rcov_code_coverage_analyzer.data_matching(re))
+                    lines = data[0]
+                end
+            end
+            (lines || []).each_with_index do |line, i|
                 case @textmode
                 when :counts
                     puts "%-70s| %6d" % [line.chomp[0,70], fileinfo.counts[i]]

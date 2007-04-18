@@ -590,6 +590,18 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
     refine_coverage_info(@script_lines__[filename], raw_data[filename])
   end
 
+  # Data for the first file matching the given regexp.
+  # See #data.
+  def data_matching(filename_re)
+    raw_data = raw_data_relative
+    update_script_lines__
+
+    match = raw_data.keys.sort.grep(filename_re).first
+    return nil unless match
+
+    refine_coverage_info(@script_lines__[match], raw_data[match])
+  end
+
   # Execute the code in the given block, monitoring it in order to gather
   # information about which code was executed.
   def run_hooked; super end
