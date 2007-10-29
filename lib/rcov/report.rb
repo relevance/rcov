@@ -709,7 +709,7 @@ EOS
                              [f.code_coverage, "coverage_code"]].each do |value, css_class|
                                 value *= 100
                                 td_ { 
-                                    table_(:cellpadding => 0, :cellspacing => 0, :align => "right") { 
+                                    table_(:cellpadding => "0", :cellspacing => "0", :align => "right") { 
                                         tr_ { 
                                             td_ {
                                                  tt_(:class => css_class) { "%3.1f%%" % value } 
@@ -717,11 +717,11 @@ EOS
                                             }
                                             ivalue = value.round
                                             td_ {
-                                                table_(:class => "percent_graph", :cellpadding => 0,
-                                                   :cellspacing => 0, :width => 100) {
+                                                table_(:class => "percent_graph", :cellpadding => "0",
+                                                   :cellspacing => "0", :width => "100") {
                                                     tr_ {
-                                                        td_(:class => "covered", :width => ivalue)
-                                                        td_(:class => "uncovered", :width => (100-ivalue))
+                                                        td_(:class => "covered", :width => ivalue.to_s)
+                                                        td_(:class => "uncovered", :width => (100-ivalue).to_s)
                                                     }
                                                 }
                                             }
@@ -773,7 +773,7 @@ EOS
                     p_ {
                         a_(:href => "http://validator.w3.org/check/referer") {
                             img_(:src => "http://www.w3.org/Icons/valid-xhtml11",
-                                 :alt => "Valid XHTML 1.1!", :height => 31, :width => 88)
+                                 :alt => "Valid XHTML 1.1!", :height => "31", :width => "88")
                         }
                         a_(:href => "http://jigsaw.w3.org/css-validator/check/referer") {
                             img_(:style => "border:0;width:88px;height:31px",
@@ -920,7 +920,7 @@ EOS
                     p_ {
                         a_(:href => "http://validator.w3.org/check/referer") {
                             img_(:src => "http://www.w3.org/Icons/valid-xhtml10",
-                                 :alt => "Valid XHTML 1.0!", :height => 31, :width => 88)
+                                 :alt => "Valid XHTML 1.0!", :height => "31", :width => "88")
                         }
                         a_(:href => "http://jigsaw.w3.org/css-validator/check/referer") {
                             img_(:style => "border:0;width:88px;height:31px",
