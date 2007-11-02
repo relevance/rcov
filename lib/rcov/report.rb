@@ -811,7 +811,7 @@ EOS
                     end_of_span = "</span>"
                 end
             end
-            result += %[<a name="line#{i+1}" />] + (format_line % (i+1)) + 
+            result += %[<a name="line#{i+1}"></a>] + (format_line % (i+1)) + 
                 " " + create_cross_refs(file.name, i+1, CGI.escapeHTML(line)) + "\n"
             last = spanclass
         end

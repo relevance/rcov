@@ -77,3 +77,8 @@ Kurt Stephens:
 Brian Candler:
 * found compatibility issues with the REXML lib included in ruby-1.8.6-p110
   and provided a workaround
+
+Mat Schaffer:
+* reported missing line colorization on Safari and probably other browsers,
+  owing to self-closing <a> not being handled properly despite being valid
+  XHTML 1.0.
