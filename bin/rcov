@@ -45,6 +45,7 @@ options.include = []
 options.html = true
 options.comments_run_by_default = false
 options.test_unit_only = false
+options.spec_only = false
 options.sort = :name
 options.sort_reverse = false
 options.output_threshold = 101
@@ -99,8 +100,12 @@ EOF
         options.comments_run_by_default = comments_run_p
     end
     opts.on("--test-unit-only",
-            "Only trace code executed in TestCases.") do
+            "Only trace code executed inside TestCases.") do
         options.test_unit_only = true
+    end
+    opts.on("--spec-only",
+            "Only trace code executed inside RSpec specs.") do
+        options.spec_only = true
     end
     opts.on("-n", "--no-color", "Create colorblind-safe output.") do
         options.color = false
@@ -506,6 +511,14 @@ if options.test_unit_only
                 result.add_run
                 yield(FINISHED, name)
             end
+        end
+    end
+elsif options.spec_only
+    require 'spec'
+    class Spec::DSL::Example
+        oldrun = instance_method(:run)
+        define_method(:run) do |*args|
+            $rcov_code_coverage_analyzer.run_hooked { oldrun.bind(self).call(*args) }
         end
     end
 else
