@@ -4,6 +4,28 @@
 require 'pathname'
 module Rcov
 
+# Try to fix bug in the REXML shipped with Ruby 1.8.6
+# This affects Mac OSX 10.5.1 users and motivates endless bug reports.
+if RUBY_VERSION == "1.8.6" && defined? REXML
+    class REXML::Document
+        def write( output=$stdout, indent=-1, trans=false, ie_hack=false )
+            if xml_decl.encoding != "UTF-8" && !output.kind_of?(Output)
+                output = Output.new( output, xml_decl.encoding )
+            end
+            formatter = if indent > -1
+                if trans
+                    REXML::Formatters::Transitive.new( indent, ie_hack )
+                else
+                    REXML::Formatters::Pretty.new( indent, ie_hack )
+                end
+            else
+                REXML::Formatters::Default.new( ie_hack )
+            end
+            formatter.write( self, output )
+        end
+    end
+end
+
 class Formatter # :nodoc:
     require 'pathname'
     ignore_files = [
