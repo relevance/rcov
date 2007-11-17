@@ -1112,8 +1112,8 @@ class RubyAnnotation < Formatter # :nodoc:
         return linetext unless @callsite_analyzer && @do_callsites
         ref_blocks = []
         _get_defsites(ref_blocks, filename, lineno, linetext, ">>") do |ref|
-            ref.file.sub!(%r!^./!, '')
             if ref.file
+                ref.file.sub!(%r!^./!, '')
                 where = "at #{mangle_filename(ref.file)}:#{ref.line}"
             else
                 where = "(C extension/core)"
