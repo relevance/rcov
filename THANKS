@@ -82,3 +82,9 @@ Mat Schaffer:
 * reported missing line colorization on Safari and probably other browsers,
   owing to self-closing <a> not being handled properly despite being valid
   XHTML 1.0.
+
+Sam Granieri:
+* tested workaround for REXML bug
+
+Kosmas Schütz, Daniel Berger, François Beausoleil, Bil Kleb:
+* provided information about the ruby-1.8.6-p11[01] REXML problems
