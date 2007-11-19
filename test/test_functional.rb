@@ -26,12 +26,12 @@ $rcov --no-html --gcc --include-file=sample --exclude=rcov sample_05.rb > expect
 class TestFunctional < Test::Unit::TestCase
   @@dir = Pathname(__FILE__).expand_path.dirname
 
-  def strip_time(str)
-    str.sub(/Generated on.+$/, '')
+  def strip_variable_sections(str)
+    str.sub(/Generated on.+$/, '').sub(/Generated using the.+$/, '')
   end
 
   def cmp(file)
-    content = lambda{|dir| strip_time(File.read(@@dir+dir+file))}
+    content = lambda{|dir| strip_variable_sections(File.read(@@dir+dir+file))}
     assert_equal(content["expected_coverage"], content["actual_coverage"])
   end
 
