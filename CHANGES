@@ -9,6 +9,7 @@ Features
   having to execute your code again
 * --spec-only: only consider cover code executed inside a spec
   (tested with RSpec 1.0.5, 1.0.8)
+* --charset can be used to specify the charset in the Content-Type declaration
 
 Bugfixes
 --------

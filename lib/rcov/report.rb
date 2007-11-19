@@ -648,7 +648,7 @@ EOS
 
     DEFAULT_OPTS = {:color => false, :fsr => 30, :destdir => "coverage",
                     :callsites => false, :cross_references => false,
-                    :validator_links => true 
+                    :validator_links => true, :charset => nil
                    }
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
@@ -660,6 +660,7 @@ EOS
         @do_cross_references = options[:cross_references]
         @span_class_index = 0
         @show_validator_links = options[:validator_links]
+        @charset = options[:charset]
     end
 
     def execute
@@ -772,6 +773,10 @@ EOS
         title = default_title
         output = xhtml_ { html_ {
             head_ {
+                if @charset
+                    meta_("http-equiv".to_sym => "Content-Type",
+                          :content => "text/html;charset=#{@charset}")
+                end
                 title_{ title }
                 style_(:type => "text/css") { t_{ "body { background-color: #{default_color}; }" }  }
                 style_(:type => "text/css") { CSS_PROLOG }
@@ -909,6 +914,10 @@ EOS
         do_ctable = output_color_table?
         output = xhtml_ { html_ {
             head_ { 
+                if @charset
+                    meta_("http-equiv".to_sym => "Content-Type",
+                          :content => "text/html;charset=#{@charset}")
+                end
                 title_{ title } 
                 style_(:type => "text/css") { t_{ "body { background-color: #{default_color}; }" }  }
                 style_(:type => "text/css") { CSS_PROLOG }
