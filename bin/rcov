@@ -521,11 +521,22 @@ if options.test_unit_only
     end
 elsif options.spec_only
     require 'spec'
-    class Spec::DSL::Example
+    override_run = lambda do
         oldrun = instance_method(:run)
         define_method(:run) do |*args|
             $rcov_code_coverage_analyzer.run_hooked { oldrun.bind(self).call(*args) }
         end
+    end
+    if defined? Spec::DSL::Example
+        Spec::DSL::Example.instance_eval(&override_run)
+    elsif defined? Spec::Example::ExampleGroup
+        Spec::Example::ExampleGroup.instance_eval(&override_run)
+    else
+        $stderr.puts <<-EOF
+Your RSpec version isn't supported. If it's a old one, consider upgrading;
+otherwise, please report the problem.
+        EOF
+        exit(-1)
     end
 else
     $rcov_code_coverage_analyzer.install_hook
