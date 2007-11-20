@@ -88,3 +88,6 @@ Sam Granieri:
 
 Kosmas Schütz, Daniel Berger, François Beausoleil, Bil Kleb:
 * provided information about the ruby-1.8.6-p11[01] REXML problems
+
+Chad Humphries:
+* indicated that Spec::DSL::Example has changed in RSpec trunk
