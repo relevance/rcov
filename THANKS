@@ -91,3 +91,6 @@ Kosmas Schütz, Daniel Berger, François Beausoleil, Bil Kleb:
 
 Chad Humphries:
 * indicated that Spec::DSL::Example has changed in RSpec trunk
+
+Jeremy Hinegardner:
+* more info about REXML's bugs in 1.8.6-p11[01]

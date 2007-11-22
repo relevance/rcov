@@ -1,6 +1,15 @@
 
 User-visible changes.
 
+Since 0.8.1.1 (2007-11-20)
+==========================
+Bugfixes
+--------
+* REXML from 1.8.6-p11[01] is more broken than anticipated; more invasive
+  workarounds. Tested on 1.8.6-p110 and 1.8.5. Note that code using REXML to
+  generate XML will behave differently under rcov in 1.8.6-p11[01] (to begin
+  with, it won't crash in REXML::Document#write).
+
 Since 0.8.1 (2007-11-19)
 ========================
 Bugfixes
