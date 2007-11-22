@@ -6,6 +6,7 @@ module Rcov
 
 # Try to fix bug in the REXML shipped with Ruby 1.8.6
 # This affects Mac OSX 10.5.1 users and motivates endless bug reports.
+begin require 'rexml/formatters/transitive'; rescue LoadError; end
 if RUBY_VERSION == "1.8.6" && defined? REXML::Formatters::Transitive &&
    RUBY_RELEASE_DATE < "2007-11-04"
     class REXML::Document
