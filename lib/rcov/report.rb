@@ -2,6 +2,19 @@
 # See LEGAL and LICENSE for additional licensing information.
 
 require 'pathname'
+require 'rcov/xx'
+
+# extend XX
+module XX
+  module XMLish
+    include Markup
+
+    def xmlish_ *a, &b
+      xx_which(XMLish){ xx_with_doc_in_effect(*a, &b)}
+    end
+  end
+end
+
 module Rcov
 
 # Try to fix bugs in the REXML shipped with Ruby 1.8.6
