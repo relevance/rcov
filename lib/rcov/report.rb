@@ -25,7 +25,7 @@ begin
 rescue LoadError
 end
 
-if RUBY_VERSION == "1.8.6" && defined? REXML::Formatters::Transitive
+if (RUBY_VERSION == "1.8.6" || RUBY_VERSION == "1.8.7") && defined? REXML::Formatters::Transitive
     class REXML::Document
         remove_method :write rescue nil
         def write( output=$stdout, indent=-1, trans=false, ie_hack=false )

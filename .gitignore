@@ -6,3 +6,4 @@ ext/rcovrt/Makefile
 ext/rcovrt/callsite.o
 ext/rcovrt/rcovrt.bundle
 ext/rcovrt/rcovrt.o
+InstalledFiles
