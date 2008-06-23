@@ -1,5 +1,4 @@
-require 'test/unit'
-require 'rcov'
+require File.dirname(__FILE__) + '/test_helper'
 
 class TestFileStatistics < Test::Unit::TestCase
   def test_trailing_end_is_inferred
@@ -40,7 +39,7 @@ class TestFileStatistics < Test::Unit::TestCase
       0   else
       1     c
       0   end
-      0   case 
+      0   case
       2   when bar =~ /foo/
       1     puts "bar"
       0   else
@@ -81,10 +80,10 @@ class TestFileStatistics < Test::Unit::TestCase
     assert_in_delta(0.375, sf.code_coverage, 0.01)
     assert_equal(8, sf.num_code_lines)
     assert_equal(13, sf.num_lines)
-    assert_equal([true, :inferred, true, false, false, false, false, false, 
+    assert_equal([true, :inferred, true, false, false, false, false, false,
                  false, false, false, false, true], sf.coverage.to_a)
   end
-  
+
   def test_merge
     lines, coverage, counts = code_info_from_string <<-EOF
       1 a = 1
@@ -237,11 +236,11 @@ class TestFileStatistics < Test::Unit::TestCase
   def test_heredocs_with_interpolation_alone_in_method
     verify_everything_marked "lonely heredocs with interpolation", <<-'EOS'
       1 def to_s
-      0  <<-EOF               
+      0  <<-EOF
       1    #{name}
-      0    #{street}          
-      0    #{city}, #{state}  
-      0    #{zip}             
+      0    #{street}
+      0    #{city}, #{state}
+      0    #{zip}
       0  EOF
       0 end
     EOS
@@ -250,13 +249,13 @@ class TestFileStatistics < Test::Unit::TestCase
   def test_handle_multiline_expressions
     verify_everything_marked "expression", <<-EOF
       1 puts 1, 2.
-      0           abs + 
+      0           abs +
       0           1 -
       0           1 *
-      0           1 /  
+      0           1 /
       0           1, 1 <
-      0           2, 3 > 
-      0           4 % 
+      0           2, 3 >
+      0           4 %
       0           3 &&
       0           true ||
       0           foo <<
@@ -321,15 +320,15 @@ class TestFileStatistics < Test::Unit::TestCase
       1    @review.save
     EOF
   end
-  
+
   def test_handle_multiline_expression_1st_line_ends_in_block_header
     # excerpt taken from mongrel/handlers.rb
     verify_everything_marked "multiline with block starting on 1st", <<-EOF
     1 uris = listener.classifier.handler_map
-    0 results << table("handlers", uris.map {|uri,handlers| 
-    1  [uri, 
-    0    "<pre>" + 
-    1    handlers.map {|h| h.class.to_s }.join("\n") + 
+    0 results << table("handlers", uris.map {|uri,handlers|
+    1  [uri,
+    0    "<pre>" +
+    1    handlers.map {|h| h.class.to_s }.join("\n") +
     0    "</pre>"
     0  ]
     1 })
@@ -340,22 +339,22 @@ class TestFileStatistics < Test::Unit::TestCase
     verify_everything_marked "multiline with }) delimiter, forward", <<-EOF
       1 assert(@c.config == {
       0 'host' => 'myhost.tld',
-      0 'port' => 1234 
+      0 'port' => 1234
       0 })
     EOF
     verify_everything_marked "multiline with }) delimiter, backwards", <<-EOF
       0 assert(@c.config == {
       0 'host' => 'myhost.tld',
-      0 'port' => 1234 
+      0 'port' => 1234
       1 })
     EOF
   end
-  
+
   STRING_DELIMITER_PAIRS = [
-    %w-%{ }-, %w-%q{ }-, %w-%Q{ }-, %w{%[ ]}, %w{%q[ ]}, 
+    %w-%{ }-, %w-%q{ }-, %w-%Q{ }-, %w{%[ ]}, %w{%q[ ]},
     %w{%( )}, %w{%Q( )}, %w{%Q[ ]}, %w{%q! !}, %w{%! !},
   ]
-  
+
   def test_multiline_strings_basic
     STRING_DELIMITER_PAIRS.each do |s_delim, e_delim|
       verify_everything_marked "multiline strings, basic #{s_delim}", <<-EOF
@@ -372,7 +371,7 @@ class TestFileStatistics < Test::Unit::TestCase
         0 ON_OFF        = 'on|off'
       EOF
 
-      verify_marked_exactly "multiline strings, #{s_delim}, interpolation", 
+      verify_marked_exactly "multiline strings, #{s_delim}, interpolation",
                             [0], <<-EOF
         1 PATTERN_TEXT = #{s_delim}  \#{#{s_delim} foo #{e_delim}} \\#{e_delim} baz #{e_delim}
         0 NUMBERS       = 'one|two|three|four|five'
@@ -380,7 +379,7 @@ class TestFileStatistics < Test::Unit::TestCase
       EOF
     end
   end
-  
+
   def test_multiline_strings_escaped_delimiter
     STRING_DELIMITER_PAIRS.each do |s_delim, e_delim|
       verify_everything_marked "multiline, escaped #{s_delim}", <<-EOF
@@ -394,9 +393,9 @@ class TestFileStatistics < Test::Unit::TestCase
 
   def test_handle_multiline_expressions_with_heredocs
     verify_everything_marked "multiline and heredocs", <<-EOF
-      1 puts <<EOF + 
+      1 puts <<EOF +
       0 testing
-      0 one two three   
+      0 one two three
       0 EOF
       0 somevar
     EOF
@@ -438,7 +437,7 @@ class TestFileStatistics < Test::Unit::TestCase
 
     sf = Rcov::FileStatistics.new(testname, lines, counts)
     is_code_arr.each_with_index do |val,i|
-      assert_equal(val, sf.is_code?(i), 
+      assert_equal(val, sf.is_code?(i),
                    "Unable to detect =begin comments properly: #{lines[i].inspect}")
     end
   end
@@ -449,15 +448,15 @@ class TestFileStatistics < Test::Unit::TestCase
     sf = Rcov::FileStatistics.new(testname, lines, counts)
     lines.size.times do |i|
       if marked_indices.include? i
-        assert(sf.coverage[i], "Test #{testname}; " + 
+        assert(sf.coverage[i], "Test #{testname}; " +
                "line should have been marked: #{lines[i].inspect}.")
       else
-        assert(!sf.coverage[i], "Test #{testname}; " + 
+        assert(!sf.coverage[i], "Test #{testname}; " +
                "line should not have been marked: #{lines[i].inspect}.")
       end
     end
   end
-  
+
   def verify_everything_marked(testname, str)
     verify_marked_exactly(testname, (0...str.size).to_a, str)
   end
@@ -466,7 +465,7 @@ class TestFileStatistics < Test::Unit::TestCase
   def code_info_from_string(str)
     str = str.gsub(/^\s*/,"")
     [ str.map{|line| line.sub(/^\d+ /, "") },
-      str.map{|line| line[/^\d+/].to_i > 0}, 
+      str.map{|line| line[/^\d+/].to_i > 0},
       str.map{|line| line[/^\d+/].to_i } ]
   end
 end

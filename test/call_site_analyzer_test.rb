@@ -1,5 +1,4 @@
-require 'test/unit'
-require 'rcov'
+require File.dirname(__FILE__) + '/test_helper'
 
 class TestCallSiteAnalyzer < Test::Unit::TestCase
 
@@ -12,7 +11,7 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
   end
 
   def verify_callsites_equal(expected, actual)
-    callsites = expected.inject({}) do |s,(backtrace, count)| 
+    callsites = expected.inject({}) do |s,(backtrace, count)|
       unless $".any?{|x| %r{\brcovrt\b} =~ x}
         backtrace = backtrace.map{|_, mid, file, line| [nil, mid, file, line] }
       end
@@ -27,25 +26,25 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
   end
 
   def test_callsite_compute_raw_difference
-    src = [ 
+    src = [
             { ["Foo", "foo"] => {"bar" => 1},
-              ["Foo", "bar"] => {"baz" => 10} }, 
-            { ["Foo", "foo"] => ["foo.rb", 10] } 
+              ["Foo", "bar"] => {"baz" => 10} },
+            { ["Foo", "foo"] => ["foo.rb", 10] }
           ]
-    dst = [ 
+    dst = [
             { ["Foo", "foo"] => {"bar" => 1, "fubar" => 10},
               ["Foo", "baz"] => {"baz" => 10} },
             { ["Foo", "foo"] => ["fooredef.rb", 10],
               ["Foo", "baz"] => ["foo.rb", 20]}
           ]
-    expected = [ 
+    expected = [
                  { ["Foo", "foo"] => {"fubar" => 10},
                    ["Foo", "baz"] => {"baz"   => 10} },
                  { ["Foo", "foo"] => ["fooredef.rb", 10],
-                   ["Foo", "baz"] => ["foo.rb", 20] } 
+                   ["Foo", "baz"] => ["foo.rb", 20] }
     ]
-               
-    assert_equal(expected, 
+
+    assert_equal(expected,
                  @a.instance_eval{ compute_raw_data_difference(src, dst) } )
   end
 
@@ -60,11 +59,11 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
 
   def test_basic_defsite_recording
     @a.run_hooked{ @o.f1 }
-    verify_defsite_equal(["./test/sample_03.rb", 3], 
+    verify_defsite_equal(["./test/sample_03.rb", 3],
                  @a.defsite("Rcov::Test::Temporary::Sample03", "f1"))
-    verify_defsite_equal(["./test/sample_03.rb", 7], 
+    verify_defsite_equal(["./test/sample_03.rb", 7],
                  @a.defsite("Rcov::Test::Temporary::Sample03", "f2"))
-    verify_defsite_equal(["./test/sample_03.rb", 7], 
+    verify_defsite_equal(["./test/sample_03.rb", 7],
                  @a.defsite("Rcov::Test::Temporary::Sample03#f2"))
   end
 
@@ -72,13 +71,13 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
     @a.run_hooked{ @o.f1 }
     assert(@a.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
     assert_equal(%w[f1 f2], @a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1, "./test/sample_03.rb", 4]] => 10}, 
+    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1, "./test/sample_03.rb", 4]] => 10},
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
-    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1, "./test/sample_03.rb", 4]] => 10}, 
+    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1, "./test/sample_03.rb", 4]] => 10},
                  @a.callsites("Rcov::Test::Temporary::Sample03#f2"))
-    #verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
+    #verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 10},
     #             @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
-    #verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 10}, 
+    #verify_callsites_equal({["./test/sample_03.rb:4:in `f1'"] => 10},
     #             @a.callsites("Rcov::Test::Temporary::Sample03#f2"))
   end
 
@@ -86,10 +85,10 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
     @a.run_hooked{ @o.f1 }
     assert(@a.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
     assert_equal(%w[f1 f2], @a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1, 
-                              "./test/sample_03.rb", 4]] => 10}, 
+    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1,
+                              "./test/sample_03.rb", 4]] => 10},
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
-    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1, "./test/sample_03.rb", 4]] => 10}, 
+    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1, "./test/sample_03.rb", 4]] => 10},
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
     callsites = @a.callsites("Rcov::Test::Temporary::Sample03", "f2")
     callsite = callsites.keys[0]
@@ -97,17 +96,17 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
     assert_equal(4, callsite.line)
     assert_equal(:f1, callsite.calling_method)
   end
-  
-  
+
+
   def test_basic_callsite_recording_with_singleton_classes
     @a.run_hooked{ @o.class.g1 }
     assert(@a.analyzed_classes.include?("#<Class:Rcov::Test::Temporary::Sample03>"))
     assert_equal(%w[g1 g2], @a.analyzed_methods("#<Class:Rcov::Test::Temporary::Sample03>"))
-    verify_callsites_equal({[[class << Rcov::Test::Temporary::Sample03; self end, 
-                             :g1, "./test/sample_03.rb", 15]] => 10}, 
+    verify_callsites_equal({[[class << Rcov::Test::Temporary::Sample03; self end,
+                             :g1, "./test/sample_03.rb", 15]] => 10},
                  @a.callsites("Rcov::Test::Temporary::Sample03.g2"))
     verify_callsites_equal({[[class << Rcov::Test::Temporary::Sample03; self end,
-                              :g1, "./test/sample_03.rb", 15]] => 10}, 
+                              :g1, "./test/sample_03.rb", 15]] => 10},
                  @a.callsites("#<Class:Rcov::Test::Temporary::Sample03>","g2"))
   end
 
@@ -117,21 +116,21 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
     assert(@a.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
     assert_equal(%w[f1 f2], @a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
     verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1,
-                              "./test/sample_03.rb", 4]] => 10}, 
+                              "./test/sample_03.rb", 4]] => 10},
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
 
     @a.run_hooked{ @o.f1 }
     assert(@a.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
     assert_equal(%w[f1 f2], @a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
     verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1,
-                              "./test/sample_03.rb", 4]] => 20}, 
+                              "./test/sample_03.rb", 4]] => 20},
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
-    
+
     @a.run_hooked{ @o.f3 }
     assert_equal(%w[f1 f2 f3], @a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1, 
+    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1,
                               "./test/sample_03.rb", 4]] => 120,
-                  [[Rcov::Test::Temporary::Sample03, :f3, 
+                  [[Rcov::Test::Temporary::Sample03, :f3,
                     "./test/sample_03.rb", 11]]=>100 },
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
   end
@@ -144,8 +143,8 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
     end
     assert(@a.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
     assert_equal(%w[f1 f2], @a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1, 
-                              "./test/sample_03.rb", 4]] => 10}, 
+    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1,
+                              "./test/sample_03.rb", 4]] => 10},
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
 
   end
@@ -153,29 +152,29 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
   def test_nested_callsite_recording
     a = Rcov::CallSiteAnalyzer.new
     b = Rcov::CallSiteAnalyzer.new
-    a.run_hooked do 
+    a.run_hooked do
       b.run_hooked { @o.f1 }
       assert(b.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
       assert_equal(%w[f1 f2], b.analyzed_methods("Rcov::Test::Temporary::Sample03"))
       verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1,
-                                "./test/sample_03.rb", 4]] => 10}, 
+                                "./test/sample_03.rb", 4]] => 10},
                    b.callsites("Rcov::Test::Temporary::Sample03", "f2"))
 
       @o.f1
       assert_equal(%w[f1 f2], b.analyzed_methods("Rcov::Test::Temporary::Sample03"))
       verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1,
-                                "./test/sample_03.rb", 4]] => 10}, 
+                                "./test/sample_03.rb", 4]] => 10},
                    b.callsites("Rcov::Test::Temporary::Sample03", "f2"))
-      
+
       assert(a.analyzed_classes.include?("Rcov::Test::Temporary::Sample03"))
       assert_equal(%w[f1 f2], a.analyzed_methods("Rcov::Test::Temporary::Sample03"))
       verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1,
-                                "./test/sample_03.rb", 4]] => 20}, 
+                                "./test/sample_03.rb", 4]] => 20},
                    a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
     end
     b.run_hooked{ @o.f3 }
     assert_equal(%w[f1 f2 f3], b.analyzed_methods("Rcov::Test::Temporary::Sample03"))
-    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1, 
+    verify_callsites_equal({[[Rcov::Test::Temporary::Sample03, :f1,
                               "./test/sample_03.rb", 4]] => 110,
                   [[Rcov::Test::Temporary::Sample03, :f3,
                     "./test/sample_03.rb", 11]]=>100 },
@@ -185,9 +184,9 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
   def test_expand_name
     assert_equal(["Foo", "foo"], @a.instance_eval{ expand_name("Foo#foo") })
     assert_equal(["Foo", "foo"], @a.instance_eval{ expand_name("Foo", "foo") })
-    assert_equal(["#<Class:Foo>", "foo"], 
+    assert_equal(["#<Class:Foo>", "foo"],
                  @a.instance_eval{ expand_name("Foo.foo") })
-    assert_equal(["#<Class:Foo>", "foo"], 
+    assert_equal(["#<Class:Foo>", "foo"],
                  @a.instance_eval{ expand_name("#<Class:Foo>", "foo") })
   end
 end

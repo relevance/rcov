@@ -18,7 +18,7 @@ ENV["RCOVPATH"] = "bin/rcov"
 # (really!)
 desc "Create a cross-referenced code coverage report."
 Rcov::RcovTask.new do |t|
-  t.test_files = FileList['test/test*.rb']
+  t.test_files = FileList['test/*_test.rb']
   t.ruby_opts << "-Ilib:ext/rcovrt" # in order to use this rcov
   t.rcov_opts << "--xrefs"  # comment to disable cross-references
   t.verbose = true
@@ -26,7 +26,7 @@ end
 
 desc "Analyze code coverage for the FileStatistics class."
 Rcov::RcovTask.new(:rcov_sourcefile) do |t|
-  t.test_files = FileList['test/test_file_statistics.rb']
+  t.test_files = FileList['test/file_statistics_test.rb']
   t.verbose = true
   t.rcov_opts << "--test-unit-only"
   t.ruby_opts << "-Ilib:ext/rcovrt" # in order to use this rcov
@@ -34,7 +34,7 @@ Rcov::RcovTask.new(:rcov_sourcefile) do |t|
 end
 
 Rcov::RcovTask.new(:rcov_ccanalyzer) do |t|
-  t.test_files = FileList['test/test_code_coverage_analyzer.rb']
+  t.test_files = FileList['test/code_coverage_analyzer_test.rb']
   t.verbose = true
   t.rcov_opts << "--test-unit-only"
   t.ruby_opts << "-Ilib:ext/rcovrt" # in order to use this rcov
@@ -44,7 +44,7 @@ end
 desc "Run the unit tests with rcovrt."
 Rake::TestTask.new(:test_rcovrt => ["ext/rcovrt/rcovrt.so"]) do |t|
   t.libs << "ext/rcovrt"
-  t.test_files = FileList['test/test*.rb']
+  t.test_files = FileList['test/*_test.rb']
   t.verbose = true
 end
 
@@ -56,7 +56,7 @@ end
 desc "Run the unit tests in pure-Ruby mode ."
 Rake::TestTask.new(:test_pure_ruby) do |t|
   t.libs << "ext/rcovrt"
-  t.test_files = FileList['test/turn_off_rcovrt.rb', 'test/test*.rb']
+  t.test_files = FileList['test/turn_off_rcovrt.rb', 'test/*_test.rb']
   t.verbose = true
 end
 

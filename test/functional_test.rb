@@ -1,6 +1,4 @@
-require 'test/unit'
-require 'pathname'
-require 'fileutils'
+require File.dirname(__FILE__) + '/test_helper'
 
 =begin
 Updating functional testdata automatically is DANGEROUS, so I do manually.
