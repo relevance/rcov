@@ -1,8 +1,8 @@
 
 ================================================================================
-!!!!! Uncovered code introduced in sample_05.rb
+!!!!! Uncovered code introduced in assets/sample_05.rb
 
-### sample_05.rb:1
+### assets/sample_05.rb:1
 [32;40mdef d(x)[37;40m
 [31;40m  4*x[37;40m
 [31;40mend[37;40m

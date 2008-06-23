@@ -37,7 +37,7 @@ EOF
   end
 
   def test_raw_coverage_info
-    sample_file = File.join(File.dirname(__FILE__), "sample_01.rb")
+    sample_file = File.join(File.dirname(__FILE__), "assets/sample_01.rb")
     lines = File.readlines(sample_file)
     analyzer = Rcov::CodeCoverageAnalyzer.new
     analyzer.run_hooked{ load sample_file }
@@ -81,7 +81,7 @@ EOF
   end
 
   def test_differential_coverage_data
-    sample_file = File.join(File.dirname(__FILE__), "sample_01.rb")
+    sample_file = File.join(File.dirname(__FILE__), "assets/sample_01.rb")
     lines = File.readlines(sample_file)
     analyzer = Rcov::CodeCoverageAnalyzer.new
     analyzer.run_hooked{ load sample_file }
@@ -90,7 +90,7 @@ EOF
 
     analyzer.reset
 
-    sample_file = File.join(File.dirname(__FILE__), "sample_02.rb")
+    sample_file = File.join(File.dirname(__FILE__), "assets/sample_02.rb")
     analyzer.run_hooked{ load sample_file }
     line_info, cov_info, count_info = analyzer.data(sample_file)
     assert_equal([8, 1, 0, 0, 0], count_info)
@@ -125,7 +125,7 @@ EOF
     a1 = Rcov::CodeCoverageAnalyzer.new
     a2 = Rcov::CodeCoverageAnalyzer.new
 
-    sample_file = File.join(File.dirname(__FILE__), "sample_02.rb")
+    sample_file = File.join(File.dirname(__FILE__), "assets/sample_02.rb")
     load sample_file
 
     a1.run_hooked do
@@ -158,7 +158,7 @@ EOF
   def test_reset
     a1 = Rcov::CodeCoverageAnalyzer.new
 
-    sample_file = File.join(File.dirname(__FILE__), "sample_02.rb")
+    sample_file = File.join(File.dirname(__FILE__), "assets/sample_02.rb")
     load sample_file
 
     a1.run_hooked do
