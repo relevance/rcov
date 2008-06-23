@@ -1,8 +1,7 @@
-
 require 'test/unit'
 require 'rcov'
 
-class Test_CodeCoverageAnalyzer < Test::Unit::TestCase
+class TestCodeCoverageAnalyzer < Test::Unit::TestCase
     LINES = <<-EOF.to_a
 puts 1
 if foo

@@ -1,9 +1,7 @@
-
-
 require 'test/unit'
 require 'rcov'
 
-class Test_CallSiteAnalyzer < Test::Unit::TestCase
+class TestCallSiteAnalyzer < Test::Unit::TestCase
 
   sample_file = File.join(File.dirname(__FILE__), "sample_03.rb")
   load sample_file

@@ -1,8 +1,7 @@
-
 require 'test/unit'
 require 'rcov'
 
-class Test_FileStatistics < Test::Unit::TestCase
+class TestFileStatistics < Test::Unit::TestCase
   def test_trailing_end_is_inferred
     verify_everything_marked "trailing end", <<-EOF
       1 class X
