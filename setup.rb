@@ -1288,7 +1288,10 @@ class Installer
     if /\Aruby/ =~ File.basename(old.cmd)
       Shebang.new(config('rubypath'), old.args)
     elsif File.basename(old.cmd) == 'env' and old.args.first == 'ruby'
-      Shebang.new(config('rubypath'), old.args[1..-1])
+      puts "Skipping shebang rename"
+      # We don't want this to happen anymore, it doesn't make sense
+      # Shebang.new(config('rubypath'), old.args[1..-1])
+      old
     else
       return old unless config('shebang') == 'all'
       Shebang.new(config('rubypath'))
