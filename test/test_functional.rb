@@ -20,7 +20,7 @@ $rcov --no-html --gcc -D --include-file=sample --exclude=rcov sample_05.rb > exp
 $rcov --no-html -D --include-file=sample --exclude=rcov sample_05.rb > expected_coverage/diff.out
 $rcov --no-html --no-color -D --include-file=sample --exclude=rcov sample_05.rb > expected_coverage/diff-no-color.out
 $rcov --no-html --gcc --include-file=sample --exclude=rcov sample_05.rb > expected_coverage/diff-gcc-all.out
-  
+
 =end
 
 class TestFunctional < Test::Unit::TestCase
@@ -32,6 +32,7 @@ class TestFunctional < Test::Unit::TestCase
 
   def cmp(file)
     content = lambda{|dir| strip_variable_sections(File.read(@@dir+dir+file))}
+
     assert_equal(content["expected_coverage"], content["actual_coverage"])
   end
 
@@ -52,13 +53,6 @@ class TestFunctional < Test::Unit::TestCase
     run_rcov("-a") do
       cmp "sample_04_rb.rb"
       cmp "sample_03_rb.rb"
-    end
-  end
-
-  def test_html
-    run_rcov("") do
-      cmp "sample_04_rb.html"
-      cmp "sample_03_rb.html"
     end
   end
 
@@ -99,7 +93,7 @@ class TestFunctional < Test::Unit::TestCase
       cmp "diff-gcc-all.out"
     end
 
-    
+
   end
 
 end
