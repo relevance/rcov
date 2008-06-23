@@ -26,7 +26,7 @@ end
 
 desc "Analyze code coverage for the FileStatistics class."
 Rcov::RcovTask.new(:rcov_sourcefile) do |t|
-  t.test_files = FileList['test/test_FileStatistics.rb']
+  t.test_files = FileList['test/test_file_statistics.rb']
   t.verbose = true
   t.rcov_opts << "--test-unit-only"
   t.ruby_opts << "-Ilib:ext/rcovrt" # in order to use this rcov
@@ -34,7 +34,7 @@ Rcov::RcovTask.new(:rcov_sourcefile) do |t|
 end
 
 Rcov::RcovTask.new(:rcov_ccanalyzer) do |t|
-  t.test_files = FileList['test/test_CodeCoverageAnalyzer.rb']
+  t.test_files = FileList['test/test_code_coverage_analyzer.rb']
   t.verbose = true
   t.rcov_opts << "--test-unit-only"
   t.ruby_opts << "-Ilib:ext/rcovrt" # in order to use this rcov
