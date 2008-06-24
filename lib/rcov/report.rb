@@ -19,7 +19,7 @@ module Rcov
 
 # Try to fix bugs in the REXML shipped with Ruby 1.8.6
 # They affect Mac OSX 10.5.1 users and motivates endless bug reports.
-begin 
+begin
     require 'rexml/formatters/transitive'
     require 'rexml/formatter/pretty'
 rescue LoadError
@@ -56,7 +56,7 @@ if (RUBY_VERSION == "1.8.6" || RUBY_VERSION == "1.8.7") && defined? REXML::Forma
             end unless node.attributes.empty?
 
             if node.children.empty?
-                output << "/>" 
+                output << "/>"
             else
                 output << ">"
                 # If compact and all children are text, and if the formatted output
@@ -86,7 +86,7 @@ class Formatter # :nodoc:
         /\bvendor\//,
         /\A#{Regexp.escape(__FILE__)}\z/]
     DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false,
-                    :output_threshold => 101, :dont_ignore => [], 
+                    :output_threshold => 101, :dont_ignore => [],
                     :callsite_analyzer => nil, :comments_run_by_default => false}
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
@@ -113,14 +113,14 @@ class Formatter # :nodoc:
         old_filename = filename
         filename = normalize_filename(filename)
         SCRIPT_LINES__[filename] = SCRIPT_LINES__[old_filename]
-        if @ignore_files.any?{|x| x === filename} && 
+        if @ignore_files.any?{|x| x === filename} &&
            !@dont_ignore_files.any?{|x| x === filename}
             return nil
         end
         if @files[filename]
             @files[filename].merge(lines, coverage, counts)
         else
-            @files[filename] = FileStatistics.new(filename, lines, counts, 
+            @files[filename] = FileStatistics.new(filename, lines, counts,
                                                   @comments_run_by_default)
         end
     end
@@ -148,9 +148,9 @@ class Formatter # :nodoc:
     def total_coverage
         lines = 0
         total = 0.0
-        @files.each do |k,f| 
-            total += f.num_lines * f.total_coverage 
-            lines += f.num_lines 
+        @files.each do |k,f|
+            total += f.num_lines * f.total_coverage
+            lines += f.num_lines
         end
         return 0 if lines == 0
         total / lines
@@ -159,9 +159,9 @@ class Formatter # :nodoc:
     def code_coverage
         lines = 0
         total = 0.0
-        @files.each do |k,f| 
-            total += f.num_code_lines * f.code_coverage 
-            lines += f.num_code_lines 
+        @files.each do |k,f|
+            total += f.num_code_lines * f.code_coverage
+            lines += f.num_code_lines
         end
         return 0 if lines == 0
         total / lines
@@ -197,13 +197,13 @@ class Formatter # :nodoc:
         @callsite_analyzer.analyzed_classes.each do |classname|
             @callsite_analyzer.analyzed_methods(classname).each do |methname|
                 defsite = @callsite_analyzer.defsite(classname, methname)
-                index[normalize_filename(defsite.file)][defsite.line] = 
+                index[normalize_filename(defsite.file)][defsite.line] =
                     @callsite_analyzer.callsites(classname, methname)
             end
         end
         index
     end
-    
+
     def build_reverse_callsite_index
         index = Hash.new{|h,k| h[k] = {}}
         @callsite_analyzer.analyzed_classes.each do |classname|
@@ -224,7 +224,7 @@ class Formatter # :nodoc:
     end
 
     def _get_defsites(ref_blocks, filename, lineno, linetext, label, &format_call_ref)
-        if @do_cross_references and 
+        if @do_cross_references and
            (rev_xref = reverse_cross_references_for(filename, lineno))
             refs = rev_xref.map do |classname, methodname, defsite, count|
                 XRefHelper.new(defsite.file, defsite.line, classname, methodname, count)
@@ -262,7 +262,7 @@ class TextReport < TextSummary # :nodoc:
         print_lines
         each_file_pair_sorted do |fname, finfo|
             name = fname.size < 52 ? fname : "..." + fname[-48..-1]
-            print_info(name, finfo.num_lines, finfo.num_code_lines, 
+            print_info(name, finfo.num_lines, finfo.num_code_lines,
                        finfo.code_coverage)
         end
         print_lines
@@ -303,7 +303,7 @@ class FullTextReport < Formatter # :nodoc:
                 # try to get the source code from the global code coverage
                 # analyzer
                 re = /#{Regexp.escape(filename)}\z/
-                if $rcov_code_coverage_analyzer and 
+                if $rcov_code_coverage_analyzer and
                     (data = $rcov_code_coverage_analyzer.data_matching(re))
                     lines = data[0]
                 end
@@ -330,7 +330,7 @@ end
 
 class TextCoverageDiff < Formatter # :nodoc:
     FORMAT_VERSION = [0, 1, 0]
-    DEFAULT_OPTS = {:textmode => :coverage_diff, 
+    DEFAULT_OPTS = {:textmode => :coverage_diff,
                     :coverage_diff_mode => :record,
                     :coverage_diff_file => "coverage.info",
                     :diff_cmd => "diff", :comments_run_by_default => true}
@@ -367,7 +367,7 @@ class TextCoverageDiff < Formatter # :nodoc:
         state = {}
         each_file_pair_sorted do |filename, fileinfo|
             state[filename] = {:lines    => SCRIPT_LINES__[filename],
-                               :coverage => fileinfo.coverage.to_a, 
+                               :coverage => fileinfo.coverage.to_a,
                                :counts   => fileinfo.counts}
         end
         File.open(@state_file, "w") do |f|
@@ -428,7 +428,7 @@ EOF
 
     def display_hunks(filename, hunks)
         return if hunks.empty?
-        puts 
+        puts
         puts "=" * 80
         puts <<EOF
 !!!!! Uncovered code introduced in #{filename}
@@ -444,7 +444,7 @@ EOF
                 end
             elsif @color
                 puts "### #{filename}:#{offset}"
-                lines.each do |line| 
+                lines.each do |line|
                     prefix = (/^!! / !~ line) ? "\e[32;40m" : "\e[31;40m"
                     puts "#{prefix}#{line[3..-1].chomp}\e[37;40m"
                 end
@@ -544,7 +544,7 @@ class HTMLCoverage < Formatter # :nodoc:
       return false;
 
     elemStyle = elem.style;
-    
+
     if ( elemStyle.display != "block" ) {
       elemStyle.display = "block"
     } else {
@@ -553,7 +553,7 @@ class HTMLCoverage < Formatter # :nodoc:
 
     return true;
   }
-  
+
   // Make cross-references hidden by default
   document.writeln( "<style type=\\"text/css\\">span.cross-ref { display: none }</style>" )
   // ]]>
@@ -585,11 +585,11 @@ span.marked1 {
   display: block;
 }
 span.inferred0 {
-  background-color: rgb(175, 200, 200);
+  background-color: rgb(255, 255, 240);
   display: block;
 }
 span.inferred1 {
-  background-color: rgb(180, 205, 205);
+  background-color: rgb(255, 255, 240);
   display: block;
 }
 span.uncovered0 {
@@ -726,7 +726,7 @@ EOS
 
     def blurb
         xmlish_ {
-                p_ { 
+                p_ {
                     t_{ "Generated using the " }
                     a_(:href => "http://eigenclass.org/hiki.rb?rcov") {
                         t_{ "rcov code coverage analysis tool for Ruby" }
@@ -752,40 +752,40 @@ EOS
         table_text = xmlish_ {
             table_(:class => "report") {
                 thead_ {
-                    tr_ { 
+                    tr_ {
                         ["Name", "Total lines", "Lines of code", "Total coverage",
                          "Code coverage"].each do |heading|
                             td_(:class => "heading") { heading }
                          end
                     }
                 }
-                tbody_ { 
+                tbody_ {
                     color_class_index = 1
                     color_classes = %w[light dark]
                     file_infos.each do |f|
                         color_class_index += 1
                         color_class_index %= color_classes.size
                         tr_(:class => color_classes[color_class_index]) {
-                            td_ { 
+                            td_ {
                                 case f.name
-                                when "TOTAL": 
+                                when "TOTAL":
                                     t_ { "TOTAL" }
                                 else
-                                    a_(:href => mangle_filename(f.name)){ t_ { f.name } } 
+                                    a_(:href => mangle_filename(f.name)){ t_ { f.name } }
                                 end
                             }
-                            [[f.num_lines, "lines_total"], 
-                             [f.num_code_lines, "lines_code"]].each do |value, css_class| 
+                            [[f.num_lines, "lines_total"],
+                             [f.num_code_lines, "lines_code"]].each do |value, css_class|
                                 td_(:class => css_class) { tt_{ value } }
                             end
                             [[f.total_coverage, "coverage_total"],
                              [f.code_coverage, "coverage_code"]].each do |value, css_class|
                                 value *= 100
-                                td_ { 
-                                    table_(:cellpadding => "0", :cellspacing => "0", :align => "right") { 
-                                        tr_ { 
+                                td_ {
+                                    table_(:cellpadding => "0", :cellspacing => "0", :align => "right") {
+                                        tr_ {
                                             td_ {
-                                                 tt_(:class => css_class) { "%3.1f%%" % value } 
+                                                 tt_(:class => css_class) { "%3.1f%%" % value }
                                                  x_ "&nbsp;"
                                             }
                                             ivalue = value.round
@@ -888,7 +888,7 @@ EOS
                     end_of_span = "</span>"
                 end
             end
-            result += %[<a name="line#{i+1}"></a>] + (format_line % (i+1)) + 
+            result += %[<a name="line#{i+1}"></a>] + (format_line % (i+1)) +
                 " " + create_cross_refs(file.name, i+1, CGI.escapeHTML(line)) + "\n"
             last = spanclass
         end
@@ -905,16 +905,16 @@ EOS
             else
                 where = "(C extension/core)"
             end
-            CGI.escapeHTML("%7d   %s" % 
+            CGI.escapeHTML("%7d   %s" %
                                [ref.count, "#{ref.klass}##{ref.mid} " + where])
         end
         _get_callsites(ref_blocks, filename, lineno, "Called by", linetext) do |ref|
-            r = "%7d   %s" % [ref.count, 
+            r = "%7d   %s" % [ref.count,
                 "#{normalize_filename(ref.file||'C code')}:#{ref.line} " +
                     "in '#{ref.klass}##{ref.mid}'"]
             CGI.escapeHTML(r)
         end
-        
+
         create_cross_reference_block(linetext, ref_blocks)
     end
 
@@ -952,7 +952,7 @@ EOS
             "marked#{@span_class_index}"
         when :inferred
             "inferred#{@span_class_index}"
-        else 
+        else
             "uncovered#{@span_class_index}"
         end
     end
@@ -963,12 +963,12 @@ EOS
         title = fileinfo.name + " - #{default_title}"
         do_ctable = output_color_table?
         output = xhtml_ { html_ {
-            head_ { 
+            head_ {
                 if @charset
                     meta_("http-equiv".to_sym => "Content-Type",
                           :content => "text/html;charset=#{@charset}")
                 end
-                title_{ title } 
+                title_{ title }
                 style_(:type => "text/css") { t_{ "body { background-color: #{default_color}; }" }  }
                 style_(:type => "text/css") { CSS_PROLOG }
                 script_(:type => "text/javascript") { h_ { JAVASCRIPT_PROLOG } }
@@ -989,7 +989,7 @@ EOS
 </span><span class='inferred0'>Lines considered as run by rcov, but not reported by Ruby, look like this,
 </span><span class='inferred1'>and this: these lines were inferred by rcov (using simple heuristics).
 </span><span class='uncovered0'>Finally, here&apos;s a line marked as not executed.
-</span></pre>                       
+</span></pre>
 EOS
                     }
                 end
@@ -1035,7 +1035,7 @@ EOF
                 g = (g * 255).to_i
                 b = (b * 255).to_i
             else
-                r = g = b = 255 - i 
+                r = g = b = 255 - i
             end
             cscale << colorscalebase % [i, r, g, b]
         end
@@ -1090,11 +1090,11 @@ class HTMLProfiling < HTMLCoverage # :nodoc:
         @max_cache = {}
         @median_cache = {}
     end
-    
+
     def default_title
         "Bogo-profile information"
     end
-    
+
     def default_color
         if @color
             "rgb(179,205,255)"
@@ -1112,7 +1112,7 @@ class HTMLProfiling < HTMLCoverage # :nodoc:
         nz_count = sourceinfo.counts.select{|x| x && x != 0}
         nz_count << 1 # avoid div by 0
         max = @max_cache[sourceinfo] ||= nz_count.max
-        #avg = @median_cache[sourceinfo] ||= 1.0 * 
+        #avg = @median_cache[sourceinfo] ||= 1.0 *
         #    nz_count.inject{|a,b| a+b} / nz_count.size
         median = @median_cache[sourceinfo] ||= 1.0 * nz_count.sort[nz_count.size/2]
         max ||= 2
@@ -1125,7 +1125,7 @@ class HTMLProfiling < HTMLCoverage # :nodoc:
             idx = 0 if idx < 0
             idx = 100 if idx > 100
             "run#{idx}"
-        else 
+        else
             nil
         end
     end
@@ -1184,7 +1184,7 @@ class RubyAnnotation < Formatter # :nodoc:
             "#{mangle_filename(ref.file||'C code')}:#{ref.line} " +
                 "in #{ref.klass}##{ref.mid}"
         end
-        
+
         create_cross_reference_block(linetext, ref_blocks, marked)
     end
 
@@ -1216,10 +1216,10 @@ class RubyAnnotation < Formatter # :nodoc:
                 end
             end
         end
-        
+
         ret
     end
-    
+
     def create_file(destfile, fileinfo)
         #$stderr.puts "Generating #{destfile.inspect}"
         body = format_lines(fileinfo)
