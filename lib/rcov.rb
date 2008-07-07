@@ -696,7 +696,9 @@ class CodeCoverageAnalyzer < DifferentialAnalyzer
       break false unless line_info.size % div == 0 && n > 1
       different = false
       n.times do |i|
-        if (0...div).map{|j| line_info[i+j*n]}.uniq.size != 1
+        
+        things = (0...div).map { |j| line_info[i + j * n] }
+        if things.uniq.size != 1
           different = true
           break
         end
