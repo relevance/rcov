@@ -6,6 +6,8 @@ $:.unshift "lib" if File.directory? "lib"
 require 'rcov/rcovtask'
 require 'rake/testtask'
 require 'rake/rdoctask'
+require 'rake/gempackagetask'
+require 'rake/clean'
 
 # Use the specified rcov executable instead of the one in $PATH
 # (this way we get a sort of informal functional test).
@@ -81,6 +83,103 @@ task :default => :test
 desc "install by setup.rb"
 task :install do
   sh "sudo ruby setup.rb install"
+end
+
+
+PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/xx.rb", "lib/rcov/version.rb", "lib/rcov/rant.rb", "lib/rcov/report.rb", "lib/rcov/rcovtask.rb", "ext/rcovrt/extconf.rb", "ext/rcovrt/rcovrt.c", "ext/rcovrt/callsite.c", "LEGAL", "LICENSE", "Rakefile", "Rantfile", "README.rake", "README.rant", "README.emacs", "README.en", "README.vim", "README.API", "THANKS", "test/functional_test.rb", "test/file_statistics_test.rb", "test/assets/sample_03.rb", "test/assets/sample_05-new.rb", "test/code_coverage_analyzer_test.rb", "test/assets/sample_04.rb", "test/assets/sample_02.rb", "test/assets/sample_05-old.rb", "test/assets/sample_01.rb", "test/turn_off_rcovrt.rb", "test/call_site_analyzer_test.rb", "test/assets/sample_05.rb", "rcov.vim", "rcov.el", "setup.rb", "BLURB", "CHANGES"]
+
+# gem management tasks  Use these to build the java code before creating the gem package
+# this code can also be used to generate the MRI gem.  But I left the gemspec file in too.
+spec = Gem::Specification.new do |s|
+  s.name = %q{rcov}
+  s.version = "0.8.1.2.0"
+
+  s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
+  s.authors = ["Mauricio Fernandez"]
+  s.cert_chain = nil
+  s.date = %q{2007-11-21}
+  s.default_executable = %q{rcov}
+  s.description = %q{rcov is a code coverage tool for Ruby. It is commonly used for viewing overall test unit coverage of target code.  It features fast execution (20-300 times faster than previous tools), multiple analysis modes, XHTML and several kinds of text reports, easy automation with Rake via a RcovTask, fairly accurate coverage information through code linkage inference using simple heuristics, colorblind-friendliness...}
+  s.email = %q{mfp@acm.org}
+  s.executables = ["rcov"]
+  s.extensions = ["ext/rcovrt/extconf.rb"]
+  s.platform = Gem::Platform::RUBY
+  s.extra_rdoc_files = ["README.API", "README.rake", "README.rant", "README.vim"]
+  s.files = PKG_FILES
+  s.has_rdoc = true
+  s.homepage = %q{http://eigenclass.org/hiki.rb?rcov}
+  s.rdoc_options = ["--main", "README.API", "--title", "rcov code coverage tool"]
+  s.require_paths = ["lib"]
+  s.required_ruby_version = Gem::Requirement.new("> 0.0.0")
+  s.rubygems_version = %q{1.2.0}
+  s.summary = %q{Code coverage analysis tool for Ruby}
+  s.test_files = ["test/functional_test.rb", "test/file_statistics_test.rb", "test/code_coverage_analyzer_test.rb", "test/call_site_analyzer_test.rb"]
+
+  if s.respond_to? :specification_version then
+    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
+    s.specification_version = 1
+
+    if current_version >= 3 then
+    else
+    end
+  else
+  end
+end
+
+#tasks added in to support generating the JRuby gem.
+if RUBY_PLATFORM == 'java'
+  spec.platform = "jruby"
+  spec.extensions = []
+  #add the jruby extension to the file list
+  PKG_FILES << "lib/rcovrt.jar"  
+  
+  def java_classpath_arg
+    begin
+      require 'java'
+      classpath = java.lang.System.getProperty('java.class.path')
+    rescue LoadError
+    end
+  
+    if classpath.empty?
+      classpath = FileList["#{ENV['JRUBY_HOME']}/lib/*.jar"].join(File::PATH_SEPARATOR)
+    end
+  
+    classpath ? "-cp #{classpath}" : ""
+  end
+  
+  
+  CLEAN.include ["ext/java/classes", "lib/rcovrt.jar", "pkg"]
+  
+  def compile_java
+    mkdir_p "ext/java/classes"
+    sh "javac -g -target 1.5 -source 1.5 -d ext/java/classes #{java_classpath_arg} #{FileList['ext/java/src/**/*.java'].join(' ')}"
+  end
+  
+  def make_jar
+    require 'fileutils'
+    lib = File.join(File.dirname(__FILE__), 'lib')
+    FileUtils.mkdir(lib) unless File.exists? lib
+    sh "jar cf lib/rcovrt.jar -C ext/java/classes/ ." 
+  end
+  
+  file 'lib/rcovrt.jar' => FileList["ext/java/src/*.java"] do
+    compile_java
+    make_jar
+  end
+  
+  desc "compile the java extension and put it into the lib directory"
+  task :java_compile => ["lib/rcovrt.jar"]
+  
+end
+
+Rake::GemPackageTask.new(spec) do |p|
+  p.need_tar = true
+  p.gem_spec = spec  
+end
+
+#extend the gem task to include the java_compile
+if RUBY_PLATFORM == 'java'
+  Rake::Task["pkg"].enhance(["java_compile"])
 end
 
 # vim: set sw=2 ft=ruby:

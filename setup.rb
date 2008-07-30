@@ -1255,7 +1255,7 @@ class Installer
   alias setup_dir_lib noop
 
   def setup_dir_ext(rel)
-    make if extdir?(curr_srcdir())
+    make if extdir?(curr_srcdir()) and File.exist?("#{curr_srcdir()}/Makefile")
   end
 
   alias setup_dir_data noop
