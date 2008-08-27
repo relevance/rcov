@@ -98,6 +98,7 @@ coverage_mark_caller()
 static void
 coverage_increase_counter_cached(char *sourcefile, int sourceline)
 {
+// See http://tomcopeland.blogs.com/juniordeveloper/2008/08/rcov-crashing-w.html for ideas
  if(cached_file == sourcefile && cached_array) {
          cached_array->ptr[sourceline]++;
          return;
