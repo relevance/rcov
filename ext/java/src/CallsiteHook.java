@@ -6,9 +6,10 @@ import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 import org.jruby.runtime.Frame;
 import org.jruby.runtime.ThreadContext;
+import org.jruby.runtime.RubyEvent;
 import org.jruby.runtime.builtin.IRubyObject;
 
-public class CallsiteHook implements RcovHook {
+public class CallsiteHook extends RcovHook {
 
     private static CallsiteHook callsiteHook;
 
@@ -33,8 +34,8 @@ public class CallsiteHook implements RcovHook {
         return active;
     }
 
-    public boolean isInterestedInEvent(int event) {
-        return event == RUBY_EVENT_CALL || event == RUBY_EVENT_C_CALL;
+    public boolean isInterestedInEvent(RubyEvent event) {
+        return event == RubyEvent.CALL || event == RubyEvent.C_CALL;
     }
 
     public RubyArray getCallsiteInfo(Ruby runtime) {
@@ -53,7 +54,7 @@ public class CallsiteHook implements RcovHook {
         return defsites;
     }
 
-    public void event(ThreadContext context, int event, String file, int line,
+    public void eventHandler(ThreadContext context, String event, String file, int line,
             String name, IRubyObject type) {
         RubyArray currentMethod = context.getRuntime().newArray();
         currentMethod.add(context.getFrameKlazz());
@@ -83,12 +84,12 @@ public class CallsiteHook implements RcovHook {
     }
 
     private RubyArray customBacktrace(ThreadContext context) {
-        Frame[] frames = context.createBacktrace(1, false);
+        StackTraceElement[] frames = context.createBacktrace2(1, false);
         RubyArray backtrace = (RubyArray) ThreadContext
                 .createBacktraceFromFrames(context.getRuntime(), frames);
 
         RubyArray ary = context.getRuntime().newArray();        
-        ary.add(frames[frames.length - 1].getKlazz());
+        ary.add(frames[frames.length - 1]);
         ary.addAll(formatBacktrace(context.getRuntime(), (String) backtrace.get(1)));
 
         return context.getRuntime().newArray((IRubyObject) ary);

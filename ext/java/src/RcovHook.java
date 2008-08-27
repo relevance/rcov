@@ -1,11 +1,11 @@
 import org.jruby.runtime.EventHook;
 
 
-public interface RcovHook extends EventHook {
+public abstract class RcovHook extends EventHook {
 
     /** returns true if the hook is set */
-    boolean isActive();
+    abstract boolean isActive();
     
     /** used to mark the hook set or unset */
-    void setActive(boolean active);
+    abstract void setActive(boolean active);
 }

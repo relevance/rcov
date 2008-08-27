@@ -2,10 +2,11 @@ import org.jruby.Ruby;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 import org.jruby.runtime.ThreadContext;
+import org.jruby.runtime.RubyEvent;
 import org.jruby.runtime.builtin.IRubyObject;
 
 
-public class CoverageHook implements RcovHook {
+public class CoverageHook extends RcovHook {
 
     private static CoverageHook hook;
 
@@ -31,9 +32,12 @@ public class CoverageHook implements RcovHook {
         this.active = active;
     }
 
-    public void event(ThreadContext context, int event, String file, int line,
+    public void eventHandler(ThreadContext context, String event, String file, int line,
             String name, IRubyObject type) {
-        
+
+		//Line numbers are 1s based.  Arrays are zero based.  We need to compensate for that.
+		line -= 1;
+
         // Make sure that we have SCRIPT_LINES__ and it's a hash
         RubyHash scriptLines = getScriptLines(context.getRuntime());
         if (scriptLines == null || !scriptLines.containsKey(file)) {
@@ -74,8 +78,8 @@ public class CoverageHook implements RcovHook {
         counts.set(line , count);
     }
 
-    public boolean isInterestedInEvent(int event) {
-        return event == RUBY_EVENT_CALL || event == RUBY_EVENT_LINE;
+    public boolean isInterestedInEvent(RubyEvent event) {
+        return event == RubyEvent.CALL || event == RubyEvent.LINE || event == RubyEvent.RETURN;
     }
     
     /**
