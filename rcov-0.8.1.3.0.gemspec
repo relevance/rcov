@@ -1,11 +1,11 @@
 Gem::Specification.new do |s|
   s.name = %q{rcov}
-  s.version = "0.8.1.2.0"
+  s.version = "0.8.1.3.0"
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
   s.authors = ["Mauricio Fernandez"]
   s.cert_chain = nil
-  s.date = %q{2007-11-21}
+  s.date = %q{2008-08-29}
   s.default_executable = %q{rcov}
   s.description = %q{rcov is a code coverage tool for Ruby. It is commonly used for viewing overall test unit coverage of target code.  It features fast execution (20-300 times faster than previous tools), multiple analysis modes, XHTML and several kinds of text reports, easy automation with Rake via a RcovTask, fairly accurate coverage information through code linkage inference using simple heuristics, colorblind-friendliness...}
   s.email = %q{mfp@acm.org}
