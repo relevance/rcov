@@ -64,7 +64,9 @@ coverage_increase_counter_uncached(char *sourcefile, unsigned int sourceline,
           if(!carray->ptr[sourceline])
                   carray->ptr[sourceline] = 1;
   } else {
+	  if (carray && carray->len > sourceline) {
           carray->ptr[sourceline]++;
+	  }
   }
 
   return carray;
@@ -98,8 +100,7 @@ coverage_mark_caller()
 static void
 coverage_increase_counter_cached(char *sourcefile, int sourceline)
 {
-// See http://tomcopeland.blogs.com/juniordeveloper/2008/08/rcov-crashing-w.html for ideas
- if(cached_file == sourcefile && cached_array) {
+ if(cached_file == sourcefile && cached_array && cached_array->len > sourceline) {
          cached_array->ptr[sourceline]++;
          return;
  }
