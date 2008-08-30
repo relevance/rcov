@@ -79,7 +79,7 @@ public class CoverageHook extends RcovHook {
     }
 
     public boolean isInterestedInEvent(RubyEvent event) {
-        return event == RubyEvent.CALL || event == RubyEvent.LINE || event == RubyEvent.RETURN;
+        return event == RubyEvent.CALL || event == RubyEvent.LINE || event == RubyEvent.RETURN || event == RubyEvent.CLASS;
     }
     
     /**

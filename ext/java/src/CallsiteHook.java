@@ -84,13 +84,12 @@ public class CallsiteHook extends RcovHook {
     }
 
     private RubyArray customBacktrace(ThreadContext context) {
-        StackTraceElement[] frames = context.createBacktrace2(1, false);
-        RubyArray backtrace = (RubyArray) ThreadContext
-                .createBacktraceFromFrames(context.getRuntime(), frames);
+        Frame[] frames = context.createBacktrace(1, false);
+//        RubyArray backtrace = (RubyArray) ThreadContext
+//                .createBacktraceFromFrames(context.getRuntime(), frames);
 
         RubyArray ary = context.getRuntime().newArray();        
-        ary.add(frames[frames.length - 1]);
-        ary.addAll(formatBacktrace(context.getRuntime(), (String) backtrace.get(1)));
+        ary.addAll(formatBacktrace(context.getRuntime(), frames[frames.length - 1]));
 
         return context.getRuntime().newArray((IRubyObject) ary);
     }
@@ -103,29 +102,21 @@ public class CallsiteHook extends RcovHook {
      * @param backtrace
      * @return
      */
-    private RubyArray formatBacktrace(Ruby runtime, String backtrace) {
+    private RubyArray formatBacktrace(Ruby runtime, Frame backtrace) {
         RubyArray ary = runtime.newArray();
         if ( backtrace == null ) {
+			ary.add(runtime.getNil());
             ary.add(runtime.getNil());
             ary.add("");
             ary.add(Long.valueOf(0));
         } else {
-            Matcher matcher = backtracePattern.matcher(backtrace);
-
-            if (matcher.matches()) {            
-                String method = matcher.group(4);
-                String file = matcher.group(1);
-                String line = matcher.group(2);
-                Long lineNum = ( line == null ? 
-                                 Long.valueOf( 0 ) : 
-                                 Long.valueOf( line ) );
-
-                ary.add( ( method == null ? 
+				ary.add( backtrace.getKlazz());
+                ary.add( ( backtrace.getName() == null ? 
                            runtime.getNil() : 
-                           runtime.newSymbol( method ) ) );
-                ary.add(file);
-                ary.add(lineNum);
-            }
+                           runtime.newSymbol( backtrace.getName() ) ) );
+                ary.add(backtrace.getFile());
+				//Add 1 to compensate for the zero offset in the Frame elements.
+                ary.add(backtrace.getLine() + 1);
         }
 
         return ary;

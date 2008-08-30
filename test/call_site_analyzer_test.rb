@@ -18,6 +18,9 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
       s[Rcov::CallSiteAnalyzer::CallSite.new(backtrace)] = count
       s
     end
+#    callsites.each_key {|key| puts "Key: #{key.backtrace[0][2]}"}
+    callsites.each_key {|key| key.backtrace[0][2] = File.expand_path(key.backtrace[0][2])}
+    actual.each_key {|key| key.backtrace[0][2] = File.expand_path(key.backtrace[0][2])}
     assert_equal(callsites, actual)
   end
 
