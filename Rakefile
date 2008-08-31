@@ -44,10 +44,18 @@ Rcov::RcovTask.new(:rcov_ccanalyzer) do |t|
 end
 
 desc "Run the unit tests with rcovrt."
-Rake::TestTask.new(:test_rcovrt => ["ext/rcovrt/rcovrt.so"]) do |t|
-  t.libs << "ext/rcovrt"
-  t.test_files = FileList['test/*_test.rb']
-  t.verbose = true
+if RUBY_PLATFORM == 'java'
+  Rake::TestTask.new(:test_rcovrt => ["lib/rcovrt.jar"]) do |t|
+    t.libs << "lib"
+    t.test_files = FileList['test/*_test.rb']
+    t.verbose = true
+  end
+else
+  Rake::TestTask.new(:test_rcovrt => ["ext/rcovrt/rcovrt.so"]) do |t|
+    t.libs << "ext/rcovrt"
+    t.test_files = FileList['test/*_test.rb']
+    t.verbose = true
+  end
 end
 
 file "ext/rcovrt/rcovrt.so" => FileList["ext/rcovrt/*.c"] do
