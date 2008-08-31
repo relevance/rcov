@@ -21,11 +21,15 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
 #    callsites.each_key {|key| puts "Key: #{key.backtrace[0][2]}"}
     callsites.each_key {|key| key.backtrace[0][2] = File.expand_path(key.backtrace[0][2])}
     actual.each_key {|key| key.backtrace[0][2] = File.expand_path(key.backtrace[0][2])}
-    assert_equal(callsites, actual)
+    
+    assert_equal(callsites.to_s, actual.to_s)
   end
 
   def verify_defsite_equal(expected, actual)
-    assert_equal(Rcov::CallSiteAnalyzer::DefSite.new(*expected), actual)
+    defsite = Rcov::CallSiteAnalyzer::DefSite.new(*expected)
+    defsite.file = File.expand_path defsite.file
+    actual.file = File.expand_path actual.file
+    assert_equal(defsite.to_s, actual.to_s)
   end
 
   def test_callsite_compute_raw_difference
@@ -95,7 +99,8 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
     callsites = @a.callsites("Rcov::Test::Temporary::Sample03", "f2")
     callsite = callsites.keys[0]
-    assert_equal("./test/assets/sample_03.rb", callsite.file)
+    #expand path is used here to compensate for differences between JRuby and MRI
+    assert_equal(File.expand_path("./test/assets/sample_03.rb"), File.expand_path(callsite.file))
     assert_equal(4, callsite.line)
     assert_equal(:f1, callsite.calling_method)
   end
