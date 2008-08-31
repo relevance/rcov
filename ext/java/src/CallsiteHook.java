@@ -23,11 +23,9 @@ public class CallsiteHook extends RcovHook {
     private boolean active;
     private RubyHash defsites;
     private RubyHash callsites;
-    private Pattern backtracePattern;
 
     private CallsiteHook() {
         super();
-        backtracePattern = Pattern.compile("^([^:]*):(\\d+)(:in `(.*)')?$");
     }
 
     public boolean isActive() {
@@ -85,9 +83,6 @@ public class CallsiteHook extends RcovHook {
 
     private RubyArray customBacktrace(ThreadContext context) {
         Frame[] frames = context.createBacktrace(1, false);
-//        RubyArray backtrace = (RubyArray) ThreadContext
-//                .createBacktraceFromFrames(context.getRuntime(), frames);
-
         RubyArray ary = context.getRuntime().newArray();        
         ary.addAll(formatBacktrace(context.getRuntime(), frames[frames.length - 1]));
 

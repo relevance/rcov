@@ -15,14 +15,21 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
       unless $".any?{|x| %r{\brcovrt\b} =~ x}
         backtrace = backtrace.map{|_, mid, file, line| [nil, mid, file, line] }
       end
+      backtrace[0][2] = File.expand_path(backtrace[0][2])
       s[Rcov::CallSiteAnalyzer::CallSite.new(backtrace)] = count
       s
     end
-#    callsites.each_key {|key| puts "Key: #{key.backtrace[0][2]}"}
-    callsites.each_key {|key| key.backtrace[0][2] = File.expand_path(key.backtrace[0][2])}
-    actual.each_key {|key| key.backtrace[0][2] = File.expand_path(key.backtrace[0][2])}
     
-    assert_equal(callsites.to_s, actual.to_s)
+    act_callsites = actual.inject({}) do |s, (key, value)|
+      #wow thats obtuse.  In a callsite we have an array of arrays.  We have to deep copy them because
+      # if we muck with the actual backtrace it messes things up for accumulation type tests.
+      # we have to muck with backtrace so that we can normalize file names (it's an issue between MRI and JRuby)
+      backtrace = key.backtrace.inject([]) {|y, val| y << val.inject([]) {|z, v2| z<< v2}}
+      backtrace[0][2] = File.expand_path(key.backtrace[0][2])
+      s[Rcov::CallSiteAnalyzer::CallSite.new(backtrace)] = value
+      s
+    end
+    assert_equal(callsites.to_s, act_callsites.to_s)
   end
 
   def verify_defsite_equal(expected, actual)
