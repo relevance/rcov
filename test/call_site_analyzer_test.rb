@@ -15,14 +15,28 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
       unless $".any?{|x| %r{\brcovrt\b} =~ x}
         backtrace = backtrace.map{|_, mid, file, line| [nil, mid, file, line] }
       end
+      backtrace[0][2] = File.expand_path(backtrace[0][2])
       s[Rcov::CallSiteAnalyzer::CallSite.new(backtrace)] = count
       s
     end
-    assert_equal(callsites, actual)
+    
+    act_callsites = actual.inject({}) do |s, (key, value)|
+      #wow thats obtuse.  In a callsite we have an array of arrays.  We have to deep copy them because
+      # if we muck with the actual backtrace it messes things up for accumulation type tests.
+      # we have to muck with backtrace so that we can normalize file names (it's an issue between MRI and JRuby)
+      backtrace = key.backtrace.inject([]) {|y, val| y << val.inject([]) {|z, v2| z<< v2}}
+      backtrace[0][2] = File.expand_path(key.backtrace[0][2])
+      s[Rcov::CallSiteAnalyzer::CallSite.new(backtrace)] = value
+      s
+    end
+    assert_equal(callsites.to_s, act_callsites.to_s)
   end
 
   def verify_defsite_equal(expected, actual)
-    assert_equal(Rcov::CallSiteAnalyzer::DefSite.new(*expected), actual)
+    defsite = Rcov::CallSiteAnalyzer::DefSite.new(*expected)
+    defsite.file = File.expand_path defsite.file
+    actual.file = File.expand_path actual.file
+    assert_equal(defsite.to_s, actual.to_s)
   end
 
   def test_callsite_compute_raw_difference
@@ -92,7 +106,8 @@ class TestCallSiteAnalyzer < Test::Unit::TestCase
                  @a.callsites("Rcov::Test::Temporary::Sample03", "f2"))
     callsites = @a.callsites("Rcov::Test::Temporary::Sample03", "f2")
     callsite = callsites.keys[0]
-    assert_equal("./test/assets/sample_03.rb", callsite.file)
+    #expand path is used here to compensate for differences between JRuby and MRI
+    assert_equal(File.expand_path("./test/assets/sample_03.rb"), File.expand_path(callsite.file))
     assert_equal(4, callsite.line)
     assert_equal(:f1, callsite.calling_method)
   end
