@@ -1,5 +1,5 @@
 # This Rakefile serves as an example of how to use Rcov::RcovTask.
-# Take a look at the RDoc documentation (or README.rake) for further
+# Take a look at the RDoc documentation (or readme_for_rake) for further
 # information.
 
 $:.unshift "lib" if File.directory? "lib"
@@ -79,10 +79,10 @@ Rake::RDocTask.new("rdoc") { |rdoc|
   rdoc.rdoc_dir = 'doc'
   rdoc.title    = "rcov"
   rdoc.options << "--line-numbers" << "--inline-source"
-  rdoc.rdoc_files.include('README.API')
-  rdoc.rdoc_files.include('README.rake')
-  rdoc.rdoc_files.include('README.rant')
-  rdoc.rdoc_files.include('README.vim')
+  rdoc.rdoc_files.include('readme_for_api')
+  rdoc.rdoc_files.include('readme_for_rake')
+  rdoc.rdoc_files.include('readme_for_rant')
+  rdoc.rdoc_files.include('readme_for_vim')
   rdoc.rdoc_files.include('lib/**/*.rb')
 }
 
@@ -94,7 +94,7 @@ task :install do
 end
 
 
-PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/xx.rb", "lib/rcov/version.rb", "lib/rcov/rant.rb", "lib/rcov/report.rb", "lib/rcov/rcovtask.rb", "ext/rcovrt/extconf.rb", "ext/rcovrt/rcovrt.c", "ext/rcovrt/callsite.c", "LEGAL", "LICENSE", "Rakefile", "Rantfile", "README.rake", "README.rant", "README.emacs", "README.en", "README.vim", "README.API", "THANKS", "test/functional_test.rb", "test/file_statistics_test.rb", "test/assets/sample_03.rb", "test/assets/sample_05-new.rb", "test/code_coverage_analyzer_test.rb", "test/assets/sample_04.rb", "test/assets/sample_02.rb", "test/assets/sample_05-old.rb", "test/assets/sample_01.rb", "test/turn_off_rcovrt.rb", "test/call_site_analyzer_test.rb", "test/assets/sample_05.rb", "rcov.vim", "rcov.el", "setup.rb", "BLURB", "CHANGES"]
+PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/xx.rb", "lib/rcov/version.rb", "lib/rcov/rant.rb", "lib/rcov/report.rb", "lib/rcov/rcovtask.rb", "ext/rcovrt/extconf.rb", "ext/rcovrt/rcovrt.c", "ext/rcovrt/callsite.c", "LEGAL", "LICENSE", "Rakefile", "Rantfile", "readme_for_rake", "readme_for_rant", "readme_for_vim", "readme_for_emacs", "readme_for_vim", "readme_for_api", "THANKS", "test/functional_test.rb", "test/file_statistics_test.rb", "test/assets/sample_03.rb", "test/assets/sample_05-new.rb", "test/code_coverage_analyzer_test.rb", "test/assets/sample_04.rb", "test/assets/sample_02.rb", "test/assets/sample_05-old.rb", "test/assets/sample_01.rb", "test/turn_off_rcovrt.rb", "test/call_site_analyzer_test.rb", "test/assets/sample_05.rb", "rcov.vim", "rcov.el", "setup.rb", "BLURB", "CHANGES"]
 
 # gem management tasks  Use these to build the java code before creating the gem package
 # this code can also be used to generate the MRI gem.  But I left the gemspec file in too.
@@ -112,11 +112,11 @@ spec = Gem::Specification.new do |s|
   s.executables = ["rcov"]
   s.extensions = ["ext/rcovrt/extconf.rb"]
   s.platform = Gem::Platform::RUBY
-  s.extra_rdoc_files = ["README.API", "README.rake", "README.rant", "README.vim"]
+  s.extra_rdoc_files = ["readme_for_api", "readme_for_rake", "readme_for_rant", "readme_for_vim"]
   s.files = PKG_FILES
   s.has_rdoc = true
   s.homepage = %q{http://eigenclass.org/hiki.rb?rcov}
-  s.rdoc_options = ["--main", "README.API", "--title", "rcov code coverage tool"]
+  s.rdoc_options = ["--main", "readme_for_api", "--title", "rcov code coverage tool"]
   s.require_paths = ["lib"]
   s.required_ruby_version = Gem::Requirement.new("> 0.0.0")
   s.rubygems_version = %q{1.2.0}

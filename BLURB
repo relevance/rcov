@@ -38,7 +38,7 @@ files: the tests themselves, files installed in Ruby's standard locations,
 etc.  See  rcov --help  for the list of regexps rcov matches filenames
 against.
 
-rcov can also be used from Rake; see README.rake or the RDoc documentation
+rcov can also be used from Rake; see readme_for_rake or the RDoc documentation
 for more information.
 
 rcov can output information in several formats, and perform different kinds

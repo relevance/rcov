@@ -78,7 +78,7 @@ Usage
   etc.  See  rcov --help  for the list of regexps rcov matches filenames
   against.
   
-  rcov can also be used from Rake; see README.rake or the RDoc documentation
+  rcov can also be used from Rake; see readme_for_rake or the RDoc documentation
   for more information.  The Rakefile included in rcov's sources holds a few
   tasks that run rcov on itself, producing a number of reports. You can try
     rake rcov

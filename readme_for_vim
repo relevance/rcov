@@ -26,7 +26,7 @@ Type the following in command mode while editing your program:
    :compiler rcov
 
 rcov.vim assumes +rcov+ can be invoked with a rake task (see 
-README.rake[link:files/README_rake.html] for
+readme_for_rake[link:files/README_rake.html] for
 information on how to create it). 
 
 You can then execute +rcov+ and enter quickfix mode by typing
