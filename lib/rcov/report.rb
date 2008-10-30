@@ -85,9 +85,11 @@ class Formatter # :nodoc:
         /\btest\//,
         /\bvendor\//,
         /\A#{Regexp.escape(__FILE__)}\z/]
+        
     DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false,
                     :output_threshold => 101, :dont_ignore => [],
                     :callsite_analyzer => nil, :comments_run_by_default => false}
+                    
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
         @files = {}
@@ -527,7 +529,6 @@ EOF
     end
 end
 
-
 class HTMLCoverage < Formatter # :nodoc:
     include XX::XHTML
     include XX::XMLish
@@ -701,25 +702,26 @@ EOS
                     :validator_links => true, :charset => nil
                    }
     def initialize(opts = {})
-        options = DEFAULT_OPTS.clone.update(opts)
-        super(options)
-        @dest = options[:destdir]
-        @color = options[:color]
-        @fsr = options[:fsr]
-        @do_callsites = options[:callsites]
-        @do_cross_references = options[:cross_references]
-        @span_class_index = 0
-        @show_validator_links = options[:validator_links]
-        @charset = options[:charset]
+      options = DEFAULT_OPTS.clone.update(opts)
+      super(options)
+      @dest = options[:destdir]
+      @color = options[:color]
+      @fsr = options[:fsr]
+      @do_callsites = options[:callsites]
+      @do_cross_references = options[:cross_references]
+      @span_class_index = 0
+      @show_validator_links = options[:validator_links]
+      @charset = options[:charset]
     end
 
     def execute
-        return if @files.empty?
-        FileUtils.mkdir_p @dest
-        create_index(File.join(@dest, "index.html"))
-        each_file_pair_sorted do |filename, fileinfo|
-            create_file(File.join(@dest, mangle_filename(filename)), fileinfo)
-        end
+      return if @files.empty?
+      FileUtils.mkdir_p @dest
+      create_index(File.join(@dest, "index.html"))
+      
+      each_file_pair_sorted do |filename, fileinfo|
+        create_file(File.join(@dest, mangle_filename(filename)), fileinfo)
+      end
     end
 
     private
@@ -737,15 +739,15 @@ EOS
     end
 
     def output_color_table?
-        true
+      true
     end
 
     def default_color
-        "rgb(240, 240, 245)"
+      "rgb(240, 240, 245)"
     end
 
     def default_title
-        "C0 code coverage information"
+      "C0 code coverage information"
     end
 
     def format_overview(*file_infos)
@@ -811,11 +813,31 @@ EOS
     end
 
     class SummaryFileInfo  # :nodoc:
-        def initialize(obj); @o = obj end
-        %w[num_lines num_code_lines code_coverage total_coverage].each do |m|
-            define_method(m){ @o.send(m) }
-        end
-        def name; "TOTAL" end
+        
+      def initialize(obj)
+        @o = obj 
+      end
+      
+      def num_lines
+        @o.num_lines
+      end
+      
+      def num_code_lines
+        @o.num_code_lines
+      end
+      
+      def code_coverage
+        @o.code_coverage
+      end
+      
+      def total_coverage
+        @o.total_coverage
+      end
+      
+      def name
+        "TOTAL" 
+      end
+
     end
 
     def create_index(destname)
@@ -1119,8 +1141,7 @@ class HTMLProfiling < HTMLCoverage # :nodoc:
         max = 2 if max == 1
         if marked == true
             count = 1 if !count || count == 0
-            idx = 50 + 1.0 * (500/full_scale_range) * Math.log(count/median) /
-                Math.log(10)
+            idx = 50 + 1.0 * (500/full_scale_range) * Math.log(count/median) / Math.log(10)
             idx = idx.to_i
             idx = 0 if idx < 0
             idx = 100 if idx > 100
@@ -1129,6 +1150,7 @@ class HTMLProfiling < HTMLCoverage # :nodoc:
             nil
         end
     end
+    
 end
 
 class RubyAnnotation < Formatter # :nodoc:
