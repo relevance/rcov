@@ -1,3 +1,7 @@
+0.8.1.4
+=============================
+- Fixed problem in gemspec that was including non existant file
+
 Rcov with segfault bug patched
 ==============================
 

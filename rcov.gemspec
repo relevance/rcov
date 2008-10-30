@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{rcov}
-  s.version = "0.8.1.3.0"
+  s.version = "0.8.1.4.0"
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
   s.authors = ["Mauricio Fernandez"]
@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.executables = ["rcov"]
   s.extensions = ["ext/rcovrt/extconf.rb"]
   s.extra_rdoc_files = ["readme_for_api", "readme_for_rake", "readme_for_rant", "readme_for_vim"]
-  s.files = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/xx.rb", "lib/rcov/version.rb", "lib/rcov/rant.rb", "lib/rcov/report.rb", "lib/rcov/rcovtask.rb", "ext/rcovrt/extconf.rb", "ext/rcovrt/rcovrt.c", "ext/rcovrt/callsite.c", "LEGAL", "LICENSE", "Rakefile", "Rantfile", "readme_for_rake", "readme_for_rant", "readme_for_vim", "readme_for_apien", "readme_for_vim", "readme_for_api", "THANKS", "test/functional_test.rb", "test/file_statistics_test.rb", "test/assets/sample_03.rb", "test/assets/sample_05-new.rb", "test/code_coverage_analyzer_test.rb", "test/assets/sample_04.rb", "test/assets/sample_02.rb", "test/assets/sample_05-old.rb", "test/assets/sample_01.rb", "test/turn_off_rcovrt.rb", "test/call_site_analyzer_test.rb", "test/assets/sample_05.rb", "rcov.vim", "rcov.el", "setup.rb", "BLURB", "CHANGES"]
+  s.files = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/xx.rb", "lib/rcov/version.rb", "lib/rcov/rant.rb", "lib/rcov/report.rb", "lib/rcov/rcovtask.rb", "ext/rcovrt/extconf.rb", "ext/rcovrt/rcovrt.c", "ext/rcovrt/callsite.c", "LEGAL", "LICENSE", "Rakefile", "Rantfile", "readme_for_rake", "readme_for_rant", "readme_for_vim", "readme_for_api", "THANKS", "test/functional_test.rb", "test/file_statistics_test.rb", "test/assets/sample_03.rb", "test/assets/sample_05-new.rb", "test/code_coverage_analyzer_test.rb", "test/assets/sample_04.rb", "test/assets/sample_02.rb", "test/assets/sample_05-old.rb", "test/assets/sample_01.rb", "test/turn_off_rcovrt.rb", "test/call_site_analyzer_test.rb", "test/assets/sample_05.rb", "rcov.vim", "rcov.el", "setup.rb", "BLURB", "CHANGES"]
   s.has_rdoc = true
   s.homepage = %q{http://eigenclass.org/hiki.rb?rcov}
   s.rdoc_options = ["--main", "readme_for_api", "--title", "rcov code coverage tool"]
