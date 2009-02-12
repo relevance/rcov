@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{rcov}
-  s.version = "0.8.1.5.0"
+  s.version = "0.8.1.5.1"
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
   s.authors = ["Mauricio Fernandez"]
