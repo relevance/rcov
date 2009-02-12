@@ -25,6 +25,8 @@ begin
 rescue LoadError
 end
 
+require 'rcov/rexml_extensions' # TODO it would be nice to move the below hacks into this rexml_extensions module
+
 if (RUBY_VERSION == "1.8.6" || RUBY_VERSION == "1.8.7") && defined? REXML::Formatters::Transitive
     class REXML::Document
         remove_method :write rescue nil
@@ -74,6 +76,7 @@ if (RUBY_VERSION == "1.8.6" || RUBY_VERSION == "1.8.7") && defined? REXML::Forma
             output << ' '*@level
         end
     end
+    
 end
 
 class Formatter # :nodoc:
