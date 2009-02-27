@@ -4,6 +4,7 @@
 
 $:.unshift "lib" if File.directory? "lib"
 require 'rcov/rcovtask'
+require 'rcov/version'
 require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/gempackagetask'
@@ -100,7 +101,7 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/xx.rb"
 # this code can also be used to generate the MRI gem.  But I left the gemspec file in too.
 spec = Gem::Specification.new do |s|
   s.name = %q{rcov}
-  s.version = "0.8.1.5.1"
+  s.version = Rcov::VERSION
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
   s.authors = ["Mauricio Fernandez"]
