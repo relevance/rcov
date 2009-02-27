@@ -134,11 +134,11 @@ spec = Gem::Specification.new do |s|
   end
 end
 
-#tasks added in to support generating the JRuby gem.
+# tasks added in to support generating the JRuby gem.
 if RUBY_PLATFORM == 'java'
   spec.platform = "jruby"
   spec.extensions = []
-  #add the jruby extension to the file list
+  # add the jruby extension to the file list
   PKG_FILES << "lib/rcovrt.jar"  
   
   def java_classpath_arg
@@ -185,7 +185,7 @@ Rake::GemPackageTask.new(spec) do |p|
   p.gem_spec = spec  
 end
 
-#extend the gem task to include the java_compile
+# extend the gem task to include the java_compile
 if RUBY_PLATFORM == 'java'
   Rake::Task["pkg"].enhance(["java_compile"])
 end

@@ -19,7 +19,6 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--main", "readme_for_api", "--title", "rcov code coverage tool"]
   s.require_paths = ["lib"]
   s.required_ruby_version = Gem::Requirement.new("> 0.0.0")
-  s.rubygems_version = %q{1.2.0}
   s.summary = %q{Code coverage analysis tool for Ruby/JRuby}
   s.test_files = ["test/functional_test.rb", "test/file_statistics_test.rb", "test/code_coverage_analyzer_test.rb", "test/call_site_analyzer_test.rb"]
 
