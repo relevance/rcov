@@ -2,7 +2,9 @@
 
 ## Why? What?
 
-This is Relevance's fork of Mauricio Fernandez's RCov.  Why does this fork exist?
+This is my fork of Mauricio Fernandez's RCov (maintained by Relevance).  
+
+## Why does this fork exist?
 
 * working on 100% stability with Ruby 1.8.6 -- there are numerous segfaults and crashes that have been fixed, and we are trying to fix more
 * Ruby 1.9 support -- still very much a work in progress in a branch
