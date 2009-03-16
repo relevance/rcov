@@ -917,8 +917,8 @@ class CallSiteAnalyzer < DifferentialAnalyzer
   def expand_name(classname_or_fullname, methodname = nil)
     if methodname.nil?
       case classname_or_fullname
-      when /(.*)#(.*)/: classname, methodname = $1, $2
-      when /(.*)\.(.*)/: classname, methodname = "#<Class:#{$1}>", $2
+      when /(.*)#(.*)/ then classname, methodname = $1, $2
+      when /(.*)\.(.*)/ then classname, methodname = "#<Class:#{$1}>", $2
       else
         raise ArgumentError, "Incorrect method name"
       end

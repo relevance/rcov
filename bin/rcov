@@ -265,7 +265,7 @@ EOF
                  "method specified by SELECTOR",
                  "(format: Foo::Bar#method, A::B.method)") do |selector|
         case selector
-        when /([^.]+)(#|\.)(.*)/: options.report_cov_bug_for = selector
+        when /([^.]+)(#|\.)(.*)/ then options.report_cov_bug_for = selector
         else
             raise OptionParser::InvalidArgument, selector
         end

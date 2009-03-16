@@ -1,6 +1,19 @@
 require File.dirname(__FILE__) + '/test_helper'
 
 class TestCodeCoverageAnalyzer < Test::Unit::TestCase
+  if RUBY_VERSION =~ /1.9/
+    LINES = <<-EOF.lines.to_a
+puts 1
+if foo
+  bar
+  baz
+end
+5.times do
+  foo
+  bar if baz
+end
+EOF
+  else
     LINES = <<-EOF.to_a
 puts 1
 if foo
@@ -12,6 +25,7 @@ end
   bar if baz
 end
 EOF
+  end
 
   def setup
     if defined? Rcov::Test::Temporary
