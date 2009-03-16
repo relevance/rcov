@@ -6,8 +6,18 @@ unless RUBY_PLATFORM == 'java' then
     have_library("gcov", "__gcov_open")
   
     $CFLAGS << " -fprofile-arcs -ftest-coverage"
-    create_makefile("rcovrt")
+    if RUBY_VERSION =~ /1.9/
+      $CFLAGS << ' -DRUBY_19_COMPATIBILITY'
+      create_makefile("rcovrt", "1.9/")
+    else
+      create_makefile("rcovrt", "1.8/")
+    end
   else
-    create_makefile("rcovrt")
+    if RUBY_VERSION =~ /1.9/
+      $CFLAGS << ' -DRUBY_19_COMPATIBILITY'
+      create_makefile("rcovrt", "1.9/")
+    else
+      create_makefile("rcovrt", "1.8/")
+    end
   end
 end
