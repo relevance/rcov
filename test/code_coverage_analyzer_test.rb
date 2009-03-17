@@ -1,8 +1,7 @@
 require File.dirname(__FILE__) + '/test_helper'
 
 class TestCodeCoverageAnalyzer < Test::Unit::TestCase
-  if RUBY_VERSION =~ /1.9/
-    LINES = <<-EOF.lines.to_a
+  LINES = <<-EOF.split "\n"
 puts 1
 if foo
   bar
@@ -13,19 +12,6 @@ end
   bar if baz
 end
 EOF
-  else
-    LINES = <<-EOF.to_a
-puts 1
-if foo
-  bar
-  baz
-end
-5.times do
-  foo
-  bar if baz
-end
-EOF
-  end
 
   def setup
     if defined? Rcov::Test::Temporary
@@ -102,9 +88,9 @@ EOF
     analyzer = Rcov::CodeCoverageAnalyzer.new
     analyzer.run_hooked{ load sample_file }
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    assert_equal([1, 2, 0, 0, 1, 0, 11], count_info) unless PLATFORM =~ /java/
+    assert_equal([1, 2, 0, 0, 1, 0, 11], count_info) unless (defined? PLATFORM && PLATFORM =~ /java/) || RUBY_VERSION =~ /1.9/
     # JRUBY reports an if x==blah as hitting this type of line once, JRUBY also optimizes this stuff so you'd have to run with --debug to get "extra" information.  MRI hits it twice.
-    assert_equal([1, 1, 0, 0, 1, 0, 11], count_info) if PLATFORM =~ /java/
+    assert_equal([1, 2, 0, 0, 1, 0, 11], count_info) if RUBY_VERSION =~ /1.9/
 
     analyzer.reset
     #set_trace_func proc { |event, file, line, id, binding, classname| printf "%8s %s:%-2d %10s %8s\n", event, file, line, id, classname if (file =~ /sample_02.rb/) }     
@@ -112,13 +98,15 @@ EOF
     sample_file = File.join(File.dirname(__FILE__), "assets/sample_02.rb")
     analyzer.run_hooked{ load sample_file }
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    assert_equal([8, 1, 0, 0, 0], count_info)
+    assert_equal([8, 1, 0, 0, 0], count_info) unless RUBY_VERSION =~ /1.9/
+    assert_equal([4, 1, 0, 0, 4], count_info) if RUBY_VERSION =~ /1.9/
 
     analyzer.reset
     assert_equal([], analyzer.analyzed_files)
     analyzer.run_hooked{ Rcov::Test::Temporary::Sample02.foo(1, 1) }
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    assert_equal([0, 1, 1, 1, 0], count_info)
+    assert_equal([0, 1, 1, 1, 0], count_info) unless RUBY_VERSION =~ /1.9/
+    assert_equal([0, 2, 1, 0, 0], count_info) if RUBY_VERSION =~ /1.9/
     analyzer.run_hooked do
       10.times{ Rcov::Test::Temporary::Sample02.foo(1, 1) }
     end
