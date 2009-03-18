@@ -11,3 +11,4 @@ TAGS
 coverage
 pkg
 .DS_Store
+*.gem
