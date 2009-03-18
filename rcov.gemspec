@@ -1,4 +1,4 @@
-PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/xx.rb", "lib/rcov/version.rb", "lib/rcov/rant.rb", "lib/rcov/report.rb", "lib/rcov/rcovtask.rb", "lib/rcov/rexml_extensions.rb", "ext/rcovrt/extconf.rb", "ext/rcovrt/1.8/rcovrt.c", "ext/rcovrt/1.9/rcovrt.c", "ext/rcovrt/1.8/callsite.c", "ext/rcovrt/1.9/callsite.c", "LEGAL", "LICENSE", "Rakefile", "Rantfile", "doc/readme_for_rake", "doc/readme_for_rant", "doc/readme_for_vim", "doc/readme_for_emacs", "doc/readme_for_vim", "doc/readme_for_api", "THANKS", "test/functional_test.rb", "test/file_statistics_test.rb", "test/assets/sample_03.rb", "test/assets/sample_05-new.rb", "test/code_coverage_analyzer_test.rb", "test/assets/sample_04.rb", "test/assets/sample_02.rb", "test/assets/sample_05-old.rb", "test/assets/sample_01.rb", "test/turn_off_rcovrt.rb", "test/call_site_analyzer_test.rb", "test/assets/sample_05.rb", "editor-extensions/rcov.vim", "editor-extensions/rcov.el", "setup.rb", "BLURB", "CHANGES"]
+PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/xx.rb", "lib/rcov/version.rb", "lib/rcov/report.rb", "lib/rcov/rcovtask.rb", "lib/rcov/rexml_extensions.rb", "ext/rcovrt/extconf.rb", "ext/rcovrt/1.8/rcovrt.c", "ext/rcovrt/1.9/rcovrt.c", "ext/rcovrt/1.8/callsite.c", "ext/rcovrt/1.9/callsite.c", "LEGAL", "LICENSE", "Rakefile", "doc/readme_for_rake", "doc/readme_for_vim", "doc/readme_for_emacs", "doc/readme_for_vim", "doc/readme_for_api", "THANKS", "test/functional_test.rb", "test/file_statistics_test.rb", "test/assets/sample_03.rb", "test/assets/sample_05-new.rb", "test/code_coverage_analyzer_test.rb", "test/assets/sample_04.rb", "test/assets/sample_02.rb", "test/assets/sample_05-old.rb", "test/assets/sample_01.rb", "test/turn_off_rcovrt.rb", "test/call_site_analyzer_test.rb", "test/assets/sample_05.rb", "editor-extensions/rcov.vim", "editor-extensions/rcov.el", "setup.rb", "BLURB", "CHANGES"]
 
 Gem::Specification.new do |s|
   s.name = %q{rcov}
@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.email = %q{mfp@acm.org}
   s.executables = ["rcov"]
   s.extensions = ["ext/rcovrt/extconf.rb"]
-  s.extra_rdoc_files = ["doc/readme_for_api", "doc/readme_for_rake", "doc/readme_for_rant", "doc/readme_for_vim"]
+  s.extra_rdoc_files = ["doc/readme_for_api", "doc/readme_for_rake", "doc/readme_for_vim"]
   s.files = PKG_FILES
   s.has_rdoc = true
   s.homepage = %q{http://github.com/spicycode/rcov}

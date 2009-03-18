@@ -88,7 +88,6 @@ Rake::RDocTask.new("rdoc") { |rdoc|
   rdoc.options << "--line-numbers" << "--inline-source"
   rdoc.rdoc_files.include('doc/readme_for_api')
   rdoc.rdoc_files.include('doc/readme_for_rake')
-  rdoc.rdoc_files.include('doc/readme_for_rant')
   rdoc.rdoc_files.include('doc/readme_for_vim')
   rdoc.rdoc_files.include('lib/**/*.rb')
 }

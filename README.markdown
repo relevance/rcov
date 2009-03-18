@@ -36,7 +36,7 @@ Rcov is a code coverage tool for Ruby. It is commonly used for viewing overall t
 * fairly accurate coverage information through code linkage inference using 
   simple heuristics
 * cross-referenced XHTML and several kinds of text reports
-* support for easy automation with Rake and Rant
+* support for easy automation with Rake
 * colorblind-friendliness
 
 ## Requirements
