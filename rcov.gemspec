@@ -2,7 +2,7 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/xx.rb"
 
 Gem::Specification.new do |s|
   s.name = %q{rcov}
-  s.version = "0.8.1.5.7"
+  s.version = "0.8.2.1"
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
   s.authors = ["Mauricio Fernandez", "Chad Humphries", "Aaron Bedra"]
