@@ -10,6 +10,7 @@
 # methods is actually executed under rcov's inspection.
 
 require 'rcov/version'
+require 'rcov/formatters'
 
 SCRIPT_LINES__ = {} unless defined? SCRIPT_LINES__
 

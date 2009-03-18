@@ -9,7 +9,7 @@
 #
 # See LEGAL and LICENSE for additional licensing information.
 #
-
+puts $LOAD_PATH
 require 'cgi'
 require 'rbconfig'
 require 'optparse'
@@ -17,6 +17,7 @@ require 'ostruct'
 
 SCRIPT_LINES__ = {} unless defined? SCRIPT_LINES__
 require 'rcov/version'
+require 'rcov/formatters'
 require 'rcov/report'
 
 #{{{ "main" code
@@ -27,7 +28,7 @@ options.profiling = false
 options.destdir = nil
 options.loadpaths = []
 options.textmode = false
-options.skip = Rcov::Formatter::DEFAULT_OPTS[:ignore]
+options.skip = Rcov::BaseFormatter::DEFAULT_OPTS[:ignore]
 options.include = []
 options.html = true
 options.comments_run_by_default = false
@@ -325,11 +326,10 @@ def rcov_load_aggregate_data(file)
 end
 
 def rcov_save_aggregate_data(file)
-    require 'zlib'
-    Zlib::GzipWriter.open(file) do |f|
-        Marshal.dump({:callsites => $rcov_callsite_analyzer, 
-                     :coverage => $rcov_code_coverage_analyzer}, f)
-    end
+  require 'zlib'
+  Zlib::GzipWriter.open(file) do |f|
+    Marshal.dump({:callsites => $rcov_callsite_analyzer, :coverage => $rcov_code_coverage_analyzer}, f)
+  end
 end
 
 if options.callsites 

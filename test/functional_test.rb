@@ -56,39 +56,34 @@ class TestFunctional < Test::Unit::TestCase
 
   @@selection = "--include-file=sample --exclude=rcov"
   def test_text_gcc
-    run_rcov("--gcc #{@@selection}",
-             "assets/sample_04.rb",
-             "> actual_coverage/gcc-text.out") do
+    run_rcov("--gcc #{@@selection}", "assets/sample_04.rb", "> actual_coverage/gcc-text.out") do
       cmp "gcc-text.out"
     end
   end
 
   def test_diff
     with_testdir { FileUtils.cp "assets/sample_05-old.rb", "assets/sample_05.rb" }
-    run_rcov("--no-html --gcc #{@@selection} --save=coverage.info", "assets/sample_05.rb",
-             "> actual_coverage/diff-gcc-original.out") do
+
+    run_rcov("--no-html --gcc #{@@selection} --save=coverage.info", "assets/sample_05.rb", "> actual_coverage/diff-gcc-original.out") do
       cmp "diff-gcc-original.out"
     end
 
     with_testdir { FileUtils.cp "assets/sample_05-new.rb", "assets/sample_05.rb" }
-    run_rcov("--no-html -D --gcc #{@@selection}", "assets/sample_05.rb",
-             "> actual_coverage/diff-gcc-diff.out") do
+    run_rcov("--no-html -D --gcc #{@@selection}", "assets/sample_05.rb", "> actual_coverage/diff-gcc-diff.out") do
       cmp "diff-gcc-diff.out"
     end
 
-    run_rcov("--no-html -D #{@@selection}", "assets/sample_05.rb",
-             "> actual_coverage/diff.out") do
+    run_rcov("--no-html -D #{@@selection}", "assets/sample_05.rb", "> actual_coverage/diff.out") do
       cmp "diff.out"
     end
 
-    run_rcov("--no-html --no-color -D #{@@selection}", "assets/sample_05.rb",
-             "> actual_coverage/diff-no-color.out") do
+    run_rcov("--no-html --no-color -D #{@@selection}", "assets/sample_05.rb", "> actual_coverage/diff-no-color.out") do
       cmp "diff-no-color.out"
     end
 
-    run_rcov("--no-html --gcc #{@@selection}", "assets/sample_05.rb",
-             "> actual_coverage/diff-gcc-all.out") do
+    run_rcov("--no-html --gcc #{@@selection}", "assets/sample_05.rb", "> actual_coverage/diff-gcc-all.out") do
       cmp "diff-gcc-all.out"
-    end
+    end  
   end
+  
 end
