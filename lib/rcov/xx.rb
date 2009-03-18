@@ -1,7 +1,7 @@
 # xx can be redistributed and used under the following conditions
 # (just keep the following copyright notice, list of conditions and disclaimer
 # in order to satisfy rcov's "Ruby license" and xx's license simultaneously).
-# 
+#
 #ePark Labs Public License version 1
 #Copyright (c) 2005, ePark Labs, Inc. and contributors
 #All rights reserved.
@@ -29,14 +29,19 @@
 #(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-unless defined? $__xx_rb__
+unless(defined?($__xx_rb__) or defined?(XX))
 
 require "rexml/document"
 
-
 module XX
 #--{{{
-  VERSION = "0.1.0"
+  VERSION = "2.1.0"
+  def self.version() VERSION end
+
+  LIBDIR = File.dirname(File.expand_path(__FILE__)) << File::SEPARATOR
+  def self.libdir() LIBDIR end
+
+  require libdir + "binding_of_caller"
 
   %w(
     CRAZY_LIKE_A_HELL
@@ -50,11 +55,13 @@ module XX
     attr "doc"
     attr "stack"
     attr "size"
+    attr_accessor "xmldecl"
 
     def initialize *a, &b
 #--{{{
-      @doc = ::REXML::Document::new(*a, &b)
+      @doc = ::REXML::Document::new *a, &b
       @stack = [@doc]
+      @xmldecl = nil
       @size = 0
 #--}}}
     end
@@ -82,17 +89,23 @@ module XX
     end
     def to_str port = ""
 #--{{{
+      xmldecl ? ugly(port) : pretty(port)
+#--}}}
+    end
+    alias_method "to_s", "to_str"
+    def pretty port = ""
+#--{{{
+      @doc.write port, indent=0, transitive=false, ie_hack=true
+      port
+#--}}}
+    end
+    def ugly port = ''
+#--{{{
       @doc.write port, indent=-1, transitive=false, ie_hack=true
       port
 #--}}}
     end
-    alias_method "to_s", "to_str"
-    def pretty port = '' 
-#--{{{
-      @doc.write port, indent=2, transitive=false, ie_hack=true
-      port
-#--}}}
-    end
+    alias_method "compact", "ugly"
     def create element
 #--{{{
       push element
@@ -174,7 +187,7 @@ module XX
                   x.to_s
               end
 
-          else # other - try anyhow 
+          else # other - try anyhow
             t <<
               case x
                 when ::REXML::Document
@@ -204,67 +217,34 @@ module XX
 
     module InstanceMethods
 #--{{{
+      def _ tag_name, *a, &b
+#--{{{
+        hashes, nothashes = a.partition{|x| Hash === x}
+
+        doc = xx_doc
+        element = ::REXML::Element::new "#{ tag_name }"
+
+        hashes.each{|h| h.each{|k,v| element.add_attribute k.to_s, v}}
+        nothashes.each{|nh| element << ::REXML::Text::new(nh.to_s)}
+
+        doc.create element, &b
+#--}}}
+      end
+      alias_method "xx_tag" , "_"
+      alias_method "__"      , "_"
+      alias_method "g__"      , "_"
       def method_missing m, *a, &b
 #--{{{
         m = m.to_s
 
-        tag_method, tag_name = xx_class::xx_tag_method_name m
+        tag_name = m.sub! %r/_+$/, ''
 
-        c_method_missing = xx_class::xx_config_for "method_missing", xx_which
-        c_tags = xx_class::xx_config_for "tags", xx_which
+        super unless tag_name
 
-        pat =
-          case c_method_missing
-            when ::XX::CRAZY_LIKE_A_HELL
-              %r/.*/
-            when ::XX::PERMISSIVE
-              %r/_$/o
-            when ::XX::STRICT
-              %r/_$/o
-            else
-              super(m.to_sym, *a, &b)
-          end
-
-        super(m.to_sym, *a, &b) unless m =~ pat
-
-        if c_method_missing == ::XX::STRICT
-          super(m.to_sym, *a, &b) unless c_tags.include? tag_name
-        end
-
-        ret, defined = nil
-
-        begin
-          xx_class::xx_define_tmp_method tag_method
-          xx_class::xx_define_tag_method tag_method, tag_name
-          ret = send tag_method, *a, &b
-          defined = true
-        ensure
-          xx_class::xx_remove_tag_method tag_method unless defined
-        end
-
-        ret
+        __ tag_name, *a, &b
 #--}}}
       end
-      def xx_tag_ tag_name, *a, &b
-#--{{{
-        tag_method, tag_name = xx_class::xx_tag_method_name tag_name 
-
-        ret, defined = nil
-
-        begin
-          xx_class::xx_define_tmp_method tag_method
-          xx_class::xx_define_tag_method tag_method, tag_name
-          ret = send tag_method, *a, &b
-          defined = true
-        ensure
-          xx_class::xx_remove_tag_method tag_method unless defined
-        end
-
-        ret
-#--}}}
-      end
-      alias_method "g_", "xx_tag_"
-      def xx_which *argv 
+      def xx_which *argv
 #--{{{
         @xx_which = nil unless defined? @xx_which
         if argv.empty?
@@ -272,7 +252,7 @@ module XX
         else
           xx_which = @xx_which
           begin
-            @xx_which = argv.shift 
+            @xx_which = argv.shift
             return yield
           ensure
             @xx_which = xx_which
@@ -283,16 +263,15 @@ module XX
       def xx_with_doc_in_effect *a, &b
 #--{{{
         @xx_docs ||= []
-        doc = ::XX::Document::new(*a)
+        doc = ::XX::Document::new *a
         ddoc = doc.doc
         begin
           @xx_docs.push doc
-          b.call doc if b
 
           doctype = xx_config_for "doctype", xx_which
           if doctype
             unless ddoc.doctype
-              doctype = ::REXML::DocType::new doctype unless 
+              doctype = ::REXML::DocType::new doctype unless
                 ::REXML::DocType === doctype
               ddoc << doctype
             end
@@ -304,8 +283,11 @@ module XX
               xmldecl = ::REXML::XMLDecl::new xmldecl unless
                 ::REXML::XMLDecl === xmldecl
               ddoc << xmldecl
+              doc.xmldecl = ::REXML::XMLDecl
             end
           end
+
+          b.call doc if b
 
           return doc
         ensure
@@ -323,26 +305,26 @@ module XX
         doc = xx_doc
 
         text =
-          ::REXML::Text::new("", 
+          ::REXML::Text::new("",
             respect_whitespace=true, parent=nil
           )
 
-        objects.each do |object| 
+        objects.each do |object|
           text << object.to_s if object
         end
 
         doc.create text, &b
 #--}}}
       end
-      alias_method "text_", "xx_text_"
-      alias_method "t_", "xx_text_"
+      alias_method "t__", "xx_text_"
+      alias_method "text__", "xx_text_"
       def xx_markup_ *objects, &b
 #--{{{
         doc = xx_doc
 
         doc2 = ::REXML::Document::new ""
 
-        objects.each do |object| 
+        objects.each do |object|
           (doc2.root ? doc2.root : doc2) << ::REXML::Document::new(object.to_s)
         end
 
@@ -353,41 +335,43 @@ module XX
         ret
 #--}}}
       end
-      alias_method "x_", "xx_markup_"
+      alias_method "x__", "xx_markup_"
+      alias_method "markup__", "xx_markup_"
       def xx_any_ *objects, &b
 #--{{{
         doc = xx_doc
         nothing = %r/.^/m
 
         text =
-          ::REXML::Text::new("", 
+          ::REXML::Text::new("",
             respect_whitespace=true, parent=nil, raw=true, entity_filter=nil, illegal=nothing
           )
 
-        objects.each do |object| 
+        objects.each do |object|
           text << object.to_s if object
         end
 
         doc.create text, &b
 #--}}}
       end
-      alias_method "h_", "xx_any_"
-      remove_method "x_" if instance_methods.include? "x_"
-      alias_method "x_", "xx_any_" # supplant for now
+      alias_method "any__", "xx_any_"
+      alias_method "h__", "xx_any_"
+      alias_method "x__", "xx_any_" # supplant for now
       def xx_cdata_ *objects, &b
 #--{{{
         doc = xx_doc
 
         cdata = ::REXML::CData::new ""
 
-        objects.each do |object| 
+        objects.each do |object|
           cdata << object.to_s if object
         end
 
         doc.create cdata, &b
 #--}}}
       end
-      alias_method "c_", "xx_cdata_"
+      alias_method "cdata__", "xx_cdata_"
+      alias_method "c__", "xx_cdata_"
       def xx_parse_attributes string
 #--{{{
         string = string.to_s
@@ -396,7 +380,7 @@ module XX
         xx_parse_yaml_attributes(tokens.join(','))
 #--}}}
       end
-      alias_method "att_", "xx_parse_attributes"
+      alias_method "a__", "xx_parse_attributes"
       def xx_parse_yaml_attributes string
 #--{{{
         require "yaml"
@@ -408,31 +392,30 @@ module XX
         obj
 #--}}}
       end
-      alias_method "at_", "xx_parse_yaml_attributes"
-      alias_method "yat_", "xx_parse_yaml_attributes"
+      alias_method "y__", "xx_parse_yaml_attributes"
       def xx_class
 #--{{{
         @xx_class ||= self.class
 #--}}}
       end
-      def xx_tag_method_name *a, &b 
+      def xx_tag_method_name *a, &b
 #--{{{
-        xx_class.xx_tag_method_name(*a, &b)
+        xx_class.xx_tag_method_name *a, &b
 #--}}}
       end
-      def xx_define_tmp_method *a, &b 
+      def xx_define_tmp_method *a, &b
 #--{{{
-        xx_class.xx_define_tmp_methodr(*a, &b)
+        xx_class.xx_define_tmp_method *a, &b
 #--}}}
       end
-      def xx_define_tag_method *a, &b 
+      def xx_define_tag_method *a, &b
 #--{{{
-        xx_class.xx_define_tag_method(*a, &b)
+        xx_class.xx_define_tag_method *a, &b
 #--}}}
       end
-      def xx_remove_tag_method *a, &b 
+      def xx_remove_tag_method *a, &b
 #--{{{
-        xx_class.xx_tag_remove_method(*a, &b)
+        xx_class.xx_tag_remove_method *a, &b
 #--}}}
       end
       def xx_ancestors
@@ -448,12 +431,12 @@ module XX
       end
       def xx_config_for *a, &b
 #--{{{
-        xx_class.xx_config_for(*a, &b)
+        xx_class.xx_config_for *a, &b
 #--}}}
       end
       def xx_configure *a, &b
 #--{{{
-        xx_class.xx_configure(*a, &b)
+        xx_class.xx_configure *a, &b
 #--}}}
       end
 #--}}}
@@ -468,7 +451,7 @@ module XX
         [ tag_method, tag_name ]
 #--}}}
       end
-      def xx_define_tmp_method m 
+      def xx_define_tmp_method m
 #--{{{
         define_method(m){ raise NotImplementedError, m.to_s }
 #--}}}
@@ -476,10 +459,9 @@ module XX
       def xx_define_tag_method tag_method, tag_name = nil
 #--{{{
         tag_method = tag_method.to_s
-        tag_name ||= tag_method.gsub %r/_+$/, ""
+        tag_name ||= tag_method.sub(%r/_$/, '')
 
-        remove_method tag_method if instance_methods.include? tag_method
-        module_eval <<-code, __FILE__, __LINE__+1
+        module_eval <<-code
           def #{ tag_method } *a, &b
             hashes, nothashes = a.partition{|x| Hash === x}
 
@@ -517,9 +499,9 @@ module XX
         @@xx_config ||= Hash::new{|h,k| h[k] = {}}
 #--}}}
       end
-      def xx_config_for key, xx_which = nil 
+      def xx_config_for key, xx_which = nil
 #--{{{
-        key = key.to_s 
+        key = key.to_s
         xx_which ||= self
         xx_ancestors(xx_which).each do |a|
           if xx_config[a].has_key? key
@@ -529,7 +511,7 @@ module XX
         nil
 #--}}}
       end
-      def xx_configure key, value, xx_which = nil 
+      def xx_configure key, value, xx_which = nil
 #--{{{
         key = key.to_s
         xx_which ||= self
@@ -572,10 +554,10 @@ module XX
     def xhtml_ which = XHTML, *a, &b
 #--{{{
       xx_which(which) do
-        doc = xx_with_doc_in_effect(*a, &b)
+        doc = xx_with_doc_in_effect *a, &b
         ddoc = doc.doc
         root = ddoc.root
-        if root and root.name and root.name =~ %r/^html$/i 
+        if root and root.name and root.name =~ %r/^html$/i
           if root.attribute("lang",nil).nil? or root.attribute("lang",nil).to_s.empty?
             root.add_attribute "lang", "en"
           end
@@ -590,6 +572,7 @@ module XX
       end
 #--}}}
     end
+    alias_method "xhtml__", "xhtml_"
 
     module Strict
 #--{{{
@@ -611,6 +594,7 @@ module XX
         super(which, *a, &b)
 #--}}}
       end
+      alias_method "xhtml__", "xhtml_"
 #--}}}
     end
 
@@ -623,6 +607,7 @@ module XX
         super(which, *a, &b)
 #--}}}
       end
+      alias_method "xhtml__", "xhtml_"
 #--}}}
     end
 #--}}}
@@ -632,12 +617,13 @@ module XX
 #--{{{
     include Markup
     xx_configure "doctype", %(html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN")
- 
+
     def html4_ which = HTML4, *a, &b
 #--{{{
-      xx_which(which){ xx_with_doc_in_effect(*a, &b) }
+      xx_which(which){ xx_with_doc_in_effect *a, &b }
 #--}}}
     end
+    alias_method "html4__", "html4_"
 
     module Strict
 #--{{{
@@ -658,6 +644,7 @@ module XX
         super(which, *a, &b)
 #--}}}
       end
+      alias_method "html4__", "html4_"
 #--}}}
     end
 
@@ -670,6 +657,7 @@ module XX
         super(which, *a, &b)
 #--}}}
       end
+      alias_method "html4__", "html4_"
 #--}}}
     end
 #--}}}
@@ -683,11 +671,218 @@ module XX
 
     def xml_ *a, &b
 #--{{{
-      xx_which(XML){ xx_with_doc_in_effect(*a, &b)}
+      xx_which(XML){ xx_with_doc_in_effect *a, &b }
+#--}}}
+    end
+    alias_method "xml__", "xml_"
+#--}}}
+  end
+
+  module Template
+#--{{{
+    class Basic
+#--{{{
+      %w( path inline type object template port pretty ).each{|a| attr_accessor a}
+      def initialize opts = {}, &b
+#--{{{
+        @path = opts['path'] || opts[:path]
+        @inline = opts['inline'] || opts[:inline]
+        @type = opts['type'] || opts[:type]
+        @object = opts['object'] || opts[:object]
+        @pretty = opts['pretty'] || opts[:pretty]
+        @port = opts['port'] || opts[:port] || STDOUT
+
+        bool = lambda{|value| value ? true : false}
+        raise ArgumentError unless(bool[@path] ^ bool[@inline])
+
+        path_init(&b) if @path
+        inline_init(&b) if @inline
+
+        @type =
+          case @type.to_s.downcase.strip
+            when /^xhtml$/
+              XHTML
+            when /^xml$/
+              XML
+            when /^html4$/
+              HTML4
+            else
+              XHTML
+          end
+#--}}}
+      end
+      def path_init &b
+#--{{{
+        @template = IO.read @path
+        @type = @path[%r/\.[^\.]+$/o] || XHTML unless @type
+#--}}}
+      end
+      def inline_init &b
+#--{{{
+        @template = (@inline || b.call).to_s
+        @type ||= XHTML
+#--}}}
+      end
+      def expand binding, opts = {}
+#--{{{
+        port = opts['port'] || opts[:port] || STDOUT
+        pretty = opts['pretty'] || opts[:pretty]
+
+        object = eval 'self', binding
+
+        unless type === object
+          __m = type
+          klass = object.class
+          klass.module_eval{ include __m }
+        end
+
+        doc = eval @template, binding
+
+        display = pretty ? 'pretty' : 'to_str'
+
+        doc.send display, port
+#--}}}
+      end
+      alias_method "result", "expand"
+#--}}}
+    end
+
+    class File < Basic
+#--{{{
+      def initialize *argv, &b
+#--{{{
+        opts, argv = argv.partition{|arg| Hash === arg}
+        opts = opts.inject{|a,b| a.update b}
+        path = argv.shift
+        raise ArgumentError, "no path" unless path
+        raise ArgumentError, "bad opts" unless Hash === opts or opts.nil?
+        opts ||= {}
+        opts['path'] = opts[:path] = path.to_s
+        super opts, &b
+#--}}}
+      end
+#--}}}
+    end
+
+    class Inline < Basic
+#--{{{
+      def initialize *argv, &b
+#--{{{
+        opts, argv = argv.partition{|arg| Hash === arg}
+        opts = opts.inject{|a,b| a.update b}
+        inline = argv.shift || b.call
+        raise ArgumentError, "no inline" unless inline
+        raise ArgumentError, "bad opts" unless Hash === opts or opts.nil?
+        opts ||= {}
+        opts['inline'] = opts[:inline] = inline.to_s
+        super opts, &b
+#--}}}
+      end
 #--}}}
     end
 #--}}}
   end
+
+  module Expandable
+#--{{{
+    module InstanceMethods
+#--{{{
+      def xx_template_file *a, &b
+#--{{{
+        template = XX::Template::File.new *a, &b
+        template.object ||= self
+        template
+#--}}}
+      end
+      def xx_template_inline *a, &b
+#--{{{
+        template = XX::Template::Inline.new *a, &b
+        template.object ||= self
+        template
+#--}}}
+      end
+      def xx_expand template, opts = {}
+#--{{{
+        port = opts['port'] || opts[:port] || STDOUT
+        pretty = opts['pretty'] || opts[:pretty]
+        binding = opts['binding'] || opts[:binding]
+
+        type = template.type
+
+        unless type === self
+          klass = self.class
+          klass.module_eval{ include type }
+        end
+
+        display = pretty ? 'pretty' : 'to_str'
+
+        Binding.of_caller do |scope|
+          binding ||= eval('binding', scope)
+          doc = eval template.template, binding
+          doc.send display, port
+        end
+#--}}}
+      end
+      def xx_expand_file *a, &b
+#--{{{
+        template = xx_template_file *a, &b
+
+        type = template.type
+        pretty = template.pretty
+        port = template.port
+
+        unless type === self
+          klass = self.class
+          klass.module_eval{ include type }
+        end
+
+        display = pretty ? 'pretty' : 'to_str'
+
+        Binding.of_caller do |scope|
+          binding ||= eval('binding', scope)
+          doc = eval template.template, binding
+          doc.send display, port
+        end
+#--}}}
+      end
+      alias_method "xx_expand_path", "xx_expand_file"
+      alias_method "xx_expand_template", "xx_expand_file"
+      def xx_expand_inline *a, &b
+#--{{{
+        template = xx_template_inline *a, &b
+
+        type = template.type
+        pretty = template.pretty
+        port = template.port
+
+        unless type === self
+          klass = self.class
+          klass.module_eval{ include type }
+        end
+
+        display = pretty ? 'pretty' : 'to_str'
+
+        Binding.of_caller do |scope|
+          binding ||= eval('binding', scope)
+          doc = eval template.template, binding
+          doc.send display, port
+        end
+#--}}}
+      end
+      alias_method "xx_expand_string", "xx_expand_inline"
+#--}}}
+    end
+    module ClassMethods
+    end
+    def self.included other
+#--{{{
+      other.instance_eval{ include InstanceMethods }
+      other.extend ClassMethods
+#--}}}
+    end
+#--}}}
+  end
+
 #--}}}
 end
 
@@ -714,7 +909,7 @@ if __FILE__ == $0
     include XX::HTML4::Strict
     include XX::XML
 
-    def doc 
+    def doc
       html_{
         head_{ title_{ "xhtml/html4/xml demo" } }
 
@@ -726,7 +921,7 @@ if __FILE__ == $0
 
         x_{ "<any_valid> xml </any_valid>" }
 
-        div_(:style => :sweet){ 
+        div_(:style => :sweet){
           em_ "this is a table"
 
           table_(:width => 42, :height => 42){
@@ -749,7 +944,7 @@ if __FILE__ == $0
   end
 
   table = Table[ %w( 0 1 2 ), %w( a b c ) ]
-  
+
   methods = %w( to_xhtml to_html4 to_xml )
 
   methods.each do |method|
