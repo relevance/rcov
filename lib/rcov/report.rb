@@ -25,6 +25,8 @@ begin
 rescue LoadError
 end
 
+require File.expand_path(File.join(File.dirname(__FILE__), 'rexml_extensions' ))
+
 if (RUBY_VERSION == "1.8.6" || RUBY_VERSION == "1.8.7") && defined? REXML::Formatters::Transitive
     class REXML::Document
         remove_method :write rescue nil
@@ -74,6 +76,7 @@ if (RUBY_VERSION == "1.8.6" || RUBY_VERSION == "1.8.7") && defined? REXML::Forma
             output << ' '*@level
         end
     end
+    
 end
 
 class Formatter # :nodoc:
@@ -85,11 +88,11 @@ class Formatter # :nodoc:
         /\btest\//,
         /\bvendor\//,
         /\A#{Regexp.escape(__FILE__)}\z/]
-
+        
     DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false,
                     :output_threshold => 101, :dont_ignore => [],
                     :callsite_analyzer => nil, :comments_run_by_default => false}
-
+                    
     def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
         @files = {}
@@ -535,7 +538,7 @@ class HTMLCoverage < Formatter # :nodoc:
     require 'fileutils'
     JAVASCRIPT_PROLOG = <<-EOS
 
-// \<![CDATA[
+// <![CDATA[
   function toggleCode( id ) {
     if ( document.getElementById )
       elem = document.getElementById( id );
@@ -556,7 +559,7 @@ class HTMLCoverage < Formatter # :nodoc:
   }
 
   // Make cross-references hidden by default
-  document.writeln( "\<style type=\\"text/css\\">span.cross-ref { display: none }</style>" )
+  document.writeln( "<style type=\\"text/css\\">span.cross-ref { display: none }</style>" )
   // ]]>
     EOS
 
@@ -718,7 +721,7 @@ EOS
       return if @files.empty?
       FileUtils.mkdir_p @dest
       create_index(File.join(@dest, "index.html"))
-
+      
       each_file_pair_sorted do |filename, fileinfo|
         create_file(File.join(@dest, mangle_filename(filename)), fileinfo)
       end
@@ -813,29 +816,29 @@ EOS
     end
 
     class SummaryFileInfo  # :nodoc:
-
+        
       def initialize(obj)
-        @o = obj
+        @o = obj 
       end
-
+      
       def num_lines
         @o.num_lines
       end
-
+      
       def num_code_lines
         @o.num_code_lines
       end
-
+      
       def code_coverage
         @o.code_coverage
       end
-
+      
       def total_coverage
         @o.total_coverage
       end
-
+      
       def name
-        "TOTAL"
+        "TOTAL" 
       end
 
     end
@@ -883,11 +886,7 @@ EOS
                 end
             }
         } }
-        if String.new.respond_to?(:lines) then
-          lines = output.pretty.lines.to_a
-        else
-          lines = output.pretty.to_a
-        end
+        lines = output.pretty.to_a
         lines.unshift lines.pop if /DOCTYPE/ =~ lines[-1]
         File.open(destname, "w") do |f|
             f.puts lines
@@ -1039,11 +1038,7 @@ EOS
             }
         } }
         # .pretty needed to make sure DOCTYPE is in a separate line
-        if String.new.respond_to?(:lines)
-          lines = output.pretty.lines.to_a
-        else
-          lines = output.pretty.to_a
-        end
+        lines = output.pretty.to_a
         lines.unshift lines.pop if /DOCTYPE/ =~ lines[-1]
         File.open(destfile, "w") do |f|
             f.puts lines
@@ -1158,7 +1153,7 @@ class HTMLProfiling < HTMLCoverage # :nodoc:
             nil
         end
     end
-
+    
 end
 
 class RubyAnnotation < Formatter # :nodoc:
