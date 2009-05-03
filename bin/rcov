@@ -9,7 +9,6 @@
 #
 # See LEGAL and LICENSE for additional licensing information.
 #
-puts $LOAD_PATH
 require 'cgi'
 require 'rbconfig'
 require 'optparse'

@@ -12,3 +12,4 @@ coverage
 pkg
 .DS_Store
 *.gem
+tags

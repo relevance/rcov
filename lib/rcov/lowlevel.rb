@@ -140,8 +140,6 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
       end
     end
   end
-end # RCOV__
+end 
 
-end # Rcov
-
-# vi: set sw=2:
+end 
