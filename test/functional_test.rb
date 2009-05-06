@@ -25,7 +25,7 @@ class TestFunctional < Test::Unit::TestCase
   @@dir = Pathname(__FILE__).expand_path.dirname
 
   def strip_variable_sections(str)
-    str.sub(/Generated on.+$/, '').sub(/Generated using the.+$/, '')
+    str.sub(/Generated on.+$/, '').sub(/Generated using the.+$/, '').squeeze("\n")
   end
 
   def cmp(file)
