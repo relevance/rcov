@@ -75,19 +75,19 @@ module XX
       return @size - n
     end
 
-    def to_str port = ""
+    def to_str(port = "")
       @doc.write port, indent=-1, transitive=false, ie_hack=true
       port
     end
     
     alias_method "to_s", "to_str"
 
-    def pretty port = '' 
+    def pretty(port = '') 
       @doc.write port, indent=2, transitive=false, ie_hack=true
       port
     end
 
-    def create element
+    def create(element)
       push element
       begin
         object = nil

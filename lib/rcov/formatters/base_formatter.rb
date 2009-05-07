@@ -1,6 +1,23 @@
 require 'rcov/xx'
+require "erb"
 
-# extend XX
+class Hash
+  def to_binding(object = Object.new)
+    object.instance_eval("def binding_for(#{keys.join(",")}) binding end")
+    object.binding_for(*values)
+  end
+end
+
+class Document
+  def initialize(template)
+    @template = ERB.new(template)
+  end
+  
+  def interpolate(replacements = {})
+    @template.result(replacements.to_binding)
+  end
+end
+
 module XX
   module XMLish
     include Markup
@@ -16,7 +33,7 @@ module Rcov
   class BaseFormatter # :nodoc:
     require 'pathname'
 
-    ignore_files = [/\A#{Regexp.escape(Pathname.new(Config::CONFIG["libdir"]).cleanpath.to_s)}/,
+    ignore_files = [/\A#{Regexp.escape(Pathname.new(::Config::CONFIG["libdir"]).cleanpath.to_s)}/,
                     /\btc_[^.]*.rb/, /_test\.rb\z/, /\btest\//, /\bvendor\//, /\A#{Regexp.escape(__FILE__)}\z/]
 
     DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false,

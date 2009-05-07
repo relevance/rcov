@@ -91,5 +91,3 @@ Rake::RDocTask.new("rdoc") { |rdoc|
   rdoc.rdoc_files.include('doc/readme_for_vim')
   rdoc.rdoc_files.include('lib/**/*.rb')
 }
-
-# vim: set sw=2 ft=ruby:
