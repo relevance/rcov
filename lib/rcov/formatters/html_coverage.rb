@@ -5,8 +5,7 @@ module Rcov
 
       DEFAULT_OPTS = {:color => false, :fsr => 30, :destdir => "coverage",
                       :callsites => false, :cross_references => false,
-                      :validator_links => true, :charset => nil
-                     }
+                      :charset => nil }
                      
       def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
@@ -17,7 +16,6 @@ module Rcov
         @do_callsites = options[:callsites]
         @do_cross_references = options[:cross_references]
         @span_class_index = 0
-        @show_validator_links = options[:validator_links]
         @charset = options[:charset]
       end
 
