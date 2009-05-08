@@ -17,7 +17,6 @@ require 'ostruct'
 SCRIPT_LINES__ = {} unless defined? SCRIPT_LINES__
 require 'rcov/version'
 require 'rcov/formatters'
-require 'rcov/report'
 
 #{{{ "main" code
 options = OpenStruct.new
