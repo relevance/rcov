@@ -20,25 +20,33 @@
       a.crossref-toggle {
         text-decoration: none;
       }
-      span.marked0 {
+      pre, code {
+        -x-system-font:none;
+        font-family:Monaco,"Courier New",monospace;
+        font-size:65%;
+        font-size-adjust:none;
+        font-stretch:normal;
+        font-style:normal;
+        font-variant:normal;
+        font-weight:normal;
+      }
+
+      tr.marked td {
         background-color: rgb(185, 210, 200);
-        display: block;
       }
       span.marked1 {
         background-color: rgb(190, 215, 205);
         display: block;
       }
-      span.inferred0 {
+      tr.inferred td {
         background-color: rgb(255, 255, 240);
-        display: block;
       }
       span.inferred1 {
         background-color: rgb(255, 255, 240);
         display: block;
       }
-      span.uncovered0 {
+      tr.uncovered td {
         background-color: rgb(225, 110, 110);
-        display: block;
       }
       span.uncovered1 {
         background-color: rgb(235, 120, 120);
@@ -174,7 +182,7 @@
     <% end %>
     <hr />
       <pre>
-        <span class='marked0'>Code reported as executed by Ruby looks like this...</span><span class='marked1'>and this: this line is also marked as covered.</span><span class='inferred0'>Lines considered as run by rcov, but not reported by Ruby, look like this,</span><span class='inferred1'>and this: these lines were inferred by rcov (using simple heuristics).</span><span class='uncovered0'>Finally, here&apos;s a line marked as not executed.</span>
+        <span class='marked'>Code reported as executed by Ruby looks like this...</span><span class='marked1'>and this: this line is also marked as covered.</span><span class='inferred'>Lines considered as run by rcov, but not reported by Ruby, look like this,</span><span class='inferred1'>and this: these lines were inferred by rcov (using simple heuristics).</span><span class='uncovered'>Finally, here&apos;s a line marked as not executed.</span>
       </pre>
     <table class='report'>
       <thead>
@@ -225,7 +233,21 @@
         </tr>
       </tbody>
     </table>
-    <%= body %>
+    <table cellpadding="0" cellspacing="0">
+      <tbody>
+      <% file.num_lines.times do |i| %>
+        <% line = file.lines[i].chomp %>
+        <% count = file.counts[i] %>
+        <tr class="<%= line_css(i) %>">
+          <td><pre><a name="line<%= i.next %>"></a><%= i.next %> <%= line %></pre></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    <pre>    
+    <% file.num_lines.times do |i| %><% line = file.lines[i].chomp %><% count = file.counts[i] %>
+      <span class="<%= line_css(i)%>"><a name="line<%= i.next %>"></a><%= i.next %> <%= line %></span><% end %>
+    </pre>
     <hr/>
     <p>Generated on <%= generated_on %> with <a href="<%= rcov::UPSTREAM_URL %>">rcov <%= rcov::VERSION %></a></p>
   </body>

@@ -100,108 +100,21 @@ module Rcov
           doc = Document.new('index.html.erb', :title => default_title, 
                                                :generated_on => Time.now,
                                                :rcov => Rcov,
+                                               :formatter => self,
                                                :output_threshold => @output_threshold,
                                                :files => files)
 
           File.open(destname, "w")  { |f| f.puts doc.render }
       end
 
-      def format_lines(file)
-          result = ""
-          last = nil
-          end_of_span = ""
-          format_line = "%#{file.num_lines.to_s.size}d"
-          file.num_lines.times do |i|
-              line = file.lines[i].chomp
-              marked = file.coverage[i]
-              count = file.counts[i]
-              spanclass = span_class(file, marked, count)
-              if spanclass != last
-                  result += end_of_span
-                  case spanclass
-                  when nil
-                      end_of_span = ""
-                  else
-                      result += %[<span class="#{spanclass}">]
-                      end_of_span = "</span>"
-                  end
-              end
-              result += %[<a name="line#{i+1}"></a>] + (format_line % (i+1)) +
-                  " " + create_cross_refs(file.name, i+1, CGI.escapeHTML(line)) + "\n"
-              last = spanclass
-          end
-          result += end_of_span
-          "<pre>#{result}</pre>"
-      end
-
-      def create_cross_refs(filename, lineno, linetext)
-          return linetext unless @callsite_analyzer && @do_callsites
-          ref_blocks = []
-          _get_defsites(ref_blocks, filename, lineno, "Calls", linetext) do |ref|
-              if ref.file
-                  where = "at #{normalize_filename(ref.file)}:#{ref.line}"
-              else
-                  where = "(C extension/core)"
-              end
-              CGI.escapeHTML("%7d   %s" %
-                                 [ref.count, "#{ref.klass}##{ref.mid} " + where])
-          end
-          _get_callsites(ref_blocks, filename, lineno, "Called by", linetext) do |ref|
-              r = "%7d   %s" % [ref.count,
-                  "#{normalize_filename(ref.file||'C code')}:#{ref.line} " +
-                      "in '#{ref.klass}##{ref.mid}'"]
-              CGI.escapeHTML(r)
-          end
-
-          create_cross_reference_block(linetext, ref_blocks)
-      end
-
-      def create_cross_reference_block(linetext, ref_blocks)
-          return linetext if ref_blocks.empty?
-          ret = ""
-          @cross_ref_idx ||= 0
-          @known_files ||= sorted_file_pairs.map{|fname, finfo| normalize_filename(fname)}
-          ret << %[<a class="crossref-toggle" href="#" onclick="toggleCode('XREF-#{@cross_ref_idx+=1}'); return false;">#{linetext}</a>]
-          ret << %[<span class="cross-ref" id="XREF-#{@cross_ref_idx}">]
-          ret << "\n"
-          ref_blocks.each do |refs, toplabel, label_proc|
-              unless !toplabel || toplabel.empty?
-                  ret << %!<span class="cross-ref-title">#{toplabel}</span>\n!
-              end
-              refs.each do |dst|
-                  dstfile = normalize_filename(dst.file) if dst.file
-                  dstline = dst.line
-                  label = label_proc.call(dst)
-                  if dst.file && @known_files.include?(dstfile)
-                      ret << %[<a href="#{mangle_filename(dstfile)}#line#{dstline}">#{label}</a>]
-                  else
-                      ret << label
-                  end
-                  ret << "\n"
-              end
-          end
-          ret << "</span>"
-      end
-
-      def span_class(sourceinfo, marked, count)
-          @span_class_index ^= 1
-          case marked
-          when true
-              "marked#{@span_class_index}"
-          when :inferred
-              "inferred#{@span_class_index}"
-          else
-              "uncovered#{@span_class_index}"
-          end
-      end
-
+     
       def create_file(destfile, fileinfo)
           doc = Document.new('detail.html.erb', :title => default_title, 
                                                 :generated_on => Time.now,
                                                 :rcov => Rcov,
+                                                :formatter => self,
                                                 :output_threshold => @output_threshold,
-                                                :file => fileinfo,
-                                                :body => format_lines(fileinfo))
+                                                :file => fileinfo)
           File.open(destfile, "w")  { |f| f.puts doc.render }
       end
 
@@ -352,58 +265,58 @@ EOF
           result
       end
 
-      def create_cross_refs(filename, lineno, linetext, marked)
-          return linetext unless @callsite_analyzer && @do_callsites
-          ref_blocks = []
-          _get_defsites(ref_blocks, filename, lineno, linetext, ">>") do |ref|
-              if ref.file
-                  ref.file.sub!(%r!^./!, '')
-                  where = "at #{mangle_filename(ref.file)}:#{ref.line}"
-              else
-                  where = "(C extension/core)"
-              end
-              "#{ref.klass}##{ref.mid} " + where + ""
-          end
-          _get_callsites(ref_blocks, filename, lineno, linetext, "<<") do |ref| # "
+  def create_cross_refs(filename, lineno, linetext, marked)
+      return linetext unless @callsite_analyzer && @do_callsites
+      ref_blocks = []
+      _get_defsites(ref_blocks, filename, lineno, linetext, ">>") do |ref|
+          if ref.file
               ref.file.sub!(%r!^./!, '')
-              "#{mangle_filename(ref.file||'C code')}:#{ref.line} " +
-                  "in #{ref.klass}##{ref.mid}"
+              where = "at #{mangle_filename(ref.file)}:#{ref.line}"
+          else
+              where = "(C extension/core)"
           end
-
-          create_cross_reference_block(linetext, ref_blocks, marked)
+          "#{ref.klass}##{ref.mid} " + where + ""
+      end
+      _get_callsites(ref_blocks, filename, lineno, linetext, "<<") do |ref| # "
+          ref.file.sub!(%r!^./!, '')
+          "#{mangle_filename(ref.file||'C code')}:#{ref.line} " +
+              "in #{ref.klass}##{ref.mid}"
       end
 
-      def create_cross_reference_block(linetext, ref_blocks, marked)
-          codelen = 75
-          if ref_blocks.empty?
-              if marked
-                  return "%-#{codelen}s #o" % linetext
-              else
-                  return linetext
-              end
-          end
-          ret = ""
-          @cross_ref_idx ||= 0
-          @known_files ||= sorted_file_pairs.map{|fname, finfo| normalize_filename(fname)}
-          ret << "%-#{codelen}s # " % linetext
-          ref_blocks.each do |refs, toplabel, label_proc|
-              unless !toplabel || toplabel.empty?
-                  ret << toplabel << " "
-              end
-              refs.each do |dst|
-                  dstfile = normalize_filename(dst.file) if dst.file
-                  dstline = dst.line
-                  label = label_proc.call(dst)
-                  if dst.file && @known_files.include?(dstfile)
-                      ret << "[[" << label << "]], "
-                  else
-                      ret << label << ", "
-                  end
-              end
-          end
+      create_cross_reference_block(linetext, ref_blocks, marked)
+  end
 
-          ret
-      end
+  def create_cross_reference_block(linetext, ref_blocks, marked)
+    codelen = 75
+    if ref_blocks.empty?
+        if marked
+            return "%-#{codelen}s #o" % linetext
+        else
+            return linetext
+        end
+    end
+    ret = ""
+    @cross_ref_idx ||= 0
+    @known_files ||= sorted_file_pairs.map{|fname, finfo| normalize_filename(fname)}
+    ret << "%-#{codelen}s # " % linetext
+    ref_blocks.each do |refs, toplabel, label_proc|
+        unless !toplabel || toplabel.empty?
+            ret << toplabel << " "
+        end
+        refs.each do |dst|
+            dstfile = normalize_filename(dst.file) if dst.file
+            dstline = dst.line
+            label = label_proc.call(dst)
+            if dst.file && @known_files.include?(dstfile)
+                ret << "[[" << label << "]], "
+            else
+                ret << label << ", "
+            end
+        end
+    end
+
+    ret
+  end
 
       def create_file(destfile, fileinfo)
         #body = format_lines(fileinfo)
