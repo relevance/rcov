@@ -15,7 +15,19 @@ require 'rcov/formatters'
 SCRIPT_LINES__ = {} unless defined? SCRIPT_LINES__
 
 module Rcov
+
+# TODO: Move to Ruby 1.8.6 Backport module
+unless RUBY_VERSION =~ /1.9/
+  
+  class ::String
     
+    def lines
+      map
+    end
+
+  end
+
+end
 # Rcov::CoverageInfo is but a wrapper for an array, with some additional
 # checks. It is returned by FileStatistics#coverage.
 class CoverageInfo
