@@ -126,9 +126,8 @@ module Rcov
   
   class BaseFormatter # :nodoc:
     require 'pathname'
-
-    lib_path_for_ignore = File.expand_path("#{File.dirname(__FILE__)}/../")
-    ignore_files = [/\A#{Regexp.escape(Pathname.new(lib_path_for_ignore).cleanpath.to_s)}/, /\btc_[^.]*.rb/, /_test\.rb\z/, /\btest\//, /\bvendor\//, /\A#{Regexp.escape(__FILE__)}\z/]
+    require 'mkmf'
+    ignore_files = [/\A#{Regexp.escape(Pathname.new(::Config::CONFIG['libdir']).cleanpath.to_s)}/, /\btc_[^.]*.rb/, /_test\.rb\z/, /\btest\//, /\bvendor\//, /\A#{Regexp.escape(__FILE__)}\z/]
 
     DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false,
       :output_threshold => 101, :dont_ignore => [], :callsite_analyzer => nil, :comments_run_by_default => false}

@@ -418,10 +418,9 @@ EOF
 
 Please fill in the blanks in the following report.
 
-You can report the bug via the Ruby-Talk ML, send it directly to 
-<mfp at acm dot org> (include "rcov" in the subject to get past the spam filters),
-or post it to 
-  http://eigenclass.org/hiki.rb?rcov+#{VERSION}
+
+You can post bugs to
+  http://github.com/relevance/rcov/issues
 
 Thank you!
         

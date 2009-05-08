@@ -1,7 +1,3 @@
-def d(x)
-  4*x
-end
-
 def a
   b 10
 end
