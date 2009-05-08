@@ -2,7 +2,7 @@
 
 ## Why? What?
 
-This is my fork of Mauricio Fernandez's RCov (maintained by Relevance).  
+This is our fork of Mauricio Fernandez's RCov (maintained by Relevance).
 
 ## Why does this fork exist?
 
@@ -12,11 +12,15 @@ This is my fork of Mauricio Fernandez's RCov (maintained by Relevance).
 
 ## INSTALL
 
-	gem install spicycode-rcov --source http://gems.github.com
+	gem install relevance-rcov --source http://gems.github.com
 
 ## BUGS? ISSUES?
 
-Go to http://relevance.lighthouseapp.com/projects/16869-rcov/overview
+Go to http://github.com/relevance/rcov/issues
+
+## CONTRIBUTORS
+
+
 
 ## Original, More Detailed Readme Below
 

@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = ["doc/readme_for_api", "doc/readme_for_rake", "doc/readme_for_vim"]
   s.files = PKG_FILES
   s.has_rdoc = true
-  s.homepage = %q{http://github.com/spicycode/rcov}
+  s.homepage = %q{http://github.com/relevance/rcov}
   s.rdoc_options = ["--main", "readme_for_api", "--title", "rcov code coverage tool"]
   s.require_paths = ["lib"]
   s.required_ruby_version = Gem::Requirement.new("> 0.0.0")
