@@ -9,25 +9,36 @@ class Hash
 end
 
 class Document
-  def initialize(template_file)
+
+  attr_accessor :local_variables 
+
+  def initialize(template_file, locals={})
     template_path = File.expand_path("#{File.dirname(__FILE__)}/../templates/#{template_file}")
     @template = ERB.new(File.read(template_path))
+    @local_variables = locals
+    @path_relativizer = Hash.new{|h,base|
+      # TODO: Waaaahhhhh?
+      h[base] = Pathname.new(base).cleanpath.to_s.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".html"
+    }
   end
   
-  def interpolate(replacements = {})
-    @template.result(replacements.to_binding)
+  def render
+    @template.result(get_binding)
   end
+
+  def relative_filename(path)
+    @path_relativizer[path]
+  end
+
+  def method_missing(key, *args)
+    local_variables.has_key?(key) ? local_variables[key] : super
+  end
+
+  def get_binding
+    binding 
+  end
+
 end
-
-#module XX
-  #module XMLish
-    #include Markup
-
-    #def xmlish_ *a, &b
-      #xx_which(XMLish){ xx_with_doc_in_effect(*a, &b)}
-    #end
-  #end
-#end
 
 module Rcov
   
