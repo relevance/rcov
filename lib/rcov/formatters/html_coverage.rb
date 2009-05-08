@@ -24,6 +24,9 @@ module Rcov
       def execute
         return if @files.empty?
         FileUtils.mkdir_p @dest
+        css_file = File.expand_path("#{File.dirname(__FILE__)}/../templates/screen.css")
+        FileUtils.cp(css_file, File.join(@dest, "screen.css"))
+
         create_index(File.join(@dest, "index.html"))
       
         each_file_pair_sorted do |filename, fileinfo|

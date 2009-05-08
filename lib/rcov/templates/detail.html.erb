@@ -2,151 +2,7 @@
 <html lang='en' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'>
   <head>
     <title><%= title %></title>
-    <style type='text/css'>
-      body { background-color: rgb(240, 240, 245); }
-      span.cross-ref-title {
-          font-size: 140%;
-      }
-      span.cross-ref a {
-        text-decoration: none;
-      }
-      span.cross-ref {
-          background-color:#f3f7fa;
-          border: 1px dashed #333;
-          margin: 1em;
-          padding: 0.5em;
-          overflow: hidden;
-      }
-      a.crossref-toggle {
-        text-decoration: none;
-      }
-      pre, code {
-        -x-system-font:none;
-        font-family:Monaco,"Courier New",monospace;
-        font-size:65%;
-        font-size-adjust:none;
-        font-stretch:normal;
-        font-style:normal;
-        font-variant:normal;
-        font-weight:normal;
-      }
-
-      tr.marked td, span.marked {
-        background-color: rgb(185, 210, 200);
-      }
-      span.marked1 {
-        background-color: rgb(190, 215, 205);
-        display: block;
-      }
-      tr.inferred td, span.inferred {
-        background-color: rgb(255, 255, 240);
-      }
-      span.inferred1 {
-        background-color: rgb(255, 255, 240);
-        display: block;
-      }
-      tr.uncovered td, span.uncovered {
-        background-color: rgb(225, 110, 110);
-      }
-      span.uncovered1 {
-        background-color: rgb(235, 120, 120);
-        display: block;
-      }
-      span.overview {
-        border-bottom: 8px solid black;
-      }
-      div.overview {
-        border-bottom: 8px solid black;
-      }
-      body {
-          font-family: verdana, arial, helvetica;
-      }
-
-      div.footer {
-          font-size: 68%;
-          margin-top: 1.5em;
-      }
-
-      h1, h2, h3, h4, h5, h6 {
-          margin-bottom: 0.5em;
-      }
-
-      h5 {
-          margin-top: 0.5em;
-      }
-
-      .hidden {
-          display: none;
-      }
-
-      div.separator {
-          height: 10px;
-      }
-      /* Commented out for better readability, esp. on IE */
-      /*
-      table tr td, table tr th {
-          font-size: 68%;
-      }
-
-      td.value table tr td {
-          font-size: 11px;
-      }
-      */
-
-      table.percent_graph {
-          height: 12px;
-          border: #808080 1px solid;
-          empty-cells: show;
-      }
-
-      table.percent_graph td.covered {
-          height: 10px;
-          background: #00f000;
-      }
-
-      table.percent_graph td.uncovered {
-          height: 10px;
-          background: #e00000;
-      }
-
-      table.percent_graph td.NA {
-          height: 10px;
-          background: #eaeaea;
-      }
-
-      table.report {
-          border-collapse: collapse;
-          width: 100%;
-      }
-
-      table.report td.heading {
-          background: #dcecff;
-          border: #d0d0d0 1px solid;
-          font-weight: bold;
-          text-align: center;
-      }
-
-      table.report td.heading:hover {
-          background: #c0ffc0;
-      }
-
-      table.report td.text {
-          border: #d0d0d0 1px solid;
-      }
-
-      table.report td.value,
-      table.report td.lines_total,
-      table.report td.lines_code {
-          text-align: right;
-          border: #d0d0d0 1px solid;
-      }
-      table.report tr.light {
-          background-color: rgb(240, 240, 245);
-      }
-      table.report tr.dark {
-          background-color: rgb(230, 230, 235);
-      }
-    </style> 
+    <link href="screen.css" media="screen" rel="stylesheet" type="text/css" />
     <script type='text/javascript'>
     // <![CDATA[
       function toggleCode( id ) {
@@ -231,15 +87,11 @@
             </table>
           </td>
         </tr>
-      </tbody>
-    </table>
-    <table cellpadding="0" cellspacing="0" width="100%">
-      <tbody>
       <% file.num_lines.times do |i| %>
         <% line = file.lines[i].chomp %>
         <% count = file.counts[i] %>
         <tr class="<%= line_css(i) %>">
-          <td><pre><a name="line<%= i.next %>"></a><%= i.next %> <%= line %></pre></td>
+          <td colspan="5"><pre><a name="line<%= i.next %>"></a><%= i.next %> <%= line %></pre></td>
         </tr>
       <% end %>
       </tbody>
