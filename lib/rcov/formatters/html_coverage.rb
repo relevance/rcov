@@ -1,172 +1,7 @@
 module Rcov
 
   class HTMLCoverage < BaseFormatter # :nodoc:
-    include XX::XHTML
-    include XX::XMLish
     require 'fileutils'
-      JAVASCRIPT_PROLOG = <<-EOS
-
-  // <![CDATA[
-    function toggleCode( id ) {
-      if ( document.getElementById )
-        elem = document.getElementById( id );
-      else if ( document.all )
-        elem = eval( "document.all." + id );
-      else
-        return false;
-
-      elemStyle = elem.style;
-
-      if ( elemStyle.display != "block" ) {
-        elemStyle.display = "block"
-      } else {
-        elemStyle.display = "none"
-      }
-
-      return true;
-    }
-
-    // Make cross-references hidden by default
-    document.writeln( "<style type=\\"text/css\\">span.cross-ref { display: none }</style>" )
-    // ]]>
-      EOS
-
-      CSS_PROLOG = <<-EOS
-  span.cross-ref-title {
-      font-size: 140%;
-  }
-  span.cross-ref a {
-    text-decoration: none;
-  }
-  span.cross-ref {
-      background-color:#f3f7fa;
-      border: 1px dashed #333;
-      margin: 1em;
-      padding: 0.5em;
-      overflow: hidden;
-  }
-  a.crossref-toggle {
-    text-decoration: none;
-  }
-  span.marked0 {
-    background-color: rgb(185, 210, 200);
-    display: block;
-  }
-  span.marked1 {
-    background-color: rgb(190, 215, 205);
-    display: block;
-  }
-  span.inferred0 {
-    background-color: rgb(255, 255, 240);
-    display: block;
-  }
-  span.inferred1 {
-    background-color: rgb(255, 255, 240);
-    display: block;
-  }
-  span.uncovered0 {
-    background-color: rgb(225, 110, 110);
-    display: block;
-  }
-  span.uncovered1 {
-    background-color: rgb(235, 120, 120);
-    display: block;
-  }
-  span.overview {
-    border-bottom: 8px solid black;
-  }
-  div.overview {
-    border-bottom: 8px solid black;
-  }
-  body {
-      font-family: verdana, arial, helvetica;
-  }
-
-  div.footer {
-      font-size: 68%;
-      margin-top: 1.5em;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-      margin-bottom: 0.5em;
-  }
-
-  h5 {
-      margin-top: 0.5em;
-  }
-
-  .hidden {
-      display: none;
-  }
-
-  div.separator {
-      height: 10px;
-  }
-  /* Commented out for better readability, esp. on IE */
-  /*
-  table tr td, table tr th {
-      font-size: 68%;
-  }
-
-  td.value table tr td {
-      font-size: 11px;
-  }
-  */
-
-  table.percent_graph {
-      height: 12px;
-      border: #808080 1px solid;
-      empty-cells: show;
-  }
-
-  table.percent_graph td.covered {
-      height: 10px;
-      background: #00f000;
-  }
-
-  table.percent_graph td.uncovered {
-      height: 10px;
-      background: #e00000;
-  }
-
-  table.percent_graph td.NA {
-      height: 10px;
-      background: #eaeaea;
-  }
-
-  table.report {
-      border-collapse: collapse;
-      width: 100%;
-  }
-
-  table.report td.heading {
-      background: #dcecff;
-      border: #d0d0d0 1px solid;
-      font-weight: bold;
-      text-align: center;
-  }
-
-  table.report td.heading:hover {
-      background: #c0ffc0;
-  }
-
-  table.report td.text {
-      border: #d0d0d0 1px solid;
-  }
-
-  table.report td.value,
-  table.report td.lines_total,
-  table.report td.lines_code {
-      text-align: right;
-      border: #d0d0d0 1px solid;
-  }
-  table.report tr.light {
-      background-color: rgb(240, 240, 245);
-  }
-  table.report tr.dark {
-      background-color: rgb(230, 230, 235);
-  }
-  EOS
 
       DEFAULT_OPTS = {:color => false, :fsr => 30, :destdir => "coverage",
                       :callsites => false, :cross_references => false,
@@ -223,65 +58,57 @@ module Rcov
       end
 
       def format_overview(*file_infos)
-          table_text = xmlish_ {
-              table_(:class => "report") {
-                  thead_ {
-                      tr_ {
-                          ["Name", "Total lines", "Lines of code", "Total coverage",
-                           "Code coverage"].each do |heading|
-                              td_(:class => "heading") { heading }
-                           end
-                      }
-                  }
-                  tbody_ {
-                      color_class_index = 1
-                      color_classes = %w[light dark]
-                      file_infos.each do |f|
-                          color_class_index += 1
-                          color_class_index %= color_classes.size
-                          tr_(:class => color_classes[color_class_index]) {
-                              td_ {
-                                  case f.name
-                                  when "TOTAL" then
-                                      t_ { "TOTAL" }
-                                  else
-                                      a_(:href => mangle_filename(f.name)){ t_ { f.name } }
-                                  end
-                              }
-                              [[f.num_lines, "lines_total"],
-                               [f.num_code_lines, "lines_code"]].each do |value, css_class|
-                                  td_(:class => css_class) { tt_{ value } }
-                              end
-                              [[f.total_coverage, "coverage_total"],
-                               [f.code_coverage, "coverage_code"]].each do |value, css_class|
-                                  value *= 100
-                                  td_ {
-                                      table_(:cellpadding => "0", :cellspacing => "0", :align => "right") {
-                                          tr_ {
-                                              td_ {
-                                                   tt_(:class => css_class) { "%3.1f%%" % value }
-                                                   x_ "&nbsp;"
-                                              }
-                                              ivalue = value.round
-                                              td_ {
-                                                  table_(:class => "percent_graph", :cellpadding => "0",
-                                                     :cellspacing => "0", :width => "100") {
-                                                      tr_ {
-                                                          td_(:class => "covered", :width => ivalue.to_s)
-                                                          td_(:class => "uncovered", :width => (100-ivalue).to_s)
-                                                      }
-                                                  }
-                                              }
-                                          }
-                                      }
-                                  }
-                              end
-                          }
-                      end
-                  }
-              }
-          }
-          table_text.pretty
+          #table_text = xmlish_ {
+              #table_(:class => "report") {
+                  #tbody_ {
+                      #color_class_index = 1
+                      #color_classes = %w[light dark]
+                      #file_infos.each do |f|
+                          #color_class_index += 1
+                          #color_class_index %= color_classes.size
+                          #tr_(:class => color_classes[color_class_index]) {
+                              #td_ {
+                                  #case f.name
+                                  #when "TOTAL" then
+                                      #t_ { "TOTAL" }
+                                  #else
+                                      #a_(:href => mangle_filename(f.name)){ t_ { f.name } }
+                                  #end
+                              #}
+                              #[[f.num_lines, "lines_total"],
+                               #[f.num_code_lines, "lines_code"]].each do |value, css_class|
+                                  #td_(:class => css_class) { tt_{ value } }
+                              #end
+                              #[[f.total_coverage, "coverage_total"],
+                               #[f.code_coverage, "coverage_code"]].each do |value, css_class|
+                                  #value *= 100
+                                  #td_ {
+                                      #table_(:cellpadding => "0", :cellspacing => "0", :align => "right") {
+                                          #tr_ {
+                                              #td_ {
+                                                   #tt_(:class => css_class) { "%3.1f%%" % value }
+                                                   #x_ "&nbsp;"
+                                              #}
+                                              #ivalue = value.round
+                                              #td_ {
+                                                  #table_(:class => "percent_graph", :cellpadding => "0",
+                                                     #:cellspacing => "0", :width => "100") {
+                                                      #tr_ {
+                                                          #td_(:class => "covered", :width => ivalue.to_s)
+                                                          #td_(:class => "uncovered", :width => (100-ivalue).to_s)
+                                                      #}
+                                                  #}
+                                              #}
+                                          #}
+                                      #}
+                                  #}
+                              #end
+                          #}
+                      #end
+                  #}
+              #}
+          #}
+          #table_text.pretty
       end
 
       class SummaryFileInfo  # :nodoc:
@@ -301,9 +128,17 @@ module Rcov
         def code_coverage
           @o.code_coverage
         end
-      
+
+        def code_coverage_for_report
+          code_coverage * 100
+        end
+
         def total_coverage
           @o.total_coverage
+        end
+
+        def total_coverage_for_report
+          total_coverage * 100
         end
       
         def name
@@ -315,50 +150,18 @@ module Rcov
       def create_index(destname)
           files = [SummaryFileInfo.new(self)] + each_file_pair_sorted.map{|k,v| v}
           title = default_title
-          output = xhtml_ { html_ {
-              head_ {
-                  if @charset
-                      meta_("http-equiv".to_sym => "Content-Type",
-                            :content => "text/html;charset=#{@charset}")
-                  end
-                  title_{ title }
-                  style_(:type => "text/css") { t_{ "body { background-color: #{default_color}; }" }  }
-                  style_(:type => "text/css") { CSS_PROLOG }
-                  script_(:type => "text/javascript") { h_{ JAVASCRIPT_PROLOG } }
-              }
-              body_ {
-                  h3_{
-                      t_{ title }
-                  }
-                  p_ {
-                      t_{ "Generated on #{Time.new.to_s} with " }
-                      a_(:href => Rcov::UPSTREAM_URL){ "rcov #{Rcov::VERSION}" }
-                  }
-                  p_ { "Threshold: #{@output_threshold}%" } if @output_threshold != 101
-                  hr_
-                  x_{ format_overview(*files) }
-                  hr_
-                  x_{ blurb }
 
-                  if @show_validator_links
-                      p_ {
-                          a_(:href => "http://validator.w3.org/check/referer") {
-                              img_(:src => "http://www.w3.org/Icons/valid-xhtml11",
-                                   :alt => "Valid XHTML 1.1!", :height => "31", :width => "88")
-                          }
-                          a_(:href => "http://jigsaw.w3.org/css-validator/check/referer") {
-                              img_(:style => "border:0;width:88px;height:31px",
-                                   :src => "http://jigsaw.w3.org/css-validator/images/vcss",
-                                   :alt => "Valid CSS!")
-                          }
-                      }
-                  end
-              }
-          } }
-          lines = output.pretty.to_a
-          lines.unshift lines.pop if /DOCTYPE/ =~ lines[-1]
+
+          doc = Document.new('index.html.erb')
+          rendered_report = doc.interpolate(:title => title, 
+                                            :generated_on => Time.now,
+                                            :rcov => Rcov,
+                                            :output_threshold => @output_threshold,
+                                            :files => files
+                                            )
+
           File.open(destname, "w") do |f|
-              f.puts lines
+            f.puts rendered_report
           end
       end
 
@@ -453,65 +256,65 @@ module Rcov
 
       def create_file(destfile, fileinfo)
           #$stderr.puts "Generating #{destfile.inspect}"
-          body = format_overview(fileinfo) + format_lines(fileinfo)
-          title = fileinfo.name + " - #{default_title}"
-          do_ctable = output_color_table?
-          output = xhtml_ { html_ {
-              head_ {
-                  if @charset
-                      meta_("http-equiv".to_sym => "Content-Type",
-                            :content => "text/html;charset=#{@charset}")
-                  end
-                  title_{ title }
-                  style_(:type => "text/css") { t_{ "body { background-color: #{default_color}; }" }  }
-                  style_(:type => "text/css") { CSS_PROLOG }
-                  script_(:type => "text/javascript") { h_ { JAVASCRIPT_PROLOG } }
-                  style_(:type => "text/css") { h_ { colorscale } }
-              }
-              body_ {
-                  h3_{ t_{ default_title } }
-                  p_ {
-                      t_{ "Generated on #{Time.new.to_s} with " }
-                      a_(:href => Rcov::UPSTREAM_URL){ "rcov #{Rcov::VERSION}" }
-                  }
-                  hr_
-                  if do_ctable
+          #body = format_overview(fileinfo) + format_lines(fileinfo)
+          #title = fileinfo.name + " - #{default_title}"
+          #do_ctable = output_color_table?
+          #output = xhtml_ { html_ {
+              #head_ {
+                  #if @charset
+                      #meta_("http-equiv".to_sym => "Content-Type",
+                            #:content => "text/html;charset=#{@charset}")
+                  #end
+                  #title_{ title }
+                  #style_(:type => "text/css") { t_{ "body { background-color: #{default_color}; }" }  }
+                  #style_(:type => "text/css") { CSS_PROLOG }
+                  #script_(:type => "text/javascript") { h_ { JAVASCRIPT_PROLOG } }
+                  #style_(:type => "text/css") { h_ { colorscale } }
+              #}
+              #body_ {
+                  #h3_{ t_{ default_title } }
+                  #p_ {
+                      #t_{ "Generated on #{Time.new.to_s} with " }
+                      #a_(:href => Rcov::UPSTREAM_URL){ "rcov #{Rcov::VERSION}" }
+                  #}
+                  #hr_
+                  #if do_ctable
                       # this kludge needed to ensure .pretty doesn't mangle it
-x_ { <<EOS
-<pre><span class='marked0'>Code reported as executed by Ruby looks like this...
-</span><span class='marked1'>and this: this line is also marked as covered.
-</span><span class='inferred0'>Lines considered as run by rcov, but not reported by Ruby, look like this,
-</span><span class='inferred1'>and this: these lines were inferred by rcov (using simple heuristics).
-</span><span class='uncovered0'>Finally, here&apos;s a line marked as not executed.
-</span></pre>
-EOS
-                      }
-                  end
-                  x_{ body }
-                  hr_
-                  x_ { blurb }
+#x_ { <<EOS
+#<pre><span class='marked0'>Code reported as executed by Ruby looks like this...
+#</span><span class='marked1'>and this: this line is also marked as covered.
+#</span><span class='inferred0'>Lines considered as run by rcov, but not reported by Ruby, look like this,
+#</span><span class='inferred1'>and this: these lines were inferred by rcov (using simple heuristics).
+#</span><span class='uncovered0'>Finally, here&apos;s a line marked as not executed.
+#</span></pre>
+#EOS
+                      #}
+                  #end
+                  #x_{ body }
+                  #hr_
+                  #x_ { blurb }
 
-                  if @show_validator_links
-                      p_ {
-                          a_(:href => "http://validator.w3.org/check/referer") {
-                              img_(:src => "http://www.w3.org/Icons/valid-xhtml10",
-                                   :alt => "Valid XHTML 1.0!", :height => "31", :width => "88")
-                          }
-                          a_(:href => "http://jigsaw.w3.org/css-validator/check/referer") {
-                              img_(:style => "border:0;width:88px;height:31px",
-                                   :src => "http://jigsaw.w3.org/css-validator/images/vcss",
-                                   :alt => "Valid CSS!")
-                          }
-                      }
-                  end
-              }
-          } }
+                  #if @show_validator_links
+                      #p_ {
+                          #a_(:href => "http://validator.w3.org/check/referer") {
+                              #img_(:src => "http://www.w3.org/Icons/valid-xhtml10",
+                                   #:alt => "Valid XHTML 1.0!", :height => "31", :width => "88")
+                          #}
+                          #a_(:href => "http://jigsaw.w3.org/css-validator/check/referer") {
+                              #img_(:style => "border:0;width:88px;height:31px",
+                                   #:src => "http://jigsaw.w3.org/css-validator/images/vcss",
+                                   #:alt => "Valid CSS!")
+                          #}
+                      #}
+                  #end
+              #}
+          #} }
           # .pretty needed to make sure DOCTYPE is in a separate line
-          lines = output.pretty.to_a
-          lines.unshift lines.pop if /DOCTYPE/ =~ lines[-1]
-          File.open(destfile, "w") do |f|
-              f.puts lines
-          end
+          #lines = output.pretty.to_a
+          #lines.unshift lines.pop if /DOCTYPE/ =~ lines[-1]
+          #File.open(destfile, "w") do |f|
+              #f.puts lines
+          #end
       end
 
       def colorscale
@@ -715,11 +518,11 @@ EOF
       end
 
       def create_file(destfile, fileinfo)
-        body = format_lines(fileinfo)
-        File.open(destfile, "w") do |f|
-          f.puts body
-          f.puts footer(fileinfo)
-        end
+        #body = format_lines(fileinfo)
+        #File.open(destfile, "w") do |f|
+          #f.puts body
+          #f.puts footer(fileinfo)
+        #end
       end
 
       def footer(fileinfo)

@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang='en' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <title><%= title %></title>
+    <style type='text/css'>
+      body { background-color: rgb(240, 240, 245); }
+      span.cross-ref-title {
+          font-size: 140%;
+      }
+      span.cross-ref a {
+        text-decoration: none;
+      }
+      span.cross-ref {
+          background-color:#f3f7fa;
+          border: 1px dashed #333;
+          margin: 1em;
+          padding: 0.5em;
+          overflow: hidden;
+      }
+      a.crossref-toggle {
+        text-decoration: none;
+      }
+      span.marked0 {
+        background-color: rgb(185, 210, 200);
+        display: block;
+      }
+      span.marked1 {
+        background-color: rgb(190, 215, 205);
+        display: block;
+      }
+      span.inferred0 {
+        background-color: rgb(255, 255, 240);
+        display: block;
+      }
+      span.inferred1 {
+        background-color: rgb(255, 255, 240);
+        display: block;
+      }
+      span.uncovered0 {
+        background-color: rgb(225, 110, 110);
+        display: block;
+      }
+      span.uncovered1 {
+        background-color: rgb(235, 120, 120);
+        display: block;
+      }
+      span.overview {
+        border-bottom: 8px solid black;
+      }
+      div.overview {
+        border-bottom: 8px solid black;
+      }
+      body {
+          font-family: verdana, arial, helvetica;
+      }
+
+      div.footer {
+          font-size: 68%;
+          margin-top: 1.5em;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+          margin-bottom: 0.5em;
+      }
+
+      h5 {
+          margin-top: 0.5em;
+      }
+
+      .hidden {
+          display: none;
+      }
+
+      div.separator {
+          height: 10px;
+      }
+      /* Commented out for better readability, esp. on IE */
+      /*
+      table tr td, table tr th {
+          font-size: 68%;
+      }
+
+      td.value table tr td {
+          font-size: 11px;
+      }
+      */
+
+      table.percent_graph {
+          height: 12px;
+          border: #808080 1px solid;
+          empty-cells: show;
+      }
+
+      table.percent_graph td.covered {
+          height: 10px;
+          background: #00f000;
+      }
+
+      table.percent_graph td.uncovered {
+          height: 10px;
+          background: #e00000;
+      }
+
+      table.percent_graph td.NA {
+          height: 10px;
+          background: #eaeaea;
+      }
+
+      table.report {
+          border-collapse: collapse;
+          width: 100%;
+      }
+
+      table.report td.heading {
+          background: #dcecff;
+          border: #d0d0d0 1px solid;
+          font-weight: bold;
+          text-align: center;
+      }
+
+      table.report td.heading:hover {
+          background: #c0ffc0;
+      }
+
+      table.report td.text {
+          border: #d0d0d0 1px solid;
+      }
+
+      table.report td.value,
+      table.report td.lines_total,
+      table.report td.lines_code {
+          text-align: right;
+          border: #d0d0d0 1px solid;
+      }
+      table.report tr.light {
+          background-color: rgb(240, 240, 245);
+      }
+      table.report tr.dark {
+          background-color: rgb(230, 230, 235);
+      }
+    </style> 
+    <script type='text/javascript'>
+    // <![CDATA[
+      function toggleCode( id ) {
+        if ( document.getElementById )
+          elem = document.getElementById( id );
+        else if ( document.all )
+          elem = eval( "document.all." + id );
+        else
+          return false;
+
+        elemStyle = elem.style;
+
+        if ( elemStyle.display != "block" ) {
+          elemStyle.display = "block"
+        } else {
+          elemStyle.display = "none"
+        }
+
+        return true;
+      }
+
+      // Make cross-references hidden by default
+      document.writeln( "<style type=\"text/css\">span.cross-ref { display: none }</style>" )
+      // ]]>
+    </script>
+  </head>
+  <body>
+    <h3><%= title %></h3>
+    <p>Generated on <%= generated_on %> with <a href="<%= rcov::UPSTREAM_URL %>">rcov <%= rcov::VERSION %></a></p>
+    <% if output_threshold != 101 %>
+      <!-- Note: 101 is the default threshold if you don't enter one -->
+      <p>Threshold: <%= output_threshold %>%</p>
+    <% end %>
+    <hr />
+    <table class='report'>
+      <thead>
+        <tr>
+          <td class='heading'>Name</td>
+          <td class='heading'>Total lines</td>
+          <td class='heading'>Lines of code</td>
+          <td class='heading'>Total coverage</td>
+          <td class='heading'>Code coverage</td>
+        </tr>
+      </thead>
+      <tbody>
+        <% files.each do |f| %>
+          <!-- alternate light/dark here -->
+          <tr class='light'>
+            <td>
+              <% if f.name == 'TOTAL' %>
+                <%= f.name %>
+              <% else %>
+                <a href="<%= f.name %>"><%= f.name %></a>
+              <% end %>
+            </td>
+            <td class='lines_total'><tt><%= f.num_lines %></tt></td>
+            <td class='lines_code'><tt><%= f.num_code_lines %></tt></td>
+            <td>
+              <table cellspacing='0' cellpadding='0' align='right'>
+                <tr>
+                  <td><tt class='coverage_total'><%= "%3.2f" % f.total_coverage_for_report %>%</tt>&nbsp;</td>
+                  <td>
+                    <table cellspacing='0' class='percent_graph' cellpadding='0' width='100'>
+                      <tr>
+                        <td class='covered' width='<%= f.total_coverage_for_report.round %>'></td>
+                        <td class='uncovered' width='<%= 100 - f.total_coverage_for_report.round %>'></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td>
+              <table cellspacing='0' cellpadding='0' align='right'>
+                <tr>
+                  <td><tt class='coverage_code'><%= "%3.2f" % f.code_coverage_for_report %>%</tt>&nbsp;</td>
+                  <td>
+                    <table cellspacing='0' class='percent_graph' cellpadding='0' width='100'>
+                      <tr>
+                        <td class='covered' width='<%= f.code_coverage_for_report.round %>'/>
+                        <td class='uncovered' width='<%= 100 - f.code_coverage_for_report.round %>'/>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <hr/>
+    <p>Generated on <%= generated_on %> with <a href="<%= rcov::UPSTREAM_URL %>">rcov <%= rcov::VERSION %></a></p>
+  </body>
+</html>

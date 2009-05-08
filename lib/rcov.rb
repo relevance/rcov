@@ -137,7 +137,15 @@ class FileStatistics
     indices.each {|i| count += 1 if @coverage[i] }
     1.0 * count / indices.size
   end
-  
+
+  def code_coverage_for_report
+    code_coverage * 100
+  end
+
+  def total_coverage_for_report
+    total_coverage * 100
+  end
+
   # Number of lines of code (loc).
   def num_code_lines
     (0...@lines.size).select{|i| is_code? i}.size

@@ -1,4 +1,4 @@
-require 'rcov/xx'
+#require 'rcov/xx'
 require "erb"
 
 class Hash
@@ -9,8 +9,9 @@ class Hash
 end
 
 class Document
-  def initialize(template)
-    @template = ERB.new(template)
+  def initialize(template_file)
+    template_path = File.expand_path("#{File.dirname(__FILE__)}/../templates/#{template_file}")
+    @template = ERB.new(File.read(template_path))
   end
   
   def interpolate(replacements = {})
@@ -18,15 +19,15 @@ class Document
   end
 end
 
-module XX
-  module XMLish
-    include Markup
+#module XX
+  #module XMLish
+    #include Markup
 
-    def xmlish_ *a, &b
-      xx_which(XMLish){ xx_with_doc_in_effect(*a, &b)}
-    end
-  end
-end
+    #def xmlish_ *a, &b
+      #xx_which(XMLish){ xx_with_doc_in_effect(*a, &b)}
+    #end
+  #end
+#end
 
 module Rcov
   
