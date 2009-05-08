@@ -31,21 +31,21 @@
         font-weight:normal;
       }
 
-      tr.marked td {
+      tr.marked td, span.marked {
         background-color: rgb(185, 210, 200);
       }
       span.marked1 {
         background-color: rgb(190, 215, 205);
         display: block;
       }
-      tr.inferred td {
+      tr.inferred td, span.inferred {
         background-color: rgb(255, 255, 240);
       }
       span.inferred1 {
         background-color: rgb(255, 255, 240);
         display: block;
       }
-      tr.uncovered td {
+      tr.uncovered td, span.uncovered {
         background-color: rgb(225, 110, 110);
       }
       span.uncovered1 {
@@ -233,7 +233,7 @@
         </tr>
       </tbody>
     </table>
-    <table cellpadding="0" cellspacing="0">
+    <table cellpadding="0" cellspacing="0" width="100%">
       <tbody>
       <% file.num_lines.times do |i| %>
         <% line = file.lines[i].chomp %>
@@ -244,10 +244,6 @@
       <% end %>
       </tbody>
     </table>
-    <pre>    
-    <% file.num_lines.times do |i| %><% line = file.lines[i].chomp %><% count = file.counts[i] %>
-      <span class="<%= line_css(i)%>"><a name="line<%= i.next %>"></a><%= i.next %> <%= line %></span><% end %>
-    </pre>
     <hr/>
     <p>Generated on <%= generated_on %> with <a href="<%= rcov::UPSTREAM_URL %>">rcov <%= rcov::VERSION %></a></p>
   </body>
