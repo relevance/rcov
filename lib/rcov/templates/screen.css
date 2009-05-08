@@ -25,6 +25,7 @@ pre, code {
   font-style:normal;
   font-variant:normal;
   font-weight:normal;
+  margin: 0;
 }
 
 tr.marked td, span.marked {
