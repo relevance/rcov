@@ -1,4 +1,3 @@
-#require 'rcov/xx'
 require "erb"
 
 class Document

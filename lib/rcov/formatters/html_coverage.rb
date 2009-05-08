@@ -1,7 +1,7 @@
 module Rcov
 
   class HTMLCoverage < BaseFormatter # :nodoc:
-    require 'fileutils'
+      require 'fileutils'
 
       DEFAULT_OPTS = {:color => false, :fsr => 30, :destdir => "coverage",
                       :callsites => false, :cross_references => false,
@@ -35,31 +35,6 @@ module Rcov
       end
 
       private
-
-      def blurb
-          xmlish_ {
-                  p_ {
-                      t_{ "Generated using the " }
-                      a_(:href => "http://eigenclass.org/hiki.rb?rcov") {
-                          t_{ "rcov code coverage analysis tool for Ruby" }
-                      }
-                      t_{ " version #{Rcov::VERSION}." }
-                  }
-          }.pretty
-      end
-
-      def output_color_table?
-        true
-      end
-
-      def default_color
-        "rgb(240, 240, 245)"
-      end
-
-      def default_title
-        "C0 code coverage information"
-      end
-
 
       class SummaryFileInfo  # :nodoc:
         
@@ -100,7 +75,7 @@ module Rcov
       def create_index(destname)
           files = [SummaryFileInfo.new(self)] + each_file_pair_sorted.map{|k,v| v}
 
-          doc = Document.new('index.html.erb', :title => default_title, 
+          doc = Document.new('index.html.erb', :title => 'C0 Coverage Information - RCov', 
                                                :generated_on => Time.now,
                                                :rcov => Rcov,
                                                :formatter => self,
@@ -112,7 +87,7 @@ module Rcov
 
      
       def create_file(destfile, fileinfo)
-          doc = Document.new('detail.html.erb', :title => default_title, 
+          doc = Document.new('detail.html.erb', :title => fileinfo.name, 
                                                 :generated_on => Time.now,
                                                 :rcov => Rcov,
                                                 :formatter => self,
@@ -121,65 +96,6 @@ module Rcov
           File.open(destfile, "w")  { |f| f.puts doc.render }
       end
 
-      def colorscale
-colorscalebase =<<EOF
-span.run%d {
-  background-color: rgb(%d, %d, %d);
-  display: block;
-}
-EOF
-          cscale = ""
-          101.times do |i|
-              if @color
-                  r, g, b = hsv2rgb(220-(2.2*i).to_i, 0.3, 1)
-                  r = (r * 255).to_i
-                  g = (g * 255).to_i
-                  b = (b * 255).to_i
-              else
-                  r = g = b = 255 - i
-              end
-              cscale << colorscalebase % [i, r, g, b]
-          end
-          cscale
-      end
-
-      # thanks to kig @ #ruby-lang for this one
-      def hsv2rgb(h,s,v)
-          return [v,v,v] if s == 0
-          h = h/60.0
-          i = h.floor
-          f = h-i
-          p = v * (1-s)
-          q = v * (1-s*f)
-          t = v * (1-s*(1-f))
-          case i
-          when 0
-              r = v
-              g = t
-              b = p
-          when 1
-              r = q
-              g = v
-              b = p
-          when 2
-              r = p
-              g = v
-              b = t
-          when 3
-              r = p
-              g = q
-              b = v
-          when 4
-              r = t
-              g = p
-              b = v
-          when 5
-              r = v
-              g = p
-              b = q
-          end
-          [r,g,b]
-      end
   end
 
   class HTMLProfiling < HTMLCoverage # :nodoc:
