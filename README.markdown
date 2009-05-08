@@ -2,7 +2,7 @@
 
 ## Why? What?
 
-This is our fork of Mauricio Fernandez's RCov (maintained by Relevance).
+This is our fork of Mauricio Fernandez's RCov (maintained by [Relevance] [3]).
 
 ## Why does this fork exist?
 
@@ -10,17 +10,21 @@ This is our fork of Mauricio Fernandez's RCov (maintained by Relevance).
 * Ruby 1.9 support -- still very much a work in progress in a branch
 * support for other runtimes/platforms, such as JRuby and win32
 
-## INSTALL
+## Install
 
 	gem install relevance-rcov --source http://gems.github.com
 
-## BUGS? ISSUES?
+## Bugs and Issues
 
-Go to http://github.com/relevance/rcov/issues
+[RCov Issues on GitHub] [1]
 
-## CONTRIBUTORS
+## Continuous Integration Status
 
+[RCov at RunCodeRun] [2]
 
+  [1]: http://github.com/relevance/rcov/issues/ "RCov Issues"
+  [2]: http://runcoderun.com/relevance/rcov/ "RCov Build Status"
+  [3]: http://thinkrelevance.com "Relevance"
 
 ## Original, More Detailed Readme Below
 
