@@ -47,9 +47,7 @@ EOF
     line_info, cov_info, count_info = analyzer.data(sample_file)
     assert_equal(lines, line_info)
     assert_equal([true, true, false, false, true, false, true], cov_info)
-    assert_equal([1, 2, 0, 0, 1, 0, 11], count_info) unless PLATFORM =~ /java/
-    # JRUBY reports an if x==blah as hitting this type of line once, JRUBY also optimizes this stuff so you'd have to run with --debug to get "extra" information.  MRI hits it twice.
-    assert_equal([1, 1, 0, 0, 1, 0, 11], count_info) if PLATFORM =~ /java/
+    assert_equal([1, 2, 0, 0, 1, 0, 11], count_info)
     analyzer.reset
     assert_equal(nil, analyzer.data(sample_file))
     assert_equal([], analyzer.analyzed_files)
@@ -88,8 +86,6 @@ EOF
     analyzer = Rcov::CodeCoverageAnalyzer.new
     analyzer.run_hooked{ load sample_file }
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    assert_equal([1, 2, 0, 0, 1, 0, 11], count_info) unless (defined? PLATFORM && PLATFORM =~ /java/) || RUBY_VERSION =~ /1.9/
-    # JRUBY reports an if x==blah as hitting this type of line once, JRUBY also optimizes this stuff so you'd have to run with --debug to get "extra" information.  MRI hits it twice.
     assert_equal([1, 2, 0, 0, 1, 0, 11], count_info) if RUBY_VERSION =~ /1.9/
 
     analyzer.reset
