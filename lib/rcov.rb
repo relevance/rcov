@@ -1006,6 +1006,4 @@ class CallSiteAnalyzer < DifferentialAnalyzer
 
 end
 
-end # Rcov
-
-# vi: set sw=2:
+end

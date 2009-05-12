@@ -1,3 +1,4 @@
+require 'rcov/formatters/html_erb_template'
 require 'rcov/formatters/base_formatter'
 require 'rcov/formatters/text_summary'
 require 'rcov/formatters/text_report'

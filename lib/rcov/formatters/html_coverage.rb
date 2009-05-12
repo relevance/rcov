@@ -72,8 +72,7 @@ module Rcov
 
       def create_index(destname)
           files = [SummaryFileInfo.new(self)] + each_file_pair_sorted.map{|k,v| v}
-
-          doc = Document.new('index.html.erb', :title => 'C0 Coverage Information - RCov', 
+          doc = Rcov::Formatters::HtmlErbTemplate.new('index.html.erb', :title => 'C0 Coverage Information - RCov', 
                                                :generated_on => Time.now,
                                                :rcov => Rcov,
                                                :formatter => self,
@@ -85,7 +84,7 @@ module Rcov
 
      
       def create_file(destfile, fileinfo)
-          doc = Document.new('detail.html.erb', :title => fileinfo.name, 
+          doc = Rcov::Formatters::HtmlErbTemplate.new('detail.html.erb', :title => fileinfo.name, 
                                                 :generated_on => Time.now,
                                                 :rcov => Rcov,
                                                 :formatter => self,

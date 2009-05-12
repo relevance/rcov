@@ -3,31 +3,7 @@
   <head>
     <title><%= title %></title>
     <link href="screen.css" media="screen" rel="stylesheet" type="text/css" />
-    <script type='text/javascript'>
-    // <![CDATA[
-      function toggleCode( id ) {
-        if ( document.getElementById )
-          elem = document.getElementById( id );
-        else if ( document.all )
-          elem = eval( "document.all." + id );
-        else
-          return false;
-
-        elemStyle = elem.style;
-
-        if ( elemStyle.display != "block" ) {
-          elemStyle.display = "block"
-        } else {
-          elemStyle.display = "none"
-        }
-
-        return true;
-      }
-
-      // Make cross-references hidden by default
-      document.writeln( "<style type=\"text/css\">span.cross-ref { display: none }</style>" )
-      // ]]>
-    </script>
+    <script type="text/javascript" src="rcov.js"></script>
   </head>
   <body>
     <h3><%= title %></h3>

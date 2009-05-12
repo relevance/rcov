@@ -10,7 +10,6 @@ module Rcov
         @dest = options[:destdir]
         @do_callsites = true
         @do_cross_references = true
-
         @mangle_filename = Hash.new{|h,base|
           h[base] = Pathname.new(base).cleanpath.to_s.gsub(%r{^\w:[/\\]}, "").gsub(/\./, "_").gsub(/[\\\/]/, "-") + ".rb"
         }
