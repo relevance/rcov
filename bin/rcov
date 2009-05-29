@@ -73,29 +73,31 @@ Usage: rcov [options] <script1.rb> [script2.rb] [-- --extra-options]
 EOF
     opts.separator ""
     opts.separator "Options:"
+
     opts.on("-o", "--output PATH", "Destination directory.") do |dir|
         options.destdir = dir
     end
-    opts.on("-I", "--include PATHS", 
-            "Prepend PATHS to $: (colon separated list)") do |paths|
-                options.loadpaths = paths.split(/:/)
-            end
-    opts.on("--[no-]comments",
-            "Mark all comments by default.",
-            "(default: --no-comments)") do |comments_run_p|
-        options.comments_run_by_default = comments_run_p
+    
+    opts.on("-I", "--include PATHS", "Prepend PATHS to $: (colon separated list)") do |paths|
+      options.loadpaths = paths.split(/:/)
     end
-    opts.on("--test-unit-only",
-            "Only trace code executed inside TestCases.") do
-        options.test_unit_only = true
+    
+    opts.on("--[no-]comments", "Mark all comments by default.", "(default: --no-comments)") do |comments_run_p|
+      options.comments_run_by_default = comments_run_p
     end
-    opts.on("--spec-only",
-            "Only trace code executed inside RSpec specs.") do
-        options.spec_only = true
+
+    opts.on("--test-unit-only", "Only trace code executed inside TestCases.") do
+      options.test_unit_only = true
     end
+
+    opts.on("--spec-only", "Only trace code executed inside RSpec specs.") do
+      options.spec_only = true
+    end
+
     opts.on("-n", "--no-color", "Create colorblind-safe output.") do
-        options.color = false
+      options.color = false
     end
+
     opts.on("-i", "--include-file PATTERNS", 
             "Generate info for files matching a",
             "pattern (comma-separated regexp list)") do |list|
@@ -106,77 +108,81 @@ EOF
                     raise OptionParser::InvalidArgument, e.message
                 end
             end
-    opts.on("-x", "--exclude PATTERNS", 
-            "Don't generate info for files matching a",
-            "pattern (comma-separated regexp list)") do |list|
-                begin
-                    regexps = list.split(/,/).map{|x| Regexp.new x}
-                    options.skip += regexps
-                rescue RegexpError => e
-                    raise OptionParser::InvalidArgument, e.message
-                end
-            end
-    opts.on("--exclude-only PATTERNS",
-            "Skip info only for files matching the",
-            "given patterns.") do |list|
-                begin
-                    options.skip = list.split(/,/).map{|x| Regexp.new(x) }
-                rescue RegexpError => e
-                    raise OptionParser::InvalidArgument, e.message
-                end
-            end
+            
+    opts.on("-x", "--exclude PATTERNS", "Don't generate info for files matching a","pattern (comma-separated regexp list)") do |list|
+      begin
+        regexps = list.split(/,/).map{|x| Regexp.new x}
+        options.skip += regexps
+      rescue RegexpError => e
+        raise OptionParser::InvalidArgument, e.message
+      end
+    end
+            
+    opts.on("--exclude-only PATTERNS", "Skip info only for files matching the", "given patterns.") do |list|
+      begin
+        options.skip = list.split(/,/).map{|x| Regexp.new(x) }
+      rescue RegexpError => e
+        raise OptionParser::InvalidArgument, e.message
+      end
+    end
+            
     opts.on("--rails", "Skip config/, environment/ and vendor/.") do 
-        options.skip.concat [%r{\bvendor/},%r{\bconfig/},%r{\benvironment/}]
-    end
-    opts.on("--[no-]callsites", "Show callsites in generated XHTML report.",
-            "(somewhat slower; disabled by default)") do |val|
-        options.callsites = val
-    end
-    opts.on("--[no-]xrefs", "Generate fully cross-referenced report.",
-            "(includes --callsites)") do |val|
-        options.crossrefs = val
-        options.callsites ||= val
-    end
-    opts.on("-p", "--profile", "Generate bogo-profiling info.") do
-        options.profiling = true
-        options.destdir ||= "profiling"
-    end
-    opts.on("-r", "--range RANGE", Float, 
-            "Color scale range for profiling info (dB).") do |val|
-        options.range = val
-    end
-    opts.on("-a", "--annotate",
-            "Generate annotated source code.") do
-        options.html = false
-        options.textmode = :annotate
-        options.crossrefs = true
-        options.callsites = true
-        options.skip = [ %r!/test/unit/! ]
+      options.skip.concat [%r{\bvendor/},%r{\bconfig/},%r{\benvironment/}]
     end
 
-    opts.on("-T", "--text-report", "Dump detailed plain-text report to stdout.",
-            "(filename, LoC, total lines, coverage)") do
-        options.textmode = :report
+    opts.on("--[no-]callsites", "Show callsites in generated XHTML report.", "(somewhat slower; disabled by default)") do |val|
+      options.callsites = val
     end
+
+    opts.on("--[no-]xrefs", "Generate fully cross-referenced report.", "(includes --callsites)") do |val|
+      options.crossrefs = val
+      options.callsites ||= val
+    end
+
+    opts.on("-p", "--profile", "Generate bogo-profiling info.") do
+      options.profiling = true
+      options.destdir ||= "profiling"
+    end
+
+    opts.on("-r", "--range RANGE", Float, "Color scale range for profiling info (dB).") do |val|
+      options.range = val
+    end
+    
+    opts.on("-a", "--annotate", "Generate annotated source code.") do
+      options.html = false
+      options.textmode = :annotate
+      options.crossrefs = true
+      options.callsites = true
+      options.skip = [ %r!/test/unit/! ]
+    end
+
+    opts.on("-T", "--text-report", "Dump detailed plain-text report to stdout.", "(filename, LoC, total lines, coverage)") do
+      options.textmode = :report
+    end
+
     opts.on("-t", "--text-summary", "Dump plain-text summary to stdout.") do
-        options.textmode = :summary
+      options.textmode = :summary
     end
+
     opts.on("--text-counts", "Dump execution counts in plaintext.") do
-        options.textmode = :counts
+      options.textmode = :counts
     end
-    opts.on("--text-coverage", "Dump coverage info to stdout, using",
-            "ANSI color sequences unless -n.") do
-        options.textmode = :coverage
+
+    opts.on("--text-coverage", "Dump coverage info to stdout, using", "ANSI color sequences unless -n.") do
+      options.textmode = :coverage
     end
+
     opts.on("--gcc", "Dump uncovered line in GCC error format.") do
-        options.gcc_output = true
+      options.gcc_output = true
     end
+    
     opts.on("--aggregate FILE", "Aggregate data from previous runs",
                                 "in FILE. Overwrites FILE with the",
                                 "merged data. FILE is created if",
                                 "necessary.") do |file|
       options.aggregate_file = file
     end
+    
     opts.on("-D [FILE]", "--text-coverage-diff [FILE]",
             "Compare code coverage with saved state",
             "in FILE, defaults to coverage.info.",
@@ -189,73 +195,77 @@ EOF
         options.coverage_diff_mode = :compare
         options.coverage_diff_file = file if file && !file.empty?
     end
-    opts.on("--save [FILE]", "Save coverage data to FILE,",
-            "for later use with rcov -D.",
-            "(default: coverage.info)") do |file|
-        options.coverage_diff_save = true
-        options.coverage_diff_mode = :record
-        if options.textmode == :coverage_diff
-            raise "You shouldn't use --save and --text-coverage-diff at a time."
-        end
-        options.coverage_diff_file = file if file && !file.empty?
+    
+    opts.on("--save [FILE]", "Save coverage data to FILE,", "for later use with rcov -D.", "(default: coverage.info)") do |file|
+      options.coverage_diff_save = true
+      options.coverage_diff_mode = :record
+      if options.textmode == :coverage_diff
+        raise "You shouldn't use --save and --text-coverage-diff at a time."
+      end
+      options.coverage_diff_file = file if file && !file.empty?
     end
-    opts.on("--[no-]html", "Generate HTML output.",
-            "(default: --html)") do |val|
-        options.html = val
+    
+    opts.on("--[no-]html", "Generate HTML output.", "(default: --html)") do |val|
+      options.html = val
     end
-    opts.on("--sort CRITERION", [:name, :loc, :coverage],
-            "Sort files in the output by the specified",
-            "field (name, loc, coverage)") do |criterion|
-        options.sort = criterion
+    
+    opts.on("--sort CRITERION", [:name, :loc, :coverage], "Sort files in the output by the specified", "field (name, loc, coverage)") do |criterion|
+      options.sort = criterion
     end
+    
     opts.on("--sort-reverse", "Reverse files in the output.") do
-        options.sort_reverse = true
+      options.sort_reverse = true
     end
-    opts.on("--threshold INT", "Only list files with coverage < INT %.",
-            "(default: 101)") do |threshold|
-        begin
-            threshold = Integer(threshold)
-            raise if threshold <= 0 || threshold > 101
-        rescue Exception
-            raise OptionParser::InvalidArgument, threshold
-        end
-        options.output_threshold = threshold
+    
+    opts.on("--threshold INT", "Only list files with coverage < INT %.", "(default: 101)") do |threshold|
+      begin
+        threshold = Integer(threshold)
+        raise if threshold <= 0 || threshold > 101
+      rescue Exception
+        raise OptionParser::InvalidArgument, threshold
+      end
+      options.output_threshold = threshold
     end
 
-    opts.on("--charset CHARSET",
-            "Charset used in Content-Type declaration of HTML reports.") do |c|
+    opts.on("--charset CHARSET", "Charset used in Content-Type declaration of HTML reports.") do |c|
         options.charset = c
     end
 
     opts.on("--only-uncovered", "Same as --threshold 100") do
         options.output_threshold = 100
     end
+    
     opts.on("--replace-progname", "Replace $0 when loading the .rb files.") do
         options.replace_prog_name = true
     end
+    
     opts.on("-w", "Turn warnings on (like ruby).") do
         $VERBOSE = true
     end
-    opts.on("--no-rcovrt", "Do not use the optimized C runtime.",
-            "(will run 30-300 times slower)") do 
+    
+    opts.on("--no-rcovrt", "Do not use the optimized C runtime.", "(will run 30-300 times slower)") do 
         $rcov_do_not_use_rcovrt = true
     end
+    
     opts.on("--diff-cmd PROGNAME", "Use PROGNAME for --text-coverage-diff.",
             "(default: diff)") do |cmd|
         options.diff_cmd = cmd
     end
+    
     opts.separator ""
+    
     opts.on_tail("-h", "--help", "Show extended help message") do
-        require 'pp'
-        puts opts
+      require 'pp'
+      puts opts
         puts <<EOF
 
 Files matching any of the following regexps will be omitted in the report(s):
 #{PP.pp(options.skip, "").chomp}
 EOF
-        puts EXTRA_HELP
-        exit
+      puts EXTRA_HELP
+      exit
     end
+    
     opts.on_tail("--report-cov-bug SELECTOR", 
                  "Report coverage analysis bug for the",
                  "method specified by SELECTOR",
@@ -277,25 +287,25 @@ end
 
 $ORIGINAL_ARGV = ARGV.clone
 if (idx = ARGV.index("--"))
-    extra_args = ARGV[idx+1..-1]
-    ARGV.replace(ARGV[0,idx])
+  extra_args = ARGV[idx+1..-1]
+  ARGV.replace(ARGV[0,idx])
 else
-    extra_args = []
+  extra_args = []
 end
 
 begin
-    opts.parse! ARGV
-rescue OptionParser::InvalidOption, OptionParser::InvalidArgument,
-       OptionParser::MissingArgument => e
-    puts opts
-    puts
-    puts e.message
-    exit(-1)
+  opts.parse! ARGV
+rescue OptionParser::InvalidOption, OptionParser::InvalidArgument, OptionParser::MissingArgument => e
+  puts opts
+  puts
+  puts e.message
+  exit(-1)
 end
+
 options.destdir ||= "coverage"
 unless ARGV[0] or options.aggregate_file && File.file?(options.aggregate_file)
-    puts opts
-    exit
+  puts opts
+  exit
 end
 
 # {{{ set loadpath
@@ -310,14 +320,14 @@ options.callsites = true if options.report_cov_bug_for
 options.textmode = :gcc if !options.textmode and options.gcc_output
 
 def rcov_load_aggregate_data(file)
-    require 'zlib'
-    begin
-        old_data = nil
-        Zlib::GzipReader.open(file){|gz| old_data = Marshal.load(gz) }
-    rescue
-        old_data = {}
-    end
-    old_data || {}
+  require 'zlib'
+  begin
+    old_data = nil
+    Zlib::GzipReader.open(file){|gz| old_data = Marshal.load(gz) }
+  rescue
+    old_data = {}
+  end
+  old_data || {}
 end
 
 def rcov_save_aggregate_data(file)
@@ -328,16 +338,16 @@ def rcov_save_aggregate_data(file)
 end
 
 if options.callsites 
-    if options.aggregate_file
-        saved_aggregate_data = rcov_load_aggregate_data(options.aggregate_file)
-        if saved_aggregate_data[:callsites]
-            $rcov_callsite_analyzer = saved_aggregate_data[:callsites]
-        end
+  if options.aggregate_file
+    saved_aggregate_data = rcov_load_aggregate_data(options.aggregate_file)
+    if saved_aggregate_data[:callsites]
+      $rcov_callsite_analyzer = saved_aggregate_data[:callsites]
     end
-    $rcov_callsite_analyzer ||= Rcov::CallSiteAnalyzer.new
-    $rcov_callsite_analyzer.install_hook
+  end
+  $rcov_callsite_analyzer ||= Rcov::CallSiteAnalyzer.new
+  $rcov_callsite_analyzer.install_hook
 else
-    $rcov_callsite_analyzer = nil
+  $rcov_callsite_analyzer = nil
 end
 
 # {{{ create formatters
@@ -362,31 +372,31 @@ make_formatter = lambda do |klass|
 end
 
 if options.html
-    if options.profiling
-        formatters << make_formatter[Rcov::HTMLProfiling]
-    else
-        formatters << make_formatter[Rcov::HTMLCoverage]
-    end
+  if options.profiling
+    formatters << make_formatter[Rcov::HTMLProfiling]
+  else
+    formatters << make_formatter[Rcov::HTMLCoverage]
+  end
 end
-textual_formatters = {:counts => Rcov::FullTextReport, 
-                      :coverage => Rcov::FullTextReport,
-                      :gcc => Rcov::FullTextReport,
-                      :annotate => Rcov::RubyAnnotation,
+
+textual_formatters = { :counts => Rcov::FullTextReport, :coverage => Rcov::FullTextReport,
+                      :gcc => Rcov::FullTextReport, :annotate => Rcov::RubyAnnotation,
                       :summary => Rcov::TextSummary, :report => Rcov::TextReport,
-                      :coverage_diff => Rcov::TextCoverageDiff}
+                      :coverage_diff => Rcov::TextCoverageDiff }
 
 if textual_formatters[options.textmode]
-    formatters << make_formatter[textual_formatters[options.textmode]]
+  formatters << make_formatter[textual_formatters[options.textmode]]
 end
 
 formatters << make_formatter[Rcov::TextCoverageDiff] if options.coverage_diff_save
 
 if options.aggregate_file
-    saved_aggregate_data ||= rcov_load_aggregate_data(options.aggregate_file)
-    if saved_aggregate_data[:coverage]
-        $rcov_code_coverage_analyzer = saved_aggregate_data[:coverage]
-    end
+  saved_aggregate_data ||= rcov_load_aggregate_data(options.aggregate_file)
+  if saved_aggregate_data[:coverage]
+    $rcov_code_coverage_analyzer = saved_aggregate_data[:coverage]
+  end
 end
+
 $rcov_code_coverage_analyzer ||= Rcov::CodeCoverageAnalyzer.new
 
 # must be registered before test/unit puts its own
@@ -469,79 +479,79 @@ EOF
 }
 
 if options.test_unit_only
-    require 'test/unit'
-    module Test::Unit
-        class TestCase
-            remove_method(:run) if instance_methods.include? "run"
-            def run(result)
-                yield(STARTED, name)
-                @_result = result
-                begin
-                    $rcov_code_coverage_analyzer.run_hooked do 
-                        setup
-                        __send__(@method_name)
-                    end
-                rescue AssertionFailedError => e
-                    add_failure(e.message, e.backtrace)
-                rescue StandardError, ScriptError
-                    add_error($!)
-                ensure
-                    begin
-                        $rcov_code_coverage_analyzer.run_hooked { teardown }
-                    rescue AssertionFailedError => e
-                        add_failure(e.message, e.backtrace)
-                    rescue StandardError, ScriptError
-                        add_error($!)
-                    end
-                end
-                result.add_run
-                yield(FINISHED, name)
-            end
-        end
-    end
-elsif options.spec_only
-    require 'spec'
-    override_run = lambda do
-        oldrun = instance_method(:run)
-        define_method(:run) do |*args|
-            $rcov_code_coverage_analyzer.run_hooked { oldrun.bind(self).call(*args) }
-        end
-    end
-
-    if defined?(Spec::DSL::Example)
-      Spec::DSL::Example.instance_eval(&override_run)
-    elsif defined?(Spec::Example::ExampleMethods)
-      override_run = lambda do
-          oldexecute = instance_method(:execute)
-          define_method(:execute) do |*args|
-              $rcov_code_coverage_analyzer.run_hooked { oldexecute.bind(self).call(*args) }
+  require 'test/unit'
+  module Test::Unit
+    class TestCase
+      remove_method(:run) if instance_methods.include? "run"
+      def run(result)
+        yield(STARTED, name)
+        @_result = result
+        begin
+          $rcov_code_coverage_analyzer.run_hooked do 
+            setup
+            __send__(@method_name)
           end
+        rescue AssertionFailedError => e
+          add_failure(e.message, e.backtrace)
+        rescue StandardError, ScriptError
+          add_error($!)
+        ensure
+          begin
+            $rcov_code_coverage_analyzer.run_hooked { teardown }
+          rescue AssertionFailedError => e
+            add_failure(e.message, e.backtrace)
+          rescue StandardError, ScriptError
+            add_error($!)
+          end
+        end
+        result.add_run
+        yield(FINISHED, name)
       end
-      Spec::Example::ExampleMethods.instance_eval(&override_run)
-    elsif defined?(Spec::Example::ExampleGroup)
-      Spec::Example::ExampleGroup.instance_eval(&override_run)
-    else
-        $stderr.puts <<-EOF
-Your RSpec version isn't supported. If it's a old one, consider upgrading;
-otherwise, please report the problem.
-        EOF
-        exit(-1)
     end
+  end
+elsif options.spec_only
+  require 'spec'
+  override_run = lambda do
+    oldrun = instance_method(:run)
+    define_method(:run) do |*args|
+      $rcov_code_coverage_analyzer.run_hooked { oldrun.bind(self).call(*args) }
+    end
+  end
+
+  if defined?(Spec::DSL::Example)
+    Spec::DSL::Example.instance_eval(&override_run)
+  elsif defined?(Spec::Example::ExampleMethods)
+    override_run = lambda do
+      oldexecute = instance_method(:execute)
+      define_method(:execute) do |*args|
+        $rcov_code_coverage_analyzer.run_hooked { oldexecute.bind(self).call(*args) }
+      end
+    end
+    Spec::Example::ExampleMethods.instance_eval(&override_run)
+  elsif defined?(Spec::Example::ExampleGroup)
+    Spec::Example::ExampleGroup.instance_eval(&override_run)
+  else
+    $stderr.puts <<-EOF
+    Your RSpec version isn't supported. If it's a old one, consider upgrading;
+    otherwise, please report the problem.
+    EOF
+    exit(-1)
+  end
 else
-    $rcov_code_coverage_analyzer.install_hook
+  $rcov_code_coverage_analyzer.install_hook
 end
 
 #{{{ Load scripts
 begin
-pending_scripts = ARGV.clone
-ARGV.replace extra_args
-until pending_scripts.empty?
+  pending_scripts = ARGV.clone
+  ARGV.replace extra_args
+  until pending_scripts.empty?
     prog = pending_scripts.shift
     if options.replace_prog_name
-        $0 = File.basename(File.expand_path(prog))
+      $0 = File.basename(File.expand_path(prog))
     end
     load prog
-end
+  end
 rescue Object => err
   $__rcov_exit_exception = err
 end

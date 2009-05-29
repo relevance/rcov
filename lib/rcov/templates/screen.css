@@ -1,7 +1,19 @@
-body { background-color: rgb(240, 240, 245); }
+body {
+	font: 62.5%/1.4em Helvetica, Arial, Sans-Serif;
+	color: #4C4C4C;
+	background-color: #F4F2ED;
+	padding: 1em;
+	margin: 8px 0 0 0;
+}
+
+a { 
+  color:#191919;
+  font-weight:bold;
+  outline: none;
+} 
 
 span.cross-ref-title {
-    font-size: 140%;
+  font-size: 140%;
 }
 span.cross-ref a {
   text-decoration: none;
@@ -13,50 +25,55 @@ span.cross-ref {
     padding: 0.5em;
     overflow: hidden;
 }
+
 a.crossref-toggle {
   text-decoration: none;
 }
 pre, code {
-  -x-system-font:none;
-  font-family:Monaco,"Courier New",monospace;
-  font-size:65%;
-  font-size-adjust:none;
-  font-stretch:normal;
-  font-style:normal;
-  font-variant:normal;
-  font-weight:normal;
-  margin: 0;
+  color: #000000;
+  font-family: "Bitstream Vera Sans Mono","Monaco","Courier New",monospace;
+  font-size: 95%;
+  line-height: 1.3em;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0;
+  word-wrap: break-word;
 }
 
-tr.marked td, span.marked {
-  background-color: rgb(185, 210, 200);
+tr.marked td, span.marked, span.marked1 {
+  background-color: #DBDEBD;
 }
-span.marked1 {
-  background-color: rgb(190, 215, 205);
+
+span.marked, span.marked1 {
   display: block;
 }
+
 tr.inferred td, span.inferred {
-  background-color: rgb(255, 255, 240);
+  background-color: #CFE6E0;
 }
-span.inferred1 {
-  background-color: rgb(255, 255, 240);
+
+tr.inferred1 td, span.inferred1 {
+  background-color: #CFE6E0;
+}
+span.inferred, span.inferred1 {
   display: block;
 }
+
 tr.uncovered td, span.uncovered {
   background-color: rgb(225, 110, 110);
 }
+
 span.uncovered1 {
   background-color: rgb(235, 120, 120);
   display: block;
 }
+
 span.overview {
   border-bottom: 8px solid black;
 }
+
 div.overview {
   border-bottom: 8px solid black;
-}
-body {
-    font-family: verdana, arial, helvetica;
 }
 
 div.footer {
@@ -66,6 +83,15 @@ div.footer {
 
 h1, h2, h3, h4, h5, h6 {
     margin-bottom: 0.5em;
+}
+
+h3 { 
+  display: block;
+  margin: 0 0 20px 0;
+  padding-bottom: 20px;
+  font-size: 2.0em;
+  letter-spacing: -1px;
+  color: #333333;
 }
 
 h5 {
@@ -79,16 +105,6 @@ h5 {
 div.separator {
     height: 10px;
 }
-/* Commented out for better readability, esp. on IE */
-/*
-table tr td, table tr th {
-    font-size: 68%;
-}
-
-td.value table tr td {
-    font-size: 11px;
-}
-*/
 
 table.percent_graph {
     height: 12px;
@@ -129,6 +145,10 @@ table.report td.heading:hover {
 
 table.report td.text {
     border: #d0d0d0 1px solid;
+}
+
+table.report td {
+    font-size: 125%;
 }
 
 table.report td.value,
