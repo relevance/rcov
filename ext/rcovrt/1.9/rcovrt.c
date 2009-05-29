@@ -9,8 +9,6 @@
 #define RCOVRT_VERSION_MINOR 0
 #define RCOVRT_VERSION_REV   0
 
-#define DEBUG = true;
-
 static VALUE mRcov;
 static VALUE mRCOV__;
 static VALUE oSCRIPT_LINES__;
