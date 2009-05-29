@@ -65,6 +65,10 @@ $PROGRAM_NAME (aka. $0) will be set before each file is load()ed if
 --replace-progname is used.
 EOF
 
+def deprecated(opt)
+  puts "#{opt} is now depricated.  Please remove it from you Rakefile or scripts.  It will be removed in the next release."
+end
+
 #{{{ OptionParser
 opts = OptionParser.new do |opts|
     opts.banner = <<-EOF
@@ -75,7 +79,7 @@ EOF
     opts.separator "Options:"
 
     opts.on("-o", "--output PATH", "Destination directory.") do |dir|
-        options.destdir = dir
+      options.destdir = dir
     end
     
     opts.on("-I", "--include PATHS", "Prepend PATHS to $: (colon separated list)") do |paths|
@@ -87,11 +91,11 @@ EOF
     end
 
     opts.on("--test-unit-only", "Only trace code executed inside TestCases.") do
-      options.test_unit_only = true
+      deprecated("--test-unit-only")
     end
 
     opts.on("--spec-only", "Only trace code executed inside RSpec specs.") do
-      options.spec_only = true
+      deprecated("--spec-only")
     end
 
     opts.on("-n", "--no-color", "Create colorblind-safe output.") do
@@ -266,10 +270,8 @@ EOF
       exit
     end
     
-    opts.on_tail("--report-cov-bug SELECTOR", 
-                 "Report coverage analysis bug for the",
-                 "method specified by SELECTOR",
-                 "(format: Foo::Bar#method, A::B.method)") do |selector|
+    opts.on_tail("--report-cov-bug SELECTOR", "Report coverage analysis bug for the",
+                 "method specified by SELECTOR", "(format: Foo::Bar#method, A::B.method)") do |selector|
         case selector
         when /([^.]+)(#|\.)(.*)/ then options.report_cov_bug_for = selector
         else
@@ -478,68 +480,7 @@ EOF
     raise $__rcov_exit_exception if $__rcov_exit_exception
 }
 
-if options.test_unit_only
-  require 'test/unit'
-  module Test::Unit
-    class TestCase
-      remove_method(:run) if instance_methods.include? "run"
-      def run(result)
-        yield(STARTED, name)
-        @_result = result
-        begin
-          $rcov_code_coverage_analyzer.run_hooked do 
-            setup
-            __send__(@method_name)
-          end
-        rescue AssertionFailedError => e
-          add_failure(e.message, e.backtrace)
-        rescue StandardError, ScriptError
-          add_error($!)
-        ensure
-          begin
-            $rcov_code_coverage_analyzer.run_hooked { teardown }
-          rescue AssertionFailedError => e
-            add_failure(e.message, e.backtrace)
-          rescue StandardError, ScriptError
-            add_error($!)
-          end
-        end
-        result.add_run
-        yield(FINISHED, name)
-      end
-    end
-  end
-elsif options.spec_only
-  require 'spec'
-  override_run = lambda do
-    oldrun = instance_method(:run)
-    define_method(:run) do |*args|
-      $rcov_code_coverage_analyzer.run_hooked { oldrun.bind(self).call(*args) }
-    end
-  end
-
-  if defined?(Spec::DSL::Example)
-    Spec::DSL::Example.instance_eval(&override_run)
-  elsif defined?(Spec::Example::ExampleMethods)
-    override_run = lambda do
-      oldexecute = instance_method(:execute)
-      define_method(:execute) do |*args|
-        $rcov_code_coverage_analyzer.run_hooked { oldexecute.bind(self).call(*args) }
-      end
-    end
-    Spec::Example::ExampleMethods.instance_eval(&override_run)
-  elsif defined?(Spec::Example::ExampleGroup)
-    Spec::Example::ExampleGroup.instance_eval(&override_run)
-  else
-    $stderr.puts <<-EOF
-    Your RSpec version isn't supported. If it's a old one, consider upgrading;
-    otherwise, please report the problem.
-    EOF
-    exit(-1)
-  end
-else
-  $rcov_code_coverage_analyzer.install_hook
-end
+$rcov_code_coverage_analyzer.install_hook
 
 #{{{ Load scripts
 begin
@@ -557,8 +498,3 @@ rescue Object => err
 end
 
 __END__
-# vi: set sw=4: 
-# Here is Emacs setting. DO NOT REMOVE!
-# Local Variables:
-# ruby-indent-level: 4
-# End:
