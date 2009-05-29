@@ -7,7 +7,7 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/versio
              "lib/rcov/templates/index.html.erb", "lib/rcov/templates/detail.html.erb",
              "lib/rcov/templates/screen.css",
              "ext/rcovrt/extconf.rb", "ext/rcovrt/1.8/rcovrt.c", "ext/rcovrt/1.9/rcovrt.c", 
-             "ext/rcovrt/1.8/callsite.c", "ext/rcovrt/1.9/callsite.c", "LEGAL", "LICENSE", 
+             "ext/rcovrt/1.8/callsite.c", "ext/rcovrt/1.9/callsite.c", "LICENSE", 
              "Rakefile", "doc/readme_for_rake", "doc/readme_for_vim", "doc/readme_for_emacs", 
              "doc/readme_for_vim", "doc/readme_for_api", "THANKS", "test/functional_test.rb", 
              "test/file_statistics_test.rb", "test/assets/sample_03.rb", "test/assets/sample_05-new.rb", 
