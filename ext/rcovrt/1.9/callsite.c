@@ -7,9 +7,9 @@
 static char callsite_hook_set_p;
 
 typedef struct {
-        const char *sourcefile;
-        unsigned int sourceline;
-        VALUE curr_meth;
+  const char *sourcefile;
+  unsigned int sourceline;
+  VALUE curr_meth;
 } type_def_site;       
 
 static VALUE caller_info = 0;
@@ -137,7 +137,7 @@ static void coverage_event_callsite_hook(rb_event_flag_t event, VALUE node,  VAL
 
   if (rb_funcall(klass, rb_intern("=="), 1, reciever) == Qtrue) {
     klass_path = rb_sprintf("#<Class:%s>", RSTRING_PTR(klass_path));
-   OBJ_FREEZE(klass_path);
+    OBJ_FREEZE(klass_path);
   }
     
   rb_ary_push(curr_meth, klass_path);
