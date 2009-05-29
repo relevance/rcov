@@ -10,6 +10,9 @@ require 'rake/rdoctask'
 require 'rake/gempackagetask'
 require 'rake/clean'
 
+puts "************\n#{ENV["PATH"]}\n************\n"
+puts "************\n#{RUBY_VERSION}\n************"
+
 # Use the specified rcov executable instead of the one in $PATH
 # (this way we get a sort of informal functional test).
 # This could also be specified from the command like, e.g.
@@ -44,16 +47,11 @@ Rcov::RcovTask.new(:rcov_ccanalyzer) do |t|
 end
 
 desc "Run the unit tests with rcovrt."
-Rake::TestTask.new(:test_rcovrt => ["ext/rcovrt/rcovrt.so","rcr_info"]) do |t|
+Rake::TestTask.new(:test_rcovrt => ["ext/rcovrt/rcovrt.so"]) do |t|
   system("cd ext/rcovrt && make clean && rm Makefile")
   t.libs << "ext/rcovrt"
   t.test_files = FileList['test/*_test.rb']
   t.verbose = true
-end
-
-task :rcr_info do
-  puts "************#{ENV["PATH"]}************"
-  puts "************#{RUBY_VERSION}************"
 end
 
 file "ext/rcovrt/rcovrt.so" => FileList["ext/rcovrt/*.c"] do
