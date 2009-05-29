@@ -18,10 +18,10 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/versio
 
 Gem::Specification.new do |s|
   s.name = %q{rcov}
-  s.version = "0.8.3.2"
+  s.version = "0.8.3.3"
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
-  s.authors = ["Relevance", "Chad Humphries (spicycode)", "Mauricio Fernandez"]
+  s.authors = ["Relevance", "Chad Humphries (spicycode)", "Aaron Bedra (abedra)", "Mauricio Fernandez"]
   s.cert_chain = nil
   s.date = %q{2009-05-12}
   s.default_executable = %q{rcov}
@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   s.email = %q{opensource@thinkrelevance.com}
   s.executables = ["rcov"]
   s.extensions = ["ext/rcovrt/extconf.rb"]
-  s.extra_rdoc_files = ["doc/readme_for_api", "doc/readme_for_rake", "doc/readme_for_vim"]
+  s.extra_rdoc_files = ["doc/readme_for_api", "doc/readme_for_rake", "doc/readme_for_vim", "doc/readme_for_emacs"]
   s.files = PKG_FILES
   s.has_rdoc = true
   s.homepage = %q{http://github.com/relevance/rcov}
