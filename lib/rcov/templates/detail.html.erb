@@ -29,18 +29,18 @@
       <tbody>
         <!-- alternate light/dark here -->
         <tr class='light'>
-          <td><%= file.name %></td>
-          <td class='lines_total'><tt><%= file.num_lines %></tt></td>
-          <td class='lines_code'><tt><%= file.num_code_lines %></tt></td>
+          <td><%= fileinfo.name %></td>
+          <td class='lines_total'><tt><%= fileinfo.num_lines %></tt></td>
+          <td class='lines_code'><tt><%= fileinfo.num_code_lines %></tt></td>
           <td>
             <table cellspacing='0' cellpadding='0' align='right'>
               <tr>
-                <td><tt class='coverage_total'><%= "%3.2f" % file.total_coverage_for_report %>%</tt>&nbsp;</td>
+                <td><tt class='coverage_total'><%= "%3.2f" % fileinfo.total_coverage_for_report %>%</tt>&nbsp;</td>
                 <td>
                   <table cellspacing='0' class='percent_graph' cellpadding='0' width='100'>
                     <tr>
-                      <td class='covered' width='<%= file.total_coverage_for_report.round %>'></td>
-                      <td class='uncovered' width='<%= 100 - file.total_coverage_for_report.round %>'></td>
+                      <td class='covered' width='<%= fileinfo.total_coverage_for_report.round %>'></td>
+                      <td class='uncovered' width='<%= 100 - fileinfo.total_coverage_for_report.round %>'></td>
                     </tr>
                   </table>
                 </td>
@@ -50,12 +50,12 @@
           <td>
             <table cellspacing='0' cellpadding='0' align='right'>
               <tr>
-                <td><tt class='coverage_code'><%= "%3.2f" % file.code_coverage_for_report %>%</tt>&nbsp;</td>
+                <td><tt class='coverage_code'><%= "%3.2f" % fileinfo.code_coverage_for_report %>%</tt>&nbsp;</td>
                 <td>
                   <table cellspacing='0' class='percent_graph' cellpadding='0' width='100'>
                     <tr>
-                      <td class='covered' width='<%= file.code_coverage_for_report.round %>'/>
-                      <td class='uncovered' width='<%= 100 - file.code_coverage_for_report.round %>'/>
+                      <td class='covered' width='<%= fileinfo.code_coverage_for_report.round %>'/>
+                      <td class='uncovered' width='<%= 100 - fileinfo.code_coverage_for_report.round %>'/>
                     </tr>
                   </table>
                 </td>
@@ -63,9 +63,9 @@
             </table>
           </td>
         </tr>
-      <% file.num_lines.times do |i| %>
-        <% line = file.lines[i].chomp %>
-        <% count = file.counts[i] %>
+      <% fileinfo.num_lines.times do |i| %>
+        <% line = fileinfo.lines[i].chomp %>
+        <% count = fileinfo.counts[i] %>
         <tr class="<%= line_css(i) %>">
           <td colspan="5"><pre><a name="line<%= i.next %>"></a><%= i.next %> <%= line %></pre></td>
         </tr>

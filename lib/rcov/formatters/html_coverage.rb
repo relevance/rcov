@@ -89,7 +89,7 @@ module Rcov
                                                 :rcov => Rcov,
                                                 :formatter => self,
                                                 :output_threshold => @output_threshold,
-                                                :file => fileinfo)
+                                                :fileinfo => fileinfo)
           File.open(destfile, "w")  { |f| f.puts doc.render }
       end
 
