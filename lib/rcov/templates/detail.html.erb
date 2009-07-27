@@ -67,7 +67,7 @@
         <% line = fileinfo.lines[i].chomp %>
         <% count = fileinfo.counts[i] %>
         <tr class="<%= line_css(i) %>">
-          <td colspan="5"><pre><a name="line<%= i.next %>"></a><%= i.next %> <%= line %></pre></td>
+          <td colspan="5"><pre><a name="line<%= i.next %>"></a><%= i.next %> <%= CGI::escapeHTML(line) %></pre></td>
         </tr>
       <% end %>
       </tbody>
