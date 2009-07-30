@@ -74,7 +74,7 @@ module Rcov
       #end
 
       def line_css(line_number)
-        case file.coverage[line_number]
+        case fileinfo.coverage[line_number]
         when true
           "marked"
         when :inferred
