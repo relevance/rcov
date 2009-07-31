@@ -13,3 +13,4 @@ pkg
 .DS_Store
 *.gem
 tags
+ext/rcovrt/rcovrt.so
