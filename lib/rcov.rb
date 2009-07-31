@@ -210,13 +210,15 @@ class FileStatistics
         # very conservative, doesn't consider the last delimited string but
         # only the very first one
         if md = /^[^#]*%(?:[qQ])?(.)/.match(line)
-          wanted_delimiter = /(?!\\).#{Regexp.escape(matching_delimiters[md[1]])}/
-          # check if closed on the very same line
-          # conservative again, we might have several quoted strings with the
-          # same delimiter on the same line, leaving the last one open
-          unless wanted_delimiter.match(md.post_match)
-            state = :want_end_delimiter
-            string_begin_line = i
+          if !/"%"/.match(line)
+            wanted_delimiter = /(?!\\).#{Regexp.escape(matching_delimiters[md[1]])}/
+            # check if closed on the very same line
+            # conservative again, we might have several quoted strings with the
+            # same delimiter on the same line, leaving the last one open
+            unless wanted_delimiter.match(md.post_match)
+              state = :want_end_delimiter
+              string_begin_line = i
+            end
           end
         end
       when :want_end_delimiter
