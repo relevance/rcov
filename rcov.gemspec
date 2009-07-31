@@ -8,8 +8,8 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/versio
              "lib/rcov/templates/screen.css",
              "ext/rcovrt/extconf.rb", "ext/rcovrt/1.8/rcovrt.c", "ext/rcovrt/1.9/rcovrt.c", 
              "ext/rcovrt/1.8/callsite.c", "ext/rcovrt/1.9/callsite.c", "LICENSE", 
-             "Rakefile", "doc/readme_for_rake", "doc/readme_for_vim", "doc/readme_for_emacs", 
-             "doc/readme_for_vim", "doc/readme_for_api", "THANKS", "test/functional_test.rb", 
+             "Rakefile", "doc/readme_for_rake.markdown", "doc/readme_for_vim.markdown", "doc/readme_for_emacs.markdown", 
+             "doc/readme_for_api.markdown", "THANKS", "test/functional_test.rb", 
              "test/file_statistics_test.rb", "test/assets/sample_03.rb", "test/assets/sample_05-new.rb", 
              "test/code_coverage_analyzer_test.rb", "test/assets/sample_04.rb", "test/assets/sample_02.rb", 
              "test/assets/sample_05-old.rb", "test/assets/sample_01.rb", "test/turn_off_rcovrt.rb", 
@@ -18,7 +18,7 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/versio
 
 Gem::Specification.new do |s|
   s.name = %q{rcov}
-  s.version = "0.8.3.9"
+  s.version = "0.8.4"
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
   s.authors = ["Relevance", "Chad Humphries (spicycode)", "Aaron Bedra (abedra)", "Mauricio Fernandez"]
@@ -29,11 +29,10 @@ Gem::Specification.new do |s|
   s.email = %q{opensource@thinkrelevance.com}
   s.executables = ["rcov"]
   s.extensions = ["ext/rcovrt/extconf.rb"]
-  s.extra_rdoc_files = ["doc/readme_for_api", "doc/readme_for_rake", "doc/readme_for_vim", "doc/readme_for_emacs"]
   s.files = PKG_FILES
   s.has_rdoc = true
   s.homepage = %q{http://github.com/relevance/rcov}
-  s.rdoc_options = ["--main", "doc/readme_for_api", "--title", "rcov code coverage tool"]
+  s.rdoc_options = ["--title", "rcov code coverage tool"]
   s.require_paths = ["lib"]
   s.required_ruby_version = Gem::Requirement.new("> 0.0.0")
   s.summary = %q{Code coverage analysis tool for Ruby}
