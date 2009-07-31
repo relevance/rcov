@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# -*- coding: iso-8859-1 -*-
 # rcov Copyright (c) 2004-2006 Mauricio Fernandez <mfp@acm.org>
 #
 # rcov originally based on 
@@ -454,7 +455,7 @@ EOF
         end
         exit
     end
-    if formatters.all?{|formatter| formatter.sorted_file_pairs.empty? }
+  if !formatters.empty? and formatters.all?{|formatter| formatter.sorted_file_pairs.empty? }  
         require 'pp'
         $stderr.puts <<-EOF
 
