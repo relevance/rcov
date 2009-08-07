@@ -10,6 +10,7 @@ module Rcov
 
     def initialize(opts = {})
       options = DEFAULT_OPTS.clone.update(opts)
+      @failure_threshold = options[:failure_threshold]
       @files = {}
       @ignore_files = options[:ignore]
       @dont_ignore_files = options[:dont_ignore]

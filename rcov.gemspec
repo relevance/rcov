@@ -4,6 +4,7 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/versio
              "lib/rcov/formatters/html_erb_template.rb",
              "lib/rcov/formatters/html_coverage.rb", "lib/rcov/formatters/text_coverage_diff.rb",
              "lib/rcov/formatters/text_report.rb", "lib/rcov/formatters/text_summary.rb",
+             "lib/rcov/formatters/failure_report.rb",
              "lib/rcov/templates/index.html.erb", "lib/rcov/templates/detail.html.erb",
              "lib/rcov/templates/screen.css",
              "ext/rcovrt/extconf.rb", "ext/rcovrt/1.8/rcovrt.c", "ext/rcovrt/1.9/rcovrt.c", 
@@ -18,7 +19,7 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/versio
 
 Gem::Specification.new do |s|
   s.name = %q{rcov}
-  s.version = "0.8.4.1"
+  s.version = "0.8.5"
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
   s.authors = ["Relevance", "Chad Humphries (spicycode)", "Aaron Bedra (abedra)", "Mauricio Fernandez"]
