@@ -287,8 +287,7 @@ class FileStatistics
       scanner = StringScanner.new(@lines[i])
       j = k = i
       loop do
-        scanned_text = scanner.search_full(/<<(-?)(?:(['"`])((?:(?!\2).)+)\2|([A-Z_a-z]\w*))/, 
-                                           true, true)
+        scanned_text = scanner.search_full(/<<(-?)(?:(['"`])((?:(?!\2).)+)\2|([A-Z_a-z]\w*))/, true, true)
         # k is the first line after the end delimiter for the last heredoc
         # scanned so far
         unless scanner.matched?
@@ -304,8 +303,7 @@ class FileStatistics
           break
         end
         must_mark = []
-        end_of_heredoc = (scanner[1] == "-") ? 
-               /^\s*#{Regexp.escape(term)}$/ : /^#{Regexp.escape(term)}$/
+        end_of_heredoc = (scanner[1] == "-") ? /^\s*#{Regexp.escape(term)}$/ : /^#{Regexp.escape(term)}$/
         loop do
           break if j == @lines.size
           must_mark << j
@@ -318,7 +316,9 @@ class FileStatistics
               must_mark.each{|lineidx| @coverage[lineidx] ||= :inferred}
             end
             # move the "first line after heredocs" index
-            k = (j += 1)
+            if @lines[j+=1] =~ /^\s*\n$/
+              k = j
+            end
             break
           end
           j += 1
