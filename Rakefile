@@ -1,7 +1,3 @@
-# This Rakefile serves as an example of how to use Rcov::RcovTask.
-# Take a look at the RDoc documentation (or readme_for_rake) for further
-# information.
-
 $:.unshift "lib" if File.directory? "lib"
 require 'rcov/rcovtask'
 require 'rcov/version'
@@ -9,9 +5,6 @@ require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/gempackagetask'
 require 'rake/clean'
-
-puts "************\n#{ENV["PATH"]}\n************\n"
-puts "************\n#{RUBY_VERSION}\n************"
 
 # Use the specified rcov executable instead of the one in $PATH
 # (this way we get a sort of informal functional test).
