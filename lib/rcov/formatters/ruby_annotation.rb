@@ -1,6 +1,5 @@
 module Rcov
   module Formatters
-
     class RubyAnnotation < BaseFormatter
       DEFAULT_OPTS = { :destdir => "coverage" }
 
@@ -107,6 +106,5 @@ module Rcov
         s << "# Local " "Variables:\n" "# mode: " "rcov-xref\n" "# End:\n"
       end
     end
-
   end
 end

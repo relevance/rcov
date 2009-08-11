@@ -6,15 +6,16 @@ require 'rcov/version'
 
 module Rcov
 
-  # RCOV__ performs the low-level tracing of the execution, gathering code
-  # coverage information in the process. The C core made available through the
-  # rcovrt extension will be used if possible. Otherwise the functionality
-  # will be emulated using set_trace_func, but this is very expensive and
-  # will fail if other libraries (e.g. breakpoint) change the trace_func.
-  #
-  # Do not use this module; it is very low-level and subject to frequent
-  # changes. Rcov::CodeCoverageAnalyzer offers a much more convenient and
-  # stable interface.
+# RCOV__ performs the low-level tracing of the execution, gathering code
+# coverage information in the process. The C core made available through the
+# rcovrt extension will be used if possible. Otherwise the functionality
+# will be emulated using set_trace_func, but this is very expensive and
+# will fail if other libraries (e.g. breakpoint) change the trace_func.
+#
+# Do not use this module; it is very low-level and subject to frequent
+# changes. Rcov::CodeCoverageAnalyzer offers a much more convenient and
+# stable interface.
+
 module RCOV__
   COVER = {}
   CALLSITES = {}
@@ -59,19 +60,19 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
     (methods & sklass.instance_methods).each do |meth|
       sklass.class_eval{ remove_method meth }
     end
-    
+
     @coverage_hook_activated = @callsite_hook_activated = false
 
     def self.install_coverage_hook # :nodoc:
       install_common_hook
       @coverage_hook_activated = true
     end
-    
+
     def self.install_callsite_hook # :nodoc:
       install_common_hook
       @callsite_hook_activated = true
     end
-    
+
     def self.install_common_hook # :nodoc:
       set_trace_func lambda {|event, file, line, id, binding, klass|
         next unless SCRIPT_LINES__.has_key? file
@@ -109,7 +110,7 @@ One Click Installer and mswin32 builds) at http://eigenclass.org/hiki.rb?rcov .
       @coverage_hook_activated = false
       set_trace_func(nil) if !@callsite_hook_activated
     end
-    
+
     def self.remove_callsite_hook # :nodoc:
       @callsite_hook_activated = false
       set_trace_func(nil) if !@coverage_hook_activated

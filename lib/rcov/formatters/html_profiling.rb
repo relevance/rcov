@@ -1,8 +1,7 @@
 module Rcov
   module Formatters
-
     class HTMLProfiling < HTMLCoverage
-      DEFAULT_OPTS = {:destdir => "profiling"}
+      DEFAULT_OPTS = { :destdir => "profiling" }
 
       def initialize(opts = {})
         options = DEFAULT_OPTS.clone.update(opts)
@@ -29,7 +28,7 @@ module Rcov
 
       def span_class(sourceinfo, marked, count)
         full_scale_range = @fsr # dB
-        nz_count = sourceinfo.counts.select{|x| x && x != 0}
+        nz_count = sourceinfo.counts.select{ |x| x && x != 0 }
         nz_count << 1 # avoid div by 0
         max = @max_cache[sourceinfo] ||= nz_count.max
         median = @median_cache[sourceinfo] ||= 1.0 * nz_count.sort[nz_count.size/2]
@@ -47,8 +46,6 @@ module Rcov
           nil
         end
       end
-
     end
-
   end
 end

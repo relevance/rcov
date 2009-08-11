@@ -1,6 +1,6 @@
 # rcov Copyright (c) 2004-2006 Mauricio Fernandez <mfp@acm.org>
 #
-# See LEGAL and LICENSE for licensing information.
+# See LICENSE for licensing information.
 
 module Rcov
   VERSION = "0.8.5.2"

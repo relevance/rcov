@@ -1,7 +1,5 @@
 module Rcov
-
   class TextReport < TextSummary # :nodoc:
-
     def execute
       print_lines
       print_header
@@ -30,7 +28,5 @@ module Rcov
     def print_header
       puts "|                  File                              | Lines |  LOC  |  COV   |"
     end
-
   end
-
 end

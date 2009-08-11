@@ -1,12 +1,12 @@
 module Rcov
-  
   class BaseFormatter # :nodoc:
     require 'pathname'
     require 'mkmf'
     ignore_files = [/\A#{Regexp.escape(Pathname.new(::Config::CONFIG['libdir']).cleanpath.to_s)}/, /\btc_[^.]*.rb/, /_test\.rb\z/, /\btest\//, /\bvendor\//, /\A#{Regexp.escape(__FILE__)}\z/]
 
-    DEFAULT_OPTS = {:ignore => ignore_files, :sort => :name, :sort_reverse => false,
-      :output_threshold => 101, :dont_ignore => [], :callsite_analyzer => nil, :comments_run_by_default => false}
+    DEFAULT_OPTS = { :ignore => ignore_files, :sort => :name, :sort_reverse => false,
+                     :output_threshold => 101, :dont_ignore => [], :callsite_analyzer => nil, \
+                     :comments_run_by_default => false }
 
     def initialize(opts = {})
       options = DEFAULT_OPTS.clone.update(opts)
@@ -17,7 +17,7 @@ module Rcov
       @sort_criterium = case options[:sort]
       when :loc then lambda{|fname, finfo| finfo.num_code_lines}
       when :coverage then lambda{|fname, finfo| finfo.code_coverage}
-      else lambda{|fname, finfo| fname}
+      else lambda { |fname, finfo| fname }
       end
       @sort_reverse = options[:sort_reverse]
       @output_threshold = options[:output_threshold]
@@ -101,6 +101,7 @@ module Rcov
     end
 
     private
+    
     def cross_references_for(filename, lineno)
       return nil unless @callsite_analyzer
       @callsite_index ||= build_callsite_index
@@ -163,7 +164,5 @@ module Rcov
         ref_blocks << [refs, label, format_called_ref]
       end
     end
-
   end
-
 end

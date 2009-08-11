@@ -1,9 +1,9 @@
 module Rcov
-
   class TextCoverageDiff < BaseFormatter # :nodoc:
     FORMAT_VERSION = [0, 1, 0]
     DEFAULT_OPTS = { :textmode => :coverage_diff, :coverage_diff_mode => :record,
-      :coverage_diff_file => "coverage.info", :diff_cmd => "diff", :comments_run_by_default => true }
+                     :coverage_diff_file => "coverage.info", :diff_cmd => "diff", 
+                     :comments_run_by_default => true }
     HUNK_HEADER = /@@ -\d+,\d+ \+(\d+),(\d+) @@/
   
     def SERIALIZER
@@ -47,7 +47,7 @@ module Rcov
       $stderr.puts <<-EOF
       Couldn't save coverage data to #{@state_file}.
       EOF
-    end                         # '
+    end # '
 
     require 'tempfile'
     def compare_state
@@ -58,7 +58,7 @@ module Rcov
         $stderr.puts <<-EOF
         Couldn't load coverage data from #{@state_file}.
         EOF
-        return              # '
+        return # '
       end
       if !(Array === format) or
         FORMAT_VERSION[0] != format[0] || FORMAT_VERSION[1] < format[1]
@@ -67,7 +67,7 @@ module Rcov
         The file is saved in the format  #{format.inspect[0..20]}.
         This rcov executable understands #{FORMAT_VERSION.inspect}.
         EOF
-        return              # '
+        return # '
       end
       each_file_pair_sorted do |filename, fileinfo|
         old_data = Tempfile.new("#{mangle_filename(filename)}-old")
@@ -101,7 +101,7 @@ module Rcov
       puts
       puts "=" * 80
       puts "!!!!! Uncovered code introduced in #{filename}"
-      
+
       hunks.each do |offset, lines|
         if @gcc_output
           lines.each_with_index do |line,i|
@@ -126,16 +126,13 @@ module Rcov
     def verify_diff_available
       old_stderr = STDERR.dup
       old_stdout = STDOUT.dup
-      # TODO: should use /dev/null or NUL(?), but I don't want to add the
-      # win32 check right now
       new_stderr = Tempfile.new("rcov_check_diff")
       STDERR.reopen new_stderr.path
       STDOUT.reopen new_stderr.path
 
       retval = system "#{@diff_cmd} --version"
       unless retval
-old_stderr.puts <<EOF
-
+        old_stderr.puts <<EOF
   The '#{@diff_cmd}' executable seems not to be available.
   You can specify which diff executable should be used with --diff-cmd.
   If your system doesn't have one, you might want to use Diff::LCS's:
@@ -150,7 +147,6 @@ EOF
       STDERR.reopen old_stderr
       new_stderr.close!
     end
-
 
     def process_unified_diff(filename, diff)
       current_hunk = []
@@ -193,7 +189,5 @@ EOF
 
       interesting_hunks
     end
-  
   end
-
 end

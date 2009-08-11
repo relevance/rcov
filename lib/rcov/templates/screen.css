@@ -1,23 +1,25 @@
 body {
-	font: 62.5%/1.4em Helvetica, Arial, Sans-Serif;
-	color: #4C4C4C;
-	background-color: #F4F2ED;
-	padding: 1em;
-	margin: 8px 0 0 0;
+  font: 62.5%/1.4em Helvetica, Arial, Sans-Serif;
+  color: #4C4C4C;
+  background-color: #F4F2ED;
+  padding: 1em;
+  margin: 8px 0 0 0;
 }
 
 a { 
   color:#191919;
   font-weight:bold;
   outline: none;
-} 
+}
 
 span.cross-ref-title {
   font-size: 140%;
 }
+
 span.cross-ref a {
   text-decoration: none;
 }
+
 span.cross-ref {
     background-color:#f3f7fa;
     border: 1px dashed #333;
@@ -29,6 +31,7 @@ span.cross-ref {
 a.crossref-toggle {
   text-decoration: none;
 }
+
 pre, code {
   color: #000000;
   font-family: "Bitstream Vera Sans Mono","Monaco","Courier New",monospace;
@@ -77,12 +80,12 @@ div.overview {
 }
 
 div.footer {
-    font-size: 68%;
-    margin-top: 1.5em;
+  font-size: 68%;
+  margin-top: 1.5em;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    margin-bottom: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 h3 { 
@@ -95,71 +98,71 @@ h3 {
 }
 
 h5 {
-    margin-top: 0.5em;
+  margin-top: 0.5em;
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
 div.separator {
-    height: 10px;
+  height: 10px;
 }
 
 table.percent_graph {
-    height: 12px;
-    border: #808080 1px solid;
-    empty-cells: show;
+  height: 12px;
+  border: #808080 1px solid;
+  empty-cells: show;
 }
 
 table.percent_graph td.covered {
-    height: 10px;
-    background: #00f000;
+  height: 10px;
+  background: #00f000;
 }
 
 table.percent_graph td.uncovered {
-    height: 10px;
-    background: #e00000;
+  height: 10px;
+  background: #e00000;
 }
 
 table.percent_graph td.NA {
-    height: 10px;
-    background: #eaeaea;
+  height: 10px;
+  background: #eaeaea;
 }
 
 table.report {
-    border-collapse: collapse;
-    width: 100%;
+  border-collapse: collapse;
+  width: 100%;
 }
 
 table.report td.heading {
-    background: #dcecff;
-    border: #d0d0d0 1px solid;
-    font-weight: bold;
-    text-align: center;
+  background: #dcecff;
+  border: #d0d0d0 1px solid;
+  font-weight: bold;
+  text-align: center;
 }
 
 table.report td.heading:hover {
-    background: #c0ffc0;
+  background: #c0ffc0;
 }
 
 table.report td.text {
-    border: #d0d0d0 1px solid;
+  border: #d0d0d0 1px solid;
 }
 
 table.report td {
-    font-size: 125%;
+  font-size: 125%;
 }
 
 table.report td.value,
 table.report td.lines_total,
 table.report td.lines_code {
-    text-align: right;
-    border: #d0d0d0 1px solid;
+  text-align: right;
+  border: #d0d0d0 1px solid;
 }
 table.report tr.light {
-    background-color: rgb(240, 240, 245);
+  background-color: rgb(240, 240, 245);
 }
 table.report tr.dark {
-    background-color: rgb(230, 230, 235);
+  background-color: rgb(230, 230, 235);
 }
