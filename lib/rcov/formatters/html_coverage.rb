@@ -21,8 +21,12 @@ module Rcov
     def execute
       return if @files.empty?
       FileUtils.mkdir_p @dest
-      css_file = File.expand_path("#{File.dirname(__FILE__)}/../templates/screen.css")
-      FileUtils.cp(css_file, File.join(@dest, "screen.css"))
+      
+      # Copy collaterals
+      ['screen.css','print.css','rcov.js'].each do |_file|
+        _src = File.expand_path("#{File.dirname(__FILE__)}/../templates/#{_file}")
+        FileUtils.cp(_src, File.join(@dest, "#{_file}"))
+      end
 
       create_index(File.join(@dest, "index.html"))
 

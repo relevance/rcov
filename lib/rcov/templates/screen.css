@@ -1,168 +1,243 @@
-body {
-  font: 62.5%/1.4em Helvetica, Arial, Sans-Serif;
-  color: #4C4C4C;
-  background-color: #F4F2ED;
-  padding: 1em;
-  margin: 8px 0 0 0;
-}
+/* @group General */
 
-a { 
-  color:#191919;
-  font-weight:bold;
-  outline: none;
-}
+  body {
+    font-family: Verdana, Helvetica, Arial, Sans-Serif;
+    font-size: 12px;
+    color: #4C4C4C;
+    background-color: #F4F2ED;
+    padding: 1em;
+    margin: 8px 0px 0px 0px;
+  }
+  
+  a:link {
+    color: #191919;
+  }
+  
+  a:visited {
+    color: #191919;
+  }
 
-span.cross-ref-title {
-  font-size: 140%;
-}
+  pre, code {
+    color: #000000;
+    font-family: "Bitstream Vera Sans Mono","Monaco","Courier New",monospace;
+    font-size: 95%;
+    line-height: 1.3em;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0;
+    word-wrap: break-word;
+  }
 
-span.cross-ref a {
-  text-decoration: none;
-}
+  h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 0.5em;
+  }
+  
+  h3 { 
+    display: block;
+    margin: 0 0 20px 0;
+    padding-bottom: 20px;
+    font-size: 2.0em;
+    letter-spacing: -1px;
+    color: #333333;
+  }
+  
+  h5 {
+    margin-top: 0.5em;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+/* @end */
 
-span.cross-ref {
+/* @group Cross-References */
+
+  span.cross-ref-title {
+    font-size: 140%;
+  }
+  
+  span.cross-ref a {
+    text-decoration: none;
+  }
+  
+  span.cross-ref {
     background-color:#f3f7fa;
     border: 1px dashed #333;
     margin: 1em;
     padding: 0.5em;
     overflow: hidden;
-}
+  }
+  
+  a.crossref-toggle {
+    text-decoration: none;
+  }
 
-a.crossref-toggle {
-  text-decoration: none;
-}
+/* @end */
 
-pre, code {
-  color: #000000;
-  font-family: "Bitstream Vera Sans Mono","Monaco","Courier New",monospace;
-  font-size: 95%;
-  line-height: 1.3em;
-  margin-top: 0;
-  margin-bottom: 0;
-  padding: 0;
-  word-wrap: break-word;
-}
+/* @group Details page */
 
-tr.marked td, span.marked, span.marked1 {
-  background-color: #DBDEBD;
-}
+  tr.marked td, span.marked, span.marked1 {
+    background-color: #DBDEBD;
+  }
+  
+  span.marked, span.marked1 {
+    display: block;
+  }
+  
+  tr.inferred td, span.inferred {
+    background-color: #CFE6E0;
+  }
+  
+  tr.inferred1 td, span.inferred1 {
+    background-color: #CFE6E0;
+  }
+  span.inferred, span.inferred1 {
+    display: block;
+  }
+  
+  tr.uncovered td, span.uncovered {
+    background-color: rgb(225, 110, 110);
+  }
+  
+  span.uncovered1 {
+    background-color: rgb(235, 120, 120);
+    display: block;
+  }
 
-span.marked, span.marked1 {
-  display: block;
-}
+/* @end */
 
-tr.inferred td, span.inferred {
-  background-color: #CFE6E0;
-}
+/* @group Report Table */
 
-tr.inferred1 td, span.inferred1 {
-  background-color: #CFE6E0;
-}
-span.inferred, span.inferred1 {
-  display: block;
-}
+  table.report {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  table.report th.heading {
+    background: #333333;
+    font-weight: normal;
+    color: #ffffff;
+    text-align: right;
+    text-transform: uppercase;
+    font-size: .8em;
+    font-weight: bold;
+    padding: .5em;
+    border: 1px solid #333333;
+  }
+  
+  table.report thead tr th:first-child {
+    text-align: left;
+  }
+  
+  table.report th.sortcol:hover {
+    cursor:	pointer;
+    text-decoration: underline; 
+  }
 
-tr.uncovered td, span.uncovered {
-  background-color: rgb(225, 110, 110);
-}
+  table.report th.sortdesc:after{
+    content: "\\25BC";
+    margin-left: 1em;
+  }
 
-span.uncovered1 {
-  background-color: rgb(235, 120, 120);
-  display: block;
-}
+  table.report th.sortasc:after {
+    content: "\\25B2";
+    margin-left: 1em;
+  }
 
-span.overview {
-  border-bottom: 8px solid black;
-}
+  table.report tr.summary_row {
+    background: #cccccc;
+    border: 1px solid #cccccc;
+  }
 
-div.overview {
-  border-bottom: 8px solid black;
-}
+  table.report tr.summary_row td {
+    padding-left: .2em !important;
+    color: #333333;
+    font-weight: bold;
+  }
+  
+  table.report td.text {
+    border: #d0d0d0 1px solid;
+  }
+  
+  table.report td {
+    padding: .2em .5em .2em .5em;
+  }
 
-div.footer {
-  font-size: 68%;
-  margin-top: 1.5em;
-}
+  table.report td a {
+    text-decoration: none;
+  }
+  
+  table.report tbody tr:hover {
+    background: #cccccc !important;
+  }
+  
+  table.report td.filename,
+  table.report td.value,
+  table.report td.lines_total,
+  table.report td.lines_code {
+    text-align: right;
+    border: #d0d0d0 1px solid;
+  }
 
-h1, h2, h3, h4, h5, h6 {
-  margin-bottom: 0.5em;
-}
+  table.report td.filename {
+    text-align: left;
+  }
+  
+  table.report tr.summary_row td {
+    border-bottom: 1px solid #aaaaaa;
+  }
 
-h3 { 
-  display: block;
-  margin: 0 0 20px 0;
-  padding-bottom: 20px;
-  font-size: 2.0em;
-  letter-spacing: -1px;
-  color: #333333;
-}
+  table.report tr.summary_row td table td {
+    border-bottom: none;
+  }
 
-h5 {
-  margin-top: 0.5em;
-}
+  table.report tr.light {
+    background-color: rgb(240, 240, 245);
+  }
 
-.hidden {
-  display: none;
-}
+  table.report tr.dark {
+    background-color: rgb(230, 230, 235);
+  }
 
-div.separator {
-  height: 10px;
-}
+  table.report tr.roweven {
+    background-color: rgb(240, 240, 245) !important;
+  }
+  
+  table.report tr.rowodd {
+    background-color: rgb(230, 230, 235) !important;
+  }
 
-table.percent_graph {
-  height: 12px;
-  border: #808080 1px solid;
-  empty-cells: show;
-}
+/* @end */
 
-table.percent_graph td.covered {
-  height: 10px;
-  background: #00f000;
-}
+/* @group Percent Sub-Table */
 
-table.percent_graph td.uncovered {
-  height: 10px;
-  background: #e00000;
-}
+  table.percent_graph {
+    height: 12px;
+    border: #808080 1px solid;
+    empty-cells: show;
+    padding: 0px;
+    border-collapse: collapse;
+    width: 100px !important;
+  }
+  
+  table.percent_graph tbody td.covered {
+    height: 10px;
+    background: #00f000;
+    padding: 0px !important;
+  }
+  
+  table.percent_graph tbody td.uncovered {
+    height: 10px;
+    background: #e00000;
+    padding: 0px !important;
+  }
+  
+  table.percent_graph tbody td.NA {
+    height: 10px;
+    background: #eaeaea;
+    padding: 0px !important;
+  }
+  
+/* @end */
 
-table.percent_graph td.NA {
-  height: 10px;
-  background: #eaeaea;
-}
-
-table.report {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-table.report td.heading {
-  background: #dcecff;
-  border: #d0d0d0 1px solid;
-  font-weight: bold;
-  text-align: center;
-}
-
-table.report td.heading:hover {
-  background: #c0ffc0;
-}
-
-table.report td.text {
-  border: #d0d0d0 1px solid;
-}
-
-table.report td {
-  font-size: 125%;
-}
-
-table.report td.value,
-table.report td.lines_total,
-table.report td.lines_code {
-  text-align: right;
-  border: #d0d0d0 1px solid;
-}
-table.report tr.light {
-  background-color: rgb(240, 240, 245);
-}
-table.report tr.dark {
-  background-color: rgb(230, 230, 235);
-}

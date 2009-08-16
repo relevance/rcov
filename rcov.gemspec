@@ -9,6 +9,8 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/versio
              "lib/rcov/formatters/failure_report.rb",
              "lib/rcov/templates/index.html.erb", "lib/rcov/templates/detail.html.erb",
              "lib/rcov/templates/screen.css",
+             "lib/rcov/templates/print.css",
+             "lib/rcov/templates/rcov.js",
              "ext/rcovrt/extconf.rb", "ext/rcovrt/1.8/rcovrt.c", "ext/rcovrt/1.9/rcovrt.c", 
              "ext/rcovrt/1.8/callsite.c", "ext/rcovrt/1.9/callsite.c", "LICENSE", 
              "Rakefile", "doc/readme_for_rake.markdown", "doc/readme_for_vim.markdown", "doc/readme_for_emacs.markdown", 
@@ -21,10 +23,10 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/versio
 
 Gem::Specification.new do |s|
   s.name = %q{rcov}
-  s.version = "0.8.6"
+  s.version = "0.8.7"
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
-  s.authors = ["Relevance", "Chad Humphries (spicycode)", "Aaron Bedra (abedra)", "Mauricio Fernandez"]
+  s.authors = ["Relevance", "Chad Humphries (spicycode)", "Aaron Bedra (abedra)", "Corey Ehmke (Bantik)", "Mauricio Fernandez"]
   s.cert_chain = nil
   s.date = %q{2009-05-12}
   s.default_executable = %q{rcov}
