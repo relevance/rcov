@@ -1,1 +1,13 @@
-* Re-enable cross refs in HTML Report
+Main coverage page
+
+  - Label rows with coverage classes
+  - Extract filter onChange handlers to observers and move to external JS
+  - Restripe table after filter
+  - Recheck validation when done
+  
+Details page
+
+  - General HTML and layout cleanup
+  - Colorblind-safe color scheme
+  - Fix width issue with coverage table
+  
