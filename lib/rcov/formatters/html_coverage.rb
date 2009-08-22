@@ -23,7 +23,7 @@ module Rcov
       FileUtils.mkdir_p @dest
       
       # Copy collaterals
-      ['screen.css','print.css','rcov.js'].each do |_file|
+      ['screen.css','print.css','rcov.js','jquery-1.3.2.min.js','jquery.tablesorter.min.js'].each do |_file|
         _src = File.expand_path("#{File.dirname(__FILE__)}/../templates/#{_file}")
         FileUtils.cp(_src, File.join(@dest, "#{_file}"))
       end
@@ -72,24 +72,30 @@ module Rcov
     end
 
     def create_index(destname)
-        files = [SummaryFileInfo.new(self)] + each_file_pair_sorted.map{|k,v| v}
-        doc = Rcov::Formatters::HtmlErbTemplate.new('index.html.erb', :title => 'C0 Coverage Information - RCov', 
-                                                                      :generated_on => Time.now,
-                                                                      :rcov => Rcov,
-                                                                      :formatter => self,
-                                                                      :output_threshold => @output_threshold,
-                                                                      :files => files)
-        File.open(destname, "w") { |f| f.puts doc.render }
+      files = [SummaryFileInfo.new(self)] + each_file_pair_sorted.map{|k,v| v}
+      project_name = Dir.pwd.split('/')[-1].split(/[^a-zA-Z0-9]/).map{|i| i.gsub(/[^a-zA-Z0-9]/,'').capitalize} * " " || ""
+
+      doc = Rcov::Formatters::HtmlErbTemplate.new('index.html.erb',
+        :page_title => "#{project_name << ': '} C0 Coverage Information - RCov",
+        :generated_on => Time.now,
+        :rcov => Rcov,
+        :formatter => self,
+        :output_threshold => @output_threshold,
+        :files => files
+      )
+      File.open(destname, "w") { |f| f.puts doc.render }
     end
 
     def create_file(destfile, fileinfo)
-        doc = Rcov::Formatters::HtmlErbTemplate.new('detail.html.erb', :title => fileinfo.name, 
-                                                                       :generated_on => Time.now,
-                                                                       :rcov => Rcov,
-                                                                       :formatter => self,
-                                                                       :output_threshold => @output_threshold,
-                                                                       :fileinfo => fileinfo)
-        File.open(destfile, "w")  { |f| f.puts doc.render }
+      doc = Rcov::Formatters::HtmlErbTemplate.new('detail.html.erb',
+        :page_title => fileinfo.name, 
+        :generated_on => Time.now,
+        :rcov => Rcov,
+        :formatter => self,
+        :output_threshold => @output_threshold,
+        :fileinfo => fileinfo
+      )
+      File.open(destfile, "w")  { |f| f.puts doc.render }
     end
   end
 

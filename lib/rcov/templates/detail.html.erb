@@ -1,12 +1,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html lang='en' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'>
   <head>
-    <title><%= title %></title>
-    <link href="screen.css" media="screen" rel="stylesheet" type="text/css" />
+    <title><%= page_title %></title>
+    <link href="screen.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="print.css" media="print" rel="stylesheet" type="text/css" />
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
     <script type="text/javascript" src="rcov.js"></script>
   </head>
   <body>
-    <h3><%= title %></h3>
+    <h1><%= page_title %></h1>
     <p>Generated on <%= generated_on %> with <a href="<%= rcov::UPSTREAM_URL %>">rcov <%= rcov::VERSION %></a></p>
     <% if output_threshold != 101 %>
       <!-- Note: 101 is the default threshold if you don't enter one -->
