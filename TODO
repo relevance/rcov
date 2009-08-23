@@ -1,13 +1,4 @@
-Main coverage page
+Misc
 
-  - Label rows with coverage classes
-  - Extract filter onChange handlers to observers and move to external JS
-  - Restripe table after filter
-  - Recheck validation when done
-  
-Details page
+Support for specifying custom style sheet
 
-  - General HTML and layout cleanup
-  - Colorblind-safe color scheme
-  - Fix width issue with coverage table
-  
