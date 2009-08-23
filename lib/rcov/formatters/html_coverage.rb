@@ -72,10 +72,9 @@ module Rcov
     end
 
     def create_index(destname)
-      project_name = 
 
       doc = Rcov::Formatters::HtmlErbTemplate.new('index.html.erb',
-        :project_name => Dir.pwd.split('/')[-1].split(/[^a-zA-Z0-9]/).map{|i| i.gsub(/[^a-zA-Z0-9]/,'').capitalize} * " " || "",
+        :project_name => project_name,
         :generated_on => Time.now,
         :rcov => Rcov,
         :formatter => self,
@@ -88,6 +87,7 @@ module Rcov
 
     def create_file(destfile, fileinfo)
       doc = Rcov::Formatters::HtmlErbTemplate.new('detail.html.erb',
+        :project_name => project_name,
         :page_title => fileinfo.name, 
         :generated_on => Time.now,
         :rcov => Rcov,
@@ -97,6 +97,13 @@ module Rcov
       )
       File.open(destfile, "w")  { |f| f.puts doc.render }
     end
+    
+    private
+    
+    def project_name
+      Dir.pwd.split('/')[-1].split(/[^a-zA-Z0-9]/).map{|i| i.gsub(/[^a-zA-Z0-9]/,'').capitalize} * " " || ""
+    end
+    
   end
 
   class HTMLProfiling < HTMLCoverage # :nodoc:

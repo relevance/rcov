@@ -29,17 +29,17 @@
 
   h1, h2, h3, h4, h5, h6 {
     margin: 0em 0em 1em 0em;
+    color: #666666;
   }
   
   h1 { 
     display: block;
     font-size: 2em;
     letter-spacing: -1px;
-    color: #666666;
   }
   
-  h5 {
-    margin-top: 0.5em;
+  h2 {
+    margin-top: -1em;	
   }
   
   fieldset {
@@ -83,44 +83,13 @@
 
 /* @end */
 
-/* @group Details page */
-
-  tr.marked td, span.marked, span.marked1 {
-    background-color: #bed2be;
-  }
-  
-  span.marked, span.marked1 {
-    display: block;
-  }
-  
-  tr.inferred td, span.inferred {
-    background-color: #e0dedb;
-  }
-  
-  tr.inferred1 td, span.inferred1 {
-    background-color: #e0dedb;
-  }
-  span.inferred, span.inferred1 {
-    display: block;
-  }
-  
-  tr.uncovered td, span.uncovered {
-    background-color: #ce8b8c;
-  }
-  
-  span.uncovered1 {
-    background-color: #ce8b8c;
-    display: block;
-  }
-
-/* @end */
-
 /* @group Report Table */
 
   table.report {
     border-collapse: collapse;
     border: 1px solid #666666;
     width: 100%;
+    margin-bottom: 1em;
   }
   
   table.report tr {
@@ -134,7 +103,7 @@
     text-transform: uppercase;
     font-size: .8em;
     font-weight: bold;
-    padding: .5em;
+    padding: 0em .5em;
     border: 1px solid #666666;
   }
 
@@ -180,10 +149,6 @@
     font-weight: bold;
   }
   
-  table.report td.text {
-    border: #d0d0d0 1px solid;
-  }
-  
   table.report td {
     padding: .2em .5em .2em .5em;
   }
@@ -196,24 +161,8 @@
     background: #cccccc !important;
   }
   
-  table.report td.filename,
-  table.report td.value,
-  table.report td.lines_total,
-  table.report td.lines_code {
-    text-align: right;
-    border: #d0d0d0 1px solid;
-  }
-
-  table.report td.filename {
-    text-align: left;
-  }
-  
   table.report tr.summary_row td {
     border-bottom: 1px solid #aaaaaa;
-  }
-
-  table.report tr.summary_row td table td {
-    border-bottom: none;
   }
 
   table.report tr {
@@ -226,7 +175,7 @@
 
 /* @end */
 
-/* @group Percent Sub-Table */
+/* @group Percentage Graphs */
 
   div.percent_graph_legend {
     width: 5.5em;
@@ -267,3 +216,51 @@
   
 /* @end */
 
+/* @group Details page */
+
+  table.details {
+    margin-top: 1em;
+    border-collapse: collapse;
+    width: 100%;
+    border: 1px solid #666666;
+  }
+  
+  table.details tr {
+  	line-height: 1.75em;
+	}
+
+  table.details td {
+  	padding: .25em;
+	}
+
+  span.inferred, span.inferred1, span.marked, span.marked1, span.uncovered, span.uncovered1 {
+    display: block;
+    padding: .25em;
+  }
+  
+  tr.inferred td, span.inferred {
+    background-color: #e0dedb;
+  }
+  
+  tr.inferred1 td, span.inferred1 {
+    background-color: #e0dedb;
+  }
+  
+  tr.marked td, span.marked, span.marked1 {
+    background-color: #bed2be;
+  }
+  
+  tr.uncovered td, span.uncovered {
+    background-color: #ce8b8c;
+  }
+  
+  tr.uncovered1 td, span.uncovered1 {
+    background-color: #ce8b8c;
+  }
+
+  div.key {
+    border: 1px solid #666666;
+    margin: 1em 0em;
+  }
+
+/* @end */
