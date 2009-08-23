@@ -18,10 +18,27 @@ module Rcov
         @template.result(get_binding)
       end
 
+      def coverage_threshold_classes(percentage)
+        return 110 if percentage == 100
+        return (1..10).find_all{|i| i * 10 > percentage}.map{|i| i.to_i * 10} * " " 
+      end
+      
+      def code_coverage_html(code_coverage_percentage)
+        %{<div class="percent_graph_legend"><tt>#{ "%3.2f" % code_coverage_percentage }%</tt></div>
+          <div class="percent_graph">
+            <div class="covered" style="width:#{ code_coverage_percentage.round }px"></div>
+            <div class="uncovered" style="width:#{ 100 - code_coverage_percentage.round }px"></div>
+          </div>}
+      end
+
+      def file_filter_classes(file_path)
+        file_path.split('/')[0..-2] * " "
+      end
+      
       def relative_filename(path)
         @path_relativizer[path]
       end
-
+    
       def line_css(line_number)
         case fileinfo.coverage[line_number]
         when true

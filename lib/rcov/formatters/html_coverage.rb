@@ -72,16 +72,16 @@ module Rcov
     end
 
     def create_index(destname)
-      files = [SummaryFileInfo.new(self)] + each_file_pair_sorted.map{|k,v| v}
-      project_name = Dir.pwd.split('/')[-1].split(/[^a-zA-Z0-9]/).map{|i| i.gsub(/[^a-zA-Z0-9]/,'').capitalize} * " " || ""
+      project_name = 
 
       doc = Rcov::Formatters::HtmlErbTemplate.new('index.html.erb',
-        :page_title => "#{project_name << ': '} C0 Coverage Information - RCov",
+        :project_name => Dir.pwd.split('/')[-1].split(/[^a-zA-Z0-9]/).map{|i| i.gsub(/[^a-zA-Z0-9]/,'').capitalize} * " " || "",
         :generated_on => Time.now,
         :rcov => Rcov,
         :formatter => self,
         :output_threshold => @output_threshold,
-        :files => files
+        :total => SummaryFileInfo.new(self),
+        :files => each_file_pair_sorted.map{|k,v| v}
       )
       File.open(destname, "w") { |f| f.puts doc.render }
     end

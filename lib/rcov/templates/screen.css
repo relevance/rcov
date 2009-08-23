@@ -86,7 +86,7 @@
 /* @group Details page */
 
   tr.marked td, span.marked, span.marked1 {
-    background-color: #DBDEBD;
+    background-color: #bed2be;
   }
   
   span.marked, span.marked1 {
@@ -94,22 +94,22 @@
   }
   
   tr.inferred td, span.inferred {
-    background-color: #CFE6E0;
+    background-color: #e0dedb;
   }
   
   tr.inferred1 td, span.inferred1 {
-    background-color: #CFE6E0;
+    background-color: #e0dedb;
   }
   span.inferred, span.inferred1 {
     display: block;
   }
   
   tr.uncovered td, span.uncovered {
-    background-color: rgb(225, 110, 110);
+    background-color: #ce8b8c;
   }
   
   span.uncovered1 {
-    background-color: rgb(235, 120, 120);
+    background-color: #ce8b8c;
     display: block;
   }
 
@@ -238,7 +238,7 @@
   
   div.percent_graph {
     height: 1em;
-    border: #808080 1px solid;
+    border: #333333 1px solid;
     empty-cells: show;
     padding: 0px;
     border-collapse: collapse;
@@ -254,11 +254,11 @@
   }  
 
   div.percent_graph div.covered {
-    background: #00f000;
+    background: #649632;
   }
   
   div.percent_graph div.uncovered {
-    background: #e00000;
+    background: #a92730;
   }
   
   div.percent_graph div.NA {

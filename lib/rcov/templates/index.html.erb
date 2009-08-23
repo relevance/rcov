@@ -2,7 +2,7 @@
 <html lang='en' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'>
   <head>
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
-    <title><%= page_title %></title>
+    <title><%= "#{project_name} C0 Coverage Information - RCov" %></title>
     <link href="screen.css" media="all" rel="stylesheet" type="text/css" />
     <link href="print.css" media="print" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="jquery-1.3.2.min.js"></script>
@@ -10,7 +10,7 @@
     <script type="text/javascript" src="rcov.js"></script>
   </head>
   <body>
-    <h1><%= page_title %></h1>
+    <h1><%= "#{project_name} C0 Coverage Information - RCov" %></h1>
     <% if output_threshold != 101 %>
       <!-- Note: 101 is the default threshold if you don't enter one -->
       <p>Threshold: <%= output_threshold %>%</p>
@@ -19,28 +19,17 @@
     <div class="filters">
       <fieldset>
         <label>File Filter:</label>
-        <select id="file_filter" onchange="v=$('#file_filter').val();$('tr.files').hide();$('tr.' + v).show();">
-          <option value="all">Show All</option>
-          <% files.map{|f| f.name.split('/')[0..-2]}.flatten.uniq.sort.each do |f| %>
-            <option value="<%= f %>"><%= f %>/</option>
-          <% end %>
+        <select id="file_filter" class="filter">
+          <option value="all_files">Show All</option>
+          <% files.map{|f| f.name.split('/')[0..-2]}.flatten.uniq.sort.each do |f| %><option value="<%= f %>"><%= f %>/</option><% end %>
         </select>
       </fieldset>
       <fieldset>
-        <label>Coverage Threshold:</label>
-        <select id="coverage_filter" onchange="v=$('#coverage_filter').val();$('tr.files').hide();$('tr.' + v).show();">
-          <option value="all">Show All</option>
-          <option value="9">&lt; 10% Coverage</option>
-          <option value="19">&lt; 20% Coverage</option>
-          <option value="29">&lt; 30% Coverage</option>
-          <option value="39">&lt; 40% Coverage</option>
-          <option value="49">&lt; 50% Coverage</option>
-          <option value="59">&lt; 60% Coverage</option>
-          <option value="69">&lt; 70% Coverage</option>
-          <option value="79">&lt; 80% Coverage</option>
-          <option value="89">&lt; 90% Coverage</option>
-          <option value="99">&lt; 100% Coverage</option>
-          <option value="101">= 100% Coverage</option>
+        <label>Code Coverage Threshold:</label>
+        <select id="coverage_filter" class="filter">
+          <option value="all_coverage">Show All</option>
+          <% (1..10).each do |i| %><option value="<%= i * 10 %>">&lt; <%= i * 10 %>% Coverage</option><% end %>
+          <option value="110">= 100% Coverage</option>
         </select>
       </fieldset>
     </div>
@@ -55,46 +44,44 @@
           <th class="left_align">Code Coverage</th>
         </tr>
       </thead>
-      <% files.each_with_index do |f,i| %>
-        <% if i == 0 %>
-          <tfoot>
-        <% elsif i == 1 %>
-          <tbody>
+      <tbody>
+        <% files.each do |f,i| %>
+          <tr class="all_files all_coverage <%= coverage_threshold_classes(f.code_coverage_for_report) %> <%= file_filter_classes(f.name) %>">
+            <td class="left_align"><a href="<%= relative_filename(f.name) %>"><%= f.name %></a></td>
+            <td class='right_align'><tt><%= f.num_lines %></tt></td>
+            <td class='right_align'><tt><%= f.num_code_lines %></tt></td>
+            <td class="left_align"><%= code_coverage_html(f.total_coverage_for_report) %></td>
+            <td class="left_align"><%= code_coverage_html(f.code_coverage_for_report) %></td>
+          </tr>
         <% end %>
-            <tr class="<%= i > 0 ? 'files ' : '' %>all <%= f.name.split('/')[0..-2] * " " %>">
-              <td class="left_align"><%= f.name == 'TOTAL' ? f.name : %{<a href="#{relative_filename(f.name)}">#{f.name}</a>} %></td>
-              <td class='right_align'><tt><%= f.num_lines %></tt></td>
-              <td class='right_align'><tt><%= f.num_code_lines %></tt></td>
-              <td class="left_align">
-                <div class="percent_graph_legend">
-                  <tt><%= "%3.2f" % f.total_coverage_for_report %>%</tt>
-                </div>
-                <div class="percent_graph">
-                  <div class="covered" style="width:<%= f.total_coverage_for_report.round %>px"></div>
-                  <div class="uncovered" style="width:<%= 100 - f.total_coverage_for_report.round %>px"></div>
-                </div>
-              </td>
-              <td class="left_align">
-                <div class="percent_graph_legend">
-                  <tt><%= "%3.2f" % f.code_coverage_for_report %>%</tt>
-                </div>
-                <div class="percent_graph">
-                  <div class="covered" style="width:<%= f.code_coverage_for_report.round %>px"></div>
-                  <div class="uncovered" style="width:<%= 100 - f.code_coverage_for_report.round %>px"></div>
-                </div>
-              </td>
-            </tr>
-        <% if i == 0 %>
-          </tfoot>
-        <% end %>
-      <% end %>
       </tbody>
+      <tfoot>
+        <tr>
+          <td class="left_align">TOTAL</td>
+          <td class='right_align'><tt><%= total.num_lines %></tt></td>
+          <td class='right_align'><tt><%= total.num_code_lines %></tt></td>
+          <td class="left_align"><%= code_coverage_html(total.total_coverage_for_report) %></td>
+          <td class="left_align"><%= code_coverage_html(total.code_coverage_for_report) %></td>
+        </tr>
+      </tfoot>
     </table>
 
     <p>Generated on <%= generated_on %> with <a href="<%= rcov::UPSTREAM_URL %>">rcov <%= rcov::VERSION %></a></p>
 
     <script type="text/javascript">
       $(document).ready(function(){$("#report_table").tablesorter({widgets: ['zebra'], textExtraction: 'complex'});});
+      $('.filter').change(function(){
+        ff = $('#file_filter').val();
+        cf = $('#coverage_filter').val();
+        $('table#report_table tbody tr').each(function(i){ 
+          if ((this.className.split(" ").indexOf(ff) > -1) && (this.className.split(" ").indexOf(cf) > -1)) {
+            this.style.display = "";
+          } else {
+            this.style.display = "none";
+          };
+          restripe();
+        })
+      })
     </script>
 
   </body>
