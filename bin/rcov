@@ -30,6 +30,7 @@ options.textmode = false
 options.skip = Rcov::BaseFormatter::DEFAULT_OPTS[:ignore]
 options.include = []
 options.html = true
+options.css = nil
 options.comments_run_by_default = false
 options.test_unit_only = false
 options.spec_only = false
@@ -215,6 +216,10 @@ EOF
     options.html = val
   end
   
+  opts.on("--css relative/path/to/custom.css", "Use a custom CSS file for HTML output.", "Specified as a relative path.") do |val|
+    options.css = val
+  end
+  
   opts.on("--sort CRITERION", [:name, :loc, :coverage], "Sort files in the output by the specified", "field (name, loc, coverage)") do |criterion|
     options.sort = criterion
   end
@@ -377,6 +382,7 @@ make_formatter = lambda do |klass|
               :comments_run_by_default => options.comments_run_by_default,
               :gcc_output => options.gcc_output,
               :charset => options.charset,
+              :css => options.css,
               :failure_threshold => options.failure_threshold
              )
 end

@@ -10,6 +10,7 @@ module Rcov
       options = DEFAULT_OPTS.clone.update(opts)
       super(options)
       @dest = options[:destdir]
+      @css = options[:css]
       @color = options[:color]
       @fsr = options[:fsr]
       @do_callsites = options[:callsites]
@@ -28,6 +29,16 @@ module Rcov
         FileUtils.cp(_src, File.join(@dest, "#{_file}"))
       end
 
+      # Copy custom CSS, if any
+      if @css
+        begin
+          _src = File.expand_path("#{@dest}/../#{@css}")
+          FileUtils.cp(_src, File.join(@dest, "custom.css"))
+        rescue
+          @css = nil
+        end
+      end
+      
       create_index(File.join(@dest, "index.html"))
 
       each_file_pair_sorted do |filename, fileinfo|
@@ -76,6 +87,7 @@ module Rcov
       doc = Rcov::Formatters::HtmlErbTemplate.new('index.html.erb',
         :project_name => project_name,
         :generated_on => Time.now,
+        :css => @css,
         :rcov => Rcov,
         :formatter => self,
         :output_threshold => @output_threshold,
@@ -89,6 +101,7 @@ module Rcov
       doc = Rcov::Formatters::HtmlErbTemplate.new('detail.html.erb',
         :project_name => project_name,
         :page_title => fileinfo.name, 
+        :css => @css,
         :generated_on => Time.now,
         :rcov => Rcov,
         :formatter => self,
