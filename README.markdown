@@ -2,7 +2,7 @@
 
 ## Why? What?
 
-This is a fork of [Relevance]'s RCov [3].
+This is a fork of Relevance's RCov.
 
 ## Why does this fork exist?
 
