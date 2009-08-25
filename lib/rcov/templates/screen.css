@@ -85,6 +85,10 @@
 
 /* @group Report Table */
 
+  div.report_table_wrapper {
+    min-width: 900px;
+  }
+
   table.report {
     border-collapse: collapse;
     border: 1px solid #666666;
@@ -93,8 +97,8 @@
   }
   
   table.report tr {
-  	line-height: 1.75em;
-	}
+    line-height: 1.75em;
+  }
   
   table.report th {
     background: #666666;

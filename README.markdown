@@ -2,18 +2,16 @@
 
 ## Why? What?
 
-This is a fork of Relevance's RCov.
+This is our fork of Mauricio Fernandez's RCov (maintained by [Relevance] [3]).
 
 ## Why does this fork exist?
 
-* HTML output improvements for usability and readability
-* Sortable columns in the main coverage view table
-* Filter by source files and coverage thresholds in the main coverage view table
-* Support for custom CSS for HTML output (see rcov --help)
+* Ruby 1.9.1 Compatibility (in progress)
+* Removal of REXML Dependency (the source of most of the RCov bugs, done)
 
 ## Install
 
-    gem install bantik-rcov --source http://gems.github.com
+    gem install relevance-rcov --source http://gems.github.com
 
 ## Bugs and Issues
 
@@ -40,8 +38,6 @@ Rcov is a code coverage tool for Ruby. It is commonly used for viewing overall t
 * detection of uncovered code introduced since the last run ("differential code coverage")
 * fairly accurate coverage information through code linkage inference using simple heuristics
 * cross-referenced XHTML and several kinds of text reports
-* sortable, filterable XHTML reports
-* custom CSS for XHTML output
 * support for easy automation with Rake
 * colorblind-friendliness
 

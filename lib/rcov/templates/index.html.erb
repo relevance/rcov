@@ -37,38 +37,40 @@
       </fieldset>
     </div>
     
-    <table class='report' id='report_table'>
-      <thead>
-        <tr>
-          <th class="left_align">Name</th>
-          <th class="right_align">Total Lines</th>
-          <th class="right_align">Lines of Code</th>
-          <th class="left_align">Total Coverage</th>
-          <th class="left_align">Code Coverage</th>
-        </tr>
-      </thead>
-      <tfoot>
-        <tr>
-          <td class="left_align">TOTAL</td>
-          <td class='right_align'><tt><%= total.num_lines %></tt></td>
-          <td class='right_align'><tt><%= total.num_code_lines %></tt></td>
-          <td class="left_align"><%= code_coverage_html(total.total_coverage_for_report) %></td>
-          <td class="left_align"><%= code_coverage_html(total.code_coverage_for_report) %></td>
-        </tr>
-      </tfoot>
-      <tbody>
-        <% files.each_with_index do |f,i| %>
-          <tr class="all_files all_coverage <%= coverage_threshold_classes(f.code_coverage_for_report) %> <%= file_filter_classes(f.name) %> <%= i % 2 == 0 ? 'even' : 'odd' %>">
-            <td class="left_align"><a href="<%= relative_filename(f.name) %>"><%= f.name %></a></td>
-            <td class='right_align'><tt><%= f.num_lines %></tt></td>
-            <td class='right_align'><tt><%= f.num_code_lines %></tt></td>
-            <td class="left_align"><%= code_coverage_html(f.total_coverage_for_report) %></td>
-            <td class="left_align"><%= code_coverage_html(f.code_coverage_for_report) %></td>
+    <div class="report_table_wrapper">
+      <table class='report' id='report_table'>
+        <thead>
+          <tr>
+            <th class="left_align">Name</th>
+            <th class="right_align">Total Lines</th>
+            <th class="right_align">Lines of Code</th>
+            <th class="left_align">Total Coverage</th>
+            <th class="left_align">Code Coverage</th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
-
+        </thead>
+        <tfoot>
+          <tr>
+            <td class="left_align">TOTAL</td>
+            <td class='right_align'><tt><%= total.num_lines %></tt></td>
+            <td class='right_align'><tt><%= total.num_code_lines %></tt></td>
+            <td class="left_align"><%= code_coverage_html(total.total_coverage_for_report) %></td>
+            <td class="left_align"><%= code_coverage_html(total.code_coverage_for_report) %></td>
+          </tr>
+        </tfoot>
+        <tbody>
+          <% files.each_with_index do |f,i| %>
+            <tr class="all_files all_coverage <%= coverage_threshold_classes(f.code_coverage_for_report) %> <%= file_filter_classes(f.name) %> <%= i % 2 == 0 ? 'even' : 'odd' %>">
+              <td class="left_align"><a href="<%= relative_filename(f.name) %>"><%= f.name %></a></td>
+              <td class='right_align'><tt><%= f.num_lines %></tt></td>
+              <td class='right_align'><tt><%= f.num_code_lines %></tt></td>
+              <td class="left_align"><%= code_coverage_html(f.total_coverage_for_report) %></td>
+              <td class="left_align"><%= code_coverage_html(f.code_coverage_for_report) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    
     <p>Generated on <%= generated_on %> with <a href="<%= rcov::UPSTREAM_URL %>">rcov <%= rcov::VERSION %></a></p>
 
     <script type="text/javascript">
