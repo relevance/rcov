@@ -23,8 +23,8 @@ module Rcov
         return (1..10).find_all{|i| i * 10 > percentage}.map{|i| i.to_i * 10} * " " 
       end
       
-      def code_coverage_html(code_coverage_percentage)
-        %{<div class="percent_graph_legend"><tt>#{ "%3.2f" % code_coverage_percentage }%</tt></div>
+      def code_coverage_html(code_coverage_percentage, is_total=false)
+        %{<div class="percent_graph_legend"><tt class="#{ is_total ? 'coverage_total' : ''}">#{ "%3.2f" % code_coverage_percentage }%</tt></div>
           <div class="percent_graph">
             <div class="covered" style="width:#{ code_coverage_percentage.round }px"></div>
             <div class="uncovered" style="width:#{ 100 - code_coverage_percentage.round }px"></div>
