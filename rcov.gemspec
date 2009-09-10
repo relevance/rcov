@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   s.version = "0.9.0"
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
-  s.authors = ["Relevance", "Chad Humphries (spicycode)", "Aaron Bedra (abedra)", "Mauricio Fernandez"]
+  s.authors = ["Relevance", "Chad Humphries (spicycode)", "Aaron Bedra (abedra)", "Jay McGaffigan", "Mauricio Fernandez"]
   s.cert_chain = nil
   s.date = %q{2009-05-12}
   s.default_executable = %q{rcov}
