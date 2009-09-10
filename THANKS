@@ -1,3 +1,11 @@
+Jay McGaffigan:
+* JRuby support integrated from original rcov4j
+
+Aaron Bedra:
+* major refactoring
+* added threshold testing
+* Took on the task of keeping RCov going
+
 Corey Ehmke (Bantik):
 * redesigned index and detail XHTML
 * added sortable columns in coverage table
