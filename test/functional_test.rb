@@ -64,7 +64,6 @@ class TestFunctional < Test::Unit::TestCase
   end
 
   def test_diff
-    p "test diff"
     with_testdir { FileUtils.cp "assets/sample_05-old.rb", "assets/sample_05.rb" }
 
     run_rcov("--no-html --gcc #{@@selection} --save=coverage.info", "assets/sample_05.rb", "> actual_coverage/diff-gcc-original.out") do

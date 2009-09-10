@@ -47,7 +47,9 @@ EOF
     line_info, cov_info, count_info = analyzer.data(sample_file)
     assert_equal(lines, line_info)
     assert_equal([true, true, false, false, true, false, true], cov_info)
-    assert_equal([1, 2, 0, 0, 1, 0, 11], count_info)
+    assert_equal([1, 2, 0, 0, 1, 0, 11], count_info) unless PLATFORM =~ /java/
+    # JRUBY reports an if x==blah as hitting this type of line once, JRUBY also optimizes this stuff so you'd have to run with --debug to get "extra" information.  MRI hits it twice.
+    assert_equal([1, 3, 0, 0, 1, 0, 33], count_info) if PLATFORM =~ /java/
     analyzer.reset
     assert_equal(nil, analyzer.data(sample_file))
     assert_equal([], analyzer.analyzed_files)
@@ -80,6 +82,18 @@ EOF
     assert_equal(counts, ncounts)
   end
 
+  def test_if_elsif_reports_correctly
+    sample_file = File.join(File.dirname(__FILE__), "assets/sample_06.rb")
+    lines = File.readlines(sample_file)
+    analyzer = Rcov::CodeCoverageAnalyzer.new
+    analyzer.run_hooked{ load sample_file }
+    assert_equal(lines, SCRIPT_LINES__[sample_file][0, lines.size])
+    assert(analyzer.analyzed_files.include?(sample_file))
+    line_info, cov_info, count_info = analyzer.data(sample_file)
+    assert_equal(lines, line_info)
+    assert_equal([true, true, false, true, true, false, false, false], cov_info)
+  end
+
   def test_differential_coverage_data
     sample_file = File.join(File.dirname(__FILE__), "assets/sample_01.rb")
     lines = File.readlines(sample_file)
@@ -94,23 +108,33 @@ EOF
     sample_file = File.join(File.dirname(__FILE__), "assets/sample_02.rb")
     analyzer.run_hooked{ load sample_file }
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    assert_equal([8, 1, 0, 0, 0], count_info) unless RUBY_VERSION =~ /1.9/
-    assert_equal([4, 1, 0, 0, 4], count_info) if RUBY_VERSION =~ /1.9/
+    if (defined? PLATFORM && PLATFORM =~ /java/)
+      assert_equal([8, 3, 0, 0, 0], count_info) 
+    else
+      assert_equal([8, 1, 0, 0, 0], count_info) unless  RUBY_VERSION =~ /1.9/
+      assert_equal([4, 1, 0, 0, 4], count_info) if RUBY_VERSION =~ /1.9/
+    end
 
     analyzer.reset
     assert_equal([], analyzer.analyzed_files)
     analyzer.run_hooked{ Rcov::Test::Temporary::Sample02.foo(1, 1) }
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    assert_equal([0, 1, 1, 1, 0], count_info) unless RUBY_VERSION =~ /1.9/
-    assert_equal([0, 2, 1, 0, 0], count_info) if RUBY_VERSION =~ /1.9/
+    if (defined? PLATFORM && PLATFORM =~ /java/)
+      assert_equal([0, 1, 3, 1, 0], count_info) unless RUBY_VERSION =~ /1.9/
+    else
+      assert_equal([0, 1, 1, 1, 0], count_info) unless RUBY_VERSION =~ /1.9/
+      assert_equal([0, 2, 1, 0, 0], count_info) if RUBY_VERSION =~ /1.9/
+    end
     analyzer.run_hooked do
       10.times{ Rcov::Test::Temporary::Sample02.foo(1, 1) }
     end
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    assert_equal([0, 11, 11, 11, 0], count_info)
+    assert_equal([0, 11, 33, 11, 0], count_info) if (defined? PLATFORM && PLATFORM =~ /java/)
+    assert_equal([0, 11, 11, 11, 0], count_info) unless (defined? PLATFORM && PLATFORM =~ /java/)
     10.times{ analyzer.run_hooked{ Rcov::Test::Temporary::Sample02.foo(1, 1) } }
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    assert_equal([0, 21, 21, 21, 0], count_info)
+    assert_equal([0, 21, 63, 21, 0], count_info) if (defined? PLATFORM && PLATFORM =~ /java/)
+    assert_equal([0, 21, 21, 21, 0], count_info) unless (defined? PLATFORM && PLATFORM =~ /java/)
 
     count_info2 = nil
     10.times do |i|
@@ -120,8 +144,13 @@ EOF
         line_info2, cov_info2, count_info2 = analyzer.data(sample_file)
       end
     end
-    assert_equal([0, 25, 25, 25, 0], count_info)
-    assert_equal([0, 31, 31, 31, 0], count_info2)
+    if (defined? PLATFORM && PLATFORM =~ /java/)
+      assert_equal([0, 25, 75, 25, 0], count_info)
+      assert_equal([0, 31, 93, 31, 0], count_info2)
+    else
+      assert_equal([0, 25, 25, 25, 0], count_info)
+      assert_equal([0, 31, 31, 31, 0], count_info2)
+    end
   end
 
   def test_nested_analyzer_blocks
@@ -154,8 +183,13 @@ EOF
 
     _, _, counts1 = a1.data(sample_file)
     _, _, counts2 = a2.data(sample_file)
-    assert_equal([0, 221, 221, 221, 0], counts1)
-    assert_equal([0, 121, 121, 121, 0], counts2)
+    if (defined? PLATFORM && PLATFORM =~ /java/) 
+      assert_equal([0, 221, 663, 221, 0], counts1)    
+      assert_equal([0, 121, 363, 121, 0], counts2)
+    else
+      assert_equal([0, 221, 221, 221, 0], counts1)
+      assert_equal([0, 121, 121, 121, 0], counts2)
+    end
   end
 
   def test_reset
@@ -171,7 +205,8 @@ EOF
       end
     end
 
-    assert_equal([0, 50, 50, 50, 0], a1.data(sample_file)[2])
+    assert_equal([0, 50, 50, 50, 0], a1.data(sample_file)[2]) unless (defined? PLATFORM && PLATFORM =~ /java/)
+    assert_equal([0, 50, 150, 50, 0], a1.data(sample_file)[2]) if (defined? PLATFORM && PLATFORM =~ /java/)
   end
 
   def test_compute_raw_difference
