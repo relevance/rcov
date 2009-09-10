@@ -40,11 +40,28 @@ Rcov::RcovTask.new(:rcov_ccanalyzer) do |t|
 end
 
 desc "Run the unit tests with rcovrt."
-Rake::TestTask.new(:test_rcovrt => ["ext/rcovrt/rcovrt.so"]) do |t|
-  system("cd ext/rcovrt && make clean && rm Makefile")
-  t.libs << "ext/rcovrt"
-  t.test_files = FileList['test/*_test.rb']
-  t.verbose = true
+if RUBY_PLATFORM == 'java'
+  Rake::TestTask.new(:test_rcovrt => ["lib/rcovrt.jar"]) do |t|
+    t.libs << "lib"
+    t.ruby_opts << "--debug"
+    t.test_files = FileList['test/*_test.rb']
+    t.verbose = true
+  end
+
+  file "lib/rcovrt.jar" => FileList["ext/java/**/*.java"] do |t|
+    rm_f "lib/rcovrt.jar"
+    mkdir_p "pkg/classes"
+    sh "javac -classpath #{Java::JavaLang::System.getProperty('java.class.path')} -d pkg/classes #{t.prerequisites.join(' ')}"
+    sh "jar cf #{t.name} -C pkg/classes ."
+  end
+
+else
+    Rake::TestTask.new(:test_rcovrt => ["ext/rcovrt/rcovrt.so"]) do |t|
+    system("cd ext/rcovrt && make clean && rm Makefile")
+    t.libs << "ext/rcovrt"
+    t.test_files = FileList['test/*_test.rb']
+    t.verbose = true
+  end
 end
 
 file "ext/rcovrt/rcovrt.so" => FileList["ext/rcovrt/*.c"] do

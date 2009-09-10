@@ -41,8 +41,10 @@ class TestFunctional < Test::Unit::TestCase
   def run_rcov(opts, script="assets/sample_04.rb", opts_tail="")
     rcov = @@dir+"../bin/rcov"
     ruby_opts = "-I../lib:../ext/rcovrt"
+    ruby = "ruby"
+    ruby = "jruby" if RUBY_PLATFORM =~ /java/
     with_testdir do
-      `cd #{@@dir}; ruby #{ruby_opts} #{rcov} #{opts} -o actual_coverage #{script} #{opts_tail}`
+      `cd #{@@dir}; #{ruby} #{ruby_opts} #{rcov} #{opts} -o actual_coverage #{script} #{opts_tail}`
       yield if block_given?
     end
   end
@@ -62,6 +64,7 @@ class TestFunctional < Test::Unit::TestCase
   end
 
   def test_diff
+    p "test diff"
     with_testdir { FileUtils.cp "assets/sample_05-old.rb", "assets/sample_05.rb" }
 
     run_rcov("--no-html --gcc #{@@selection} --save=coverage.info", "assets/sample_05.rb", "> actual_coverage/diff-gcc-original.out") do
