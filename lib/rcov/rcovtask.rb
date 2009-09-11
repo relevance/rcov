@@ -88,6 +88,7 @@ module Rcov
       @warning = false
       @rcov_opts = ["--text-report"]
       @ruby_opts = []
+      @ruby_opts << "--debug" if RUBY_PLATFORM == 'java'
       @output_dir = "coverage"
       yield self if block_given?
       @pattern = 'test/test*.rb' if @pattern.nil? && @test_files.nil?
