@@ -54,7 +54,6 @@ if RUBY_PLATFORM == 'java'
     sh "javac -classpath #{Java::JavaLang::System.getProperty('java.class.path')} -d pkg/classes #{t.prerequisites.join(' ')}"
     sh "jar cf #{t.name} -C pkg/classes ."
   end
-
 else
     Rake::TestTask.new(:test_rcovrt => ["ext/rcovrt/rcovrt.so"]) do |t|
     system("cd ext/rcovrt && make clean && rm Makefile")

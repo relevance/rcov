@@ -47,9 +47,9 @@ EOF
     line_info, cov_info, count_info = analyzer.data(sample_file)
     assert_equal(lines, line_info)
     assert_equal([true, true, false, false, true, false, true], cov_info)
-    assert_equal([1, 2, 0, 0, 1, 0, 11], count_info) unless PLATFORM =~ /java/
+    assert_equal([1, 2, 0, 0, 1, 0, 11], count_info) unless RUBY_PLATFORM =~ /java/
     # JRUBY reports an if x==blah as hitting this type of line once, JRUBY also optimizes this stuff so you'd have to run with --debug to get "extra" information.  MRI hits it twice.
-    assert_equal([1, 3, 0, 0, 1, 0, 33], count_info) if PLATFORM =~ /java/
+    assert_equal([1, 3, 0, 0, 1, 0, 33], count_info) if RUBY_PLATFORM =~ /java/
     analyzer.reset
     assert_equal(nil, analyzer.data(sample_file))
     assert_equal([], analyzer.analyzed_files)
@@ -91,7 +91,7 @@ EOF
     assert(analyzer.analyzed_files.include?(sample_file))
     line_info, cov_info, count_info = analyzer.data(sample_file)
     assert_equal(lines, line_info)
-    assert_equal([true, true, false, true, true, false, false, false], cov_info)
+    assert_equal([true, true, false, true, true, false, false, false], cov_info) unless RUBY_PLATFORM == "java"
   end
 
   def test_differential_coverage_data
@@ -108,7 +108,7 @@ EOF
     sample_file = File.join(File.dirname(__FILE__), "assets/sample_02.rb")
     analyzer.run_hooked{ load sample_file }
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    if (defined? PLATFORM && PLATFORM =~ /java/)
+    if RUBY_PLATFORM == "java"
       assert_equal([8, 3, 0, 0, 0], count_info) 
     else
       assert_equal([8, 1, 0, 0, 0], count_info) unless  RUBY_VERSION =~ /1.9/
@@ -119,7 +119,7 @@ EOF
     assert_equal([], analyzer.analyzed_files)
     analyzer.run_hooked{ Rcov::Test::Temporary::Sample02.foo(1, 1) }
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    if (defined? PLATFORM && PLATFORM =~ /java/)
+    if RUBY_PLATFORM == "java"
       assert_equal([0, 1, 3, 1, 0], count_info) unless RUBY_VERSION =~ /1.9/
     else
       assert_equal([0, 1, 1, 1, 0], count_info) unless RUBY_VERSION =~ /1.9/
@@ -129,12 +129,12 @@ EOF
       10.times{ Rcov::Test::Temporary::Sample02.foo(1, 1) }
     end
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    assert_equal([0, 11, 33, 11, 0], count_info) if (defined? PLATFORM && PLATFORM =~ /java/)
-    assert_equal([0, 11, 11, 11, 0], count_info) unless (defined? PLATFORM && PLATFORM =~ /java/)
+    assert_equal([0, 11, 33, 11, 0], count_info) if RUBY_PLATFORM == "java"
+    assert_equal([0, 11, 11, 11, 0], count_info) unless RUBY_PLATFORM == "java"
     10.times{ analyzer.run_hooked{ Rcov::Test::Temporary::Sample02.foo(1, 1) } }
     line_info, cov_info, count_info = analyzer.data(sample_file)
-    assert_equal([0, 21, 63, 21, 0], count_info) if (defined? PLATFORM && PLATFORM =~ /java/)
-    assert_equal([0, 21, 21, 21, 0], count_info) unless (defined? PLATFORM && PLATFORM =~ /java/)
+    assert_equal([0, 21, 63, 21, 0], count_info) if RUBY_PLATFORM == "java"
+    assert_equal([0, 21, 21, 21, 0], count_info) unless RUBY_PLATFORM == "java"
 
     count_info2 = nil
     10.times do |i|
@@ -144,7 +144,7 @@ EOF
         line_info2, cov_info2, count_info2 = analyzer.data(sample_file)
       end
     end
-    if (defined? PLATFORM && PLATFORM =~ /java/)
+    if RUBY_PLATFORM == "java"
       assert_equal([0, 25, 75, 25, 0], count_info)
       assert_equal([0, 31, 93, 31, 0], count_info2)
     else
@@ -183,7 +183,7 @@ EOF
 
     _, _, counts1 = a1.data(sample_file)
     _, _, counts2 = a2.data(sample_file)
-    if (defined? PLATFORM && PLATFORM =~ /java/) 
+    if RUBY_PLATFORM == "java"
       assert_equal([0, 221, 663, 221, 0], counts1)    
       assert_equal([0, 121, 363, 121, 0], counts2)
     else
@@ -205,8 +205,8 @@ EOF
       end
     end
 
-    assert_equal([0, 50, 50, 50, 0], a1.data(sample_file)[2]) unless (defined? PLATFORM && PLATFORM =~ /java/)
-    assert_equal([0, 50, 150, 50, 0], a1.data(sample_file)[2]) if (defined? PLATFORM && PLATFORM =~ /java/)
+    assert_equal([0, 50, 50, 50, 0], a1.data(sample_file)[2]) unless RUBY_PLATFORM == "java"
+    assert_equal([0, 50, 150, 50, 0], a1.data(sample_file)[2]) if RUBY_PLATFORM == "java"
   end
 
   def test_compute_raw_difference

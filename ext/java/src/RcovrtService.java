@@ -38,7 +38,7 @@ public class RcovrtService implements BasicLibraryService {
         if (hook.isActive()) {
             throw RaiseException.createNativeRaiseException(
                     recv.getRuntime(),
-                    new RuntimeException("Cannot reset the callsite info in the middle of a traced run."),null);
+                    new RuntimeException("Cannot reset the callsite info in the middle of a traced run."));
         }
         return hook.resetDefsites();
     }
@@ -49,7 +49,7 @@ public class RcovrtService implements BasicLibraryService {
         if (hook.isActive()) {
             throw RaiseException.createNativeRaiseException(
                     recv.getRuntime(),
-                    new RuntimeException("Cannot reset the coverage info in the middle of a traced run."), null);
+                    new RuntimeException("Cannot reset the coverage info in the middle of a traced run."));
         }
         return hook.resetCoverage(recv.getRuntime());
     }
