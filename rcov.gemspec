@@ -44,7 +44,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = Gem::Requirement.new("> 0.0.0")
   s.summary = %q{Code coverage analysis tool for Ruby}
   s.test_files = ["test/functional_test.rb", "test/file_statistics_test.rb", "test/code_coverage_analyzer_test.rb", "test/call_site_analyzer_test.rb"]
-
+ 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 1
