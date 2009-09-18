@@ -1,11 +1,12 @@
 module Rcov
   class BaseFormatter # :nodoc:
     require 'pathname'
-    ignore_files = [ /\btc_[^.]*.rb/, /_test\.rb\z/, /\btest\//, /\bvendor\//, /\A#{Regexp.escape(__FILE__)}\z/]
 
-    unless RUBY_PLATFORM =~ /java/
+    if RUBY_PLATFORM =~ /java/
+      ignore_files = [ /\btc_[^.]*.rb/, /_test\.rb\z/, /\btest\//, /\bvendor\//, /\A#{Regexp.escape(__FILE__)}\z/]
+    else
       require 'mkmf'
-      ignore_files << [/\A#{Regexp.escape(Pathname.new(::Config::CONFIG['libdir']).cleanpath.to_s)}/]
+      ignore_files = [/\A#{Regexp.escape(Pathname.new(::Config::CONFIG['libdir']).cleanpath.to_s)}/, /\btc_[^.]*.rb/, /_test\.rb\z/, /\btest\//, /\bvendor\//, /\A#{Regexp.escape(__FILE__)}\z/]      
     end
 
     DEFAULT_OPTS = { :ignore => ignore_files, :sort => :name, :sort_reverse => false,
