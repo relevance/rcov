@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>detail.html.erb</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="../../../../css/reset.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="../../../../css/main.css" type="text/css" media="screen" />
+    <script src="../../../../js/jquery-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../../../js/jquery-effect.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../../../js/main.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body>     
+    <div class="banner">
+        <h1>
+            detail.html.erb
+        </h1>
+        <ul class="files">
+            <li>lib/rcov/templates/detail.html.erb</li>
+            <li>Last modified: Fri Oct 09 13:31:28 -0400 2009</li>
+        </ul>
+    </div>
+
+    <div id="bodyContent">
+        <div id="content">
+    
+    <div class="description">
+        <p>
+<!DOCTYPE html PUBLIC &#8220;-//W3C//DTD XHTML 1.0 Transitional//EN&#8220;
+&#8220;<a
+href="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</a>&#8220;>
+<html lang=&#8217;en&#8217; xml:lang=&#8217;en&#8217; xmlns=&#8217;<a
+href="http://www.w3.org/1999/xhtml">www.w3.org/1999/xhtml</a>&#8217;>
+</p>
+<pre>
+  &lt;head&gt;
+    &lt;title&gt;&lt;%= page_title %&gt;&lt;/title&gt;
+    &lt;link href=&quot;screen.css&quot; media=&quot;all&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
+    &lt;link href=&quot;print.css&quot; media=&quot;print&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
+    &lt;% if css %&gt;&lt;link href=&quot;custom.css&quot; media=&quot;all&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;&lt;% end %&gt;
+    &lt;meta http-equiv=&quot;Content-type&quot; content=&quot;text/html;charset=UTF-8&quot; /&gt;
+    &lt;script type=&quot;text/javascript&quot; src=&quot;rcov.js&quot;&gt;&lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;&lt;%= &quot;#{project_name} C0 Coverage Information - RCov&quot; %&gt;&lt;/h1&gt;
+    &lt;h2&gt;&lt;%= page_title %&gt;&lt;/h2&gt;
+
+    &lt;% if output_threshold != 101 %&gt;
+      &lt;!-- Note: 101 is the default threshold if you don't enter one --&gt;
+      &lt;p&gt;Threshold: &lt;%= output_threshold %&gt;%&lt;/p&gt;
+    &lt;% end %&gt;
+
+    &lt;div class=&quot;report_table_wrapper&quot;&gt;
+      &lt;table class='report' id='report_table'&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th class=&quot;left_align&quot;&gt;Name&lt;/th&gt;
+            &lt;th class=&quot;right_align&quot;&gt;Total Lines&lt;/th&gt;
+            &lt;th class=&quot;right_align&quot;&gt;Lines of Code&lt;/th&gt;
+            &lt;th class=&quot;left_align&quot;&gt;Total Coverage&lt;/th&gt;
+            &lt;th class=&quot;left_align&quot;&gt;Code Coverage&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          &lt;tr&gt;
+            &lt;td class=&quot;left_align&quot;&gt;&lt;a href=&quot;&lt;%= relative_filename(fileinfo.name) %&gt;&quot;&gt;&lt;%= fileinfo.name %&gt;&lt;/a&gt;&lt;/td&gt;
+            &lt;td class='right_align'&gt;&lt;tt&gt;&lt;%= fileinfo.num_lines %&gt;&lt;/tt&gt;&lt;/td&gt;
+            &lt;td class='right_align'&gt;&lt;tt&gt;&lt;%= fileinfo.num_code_lines %&gt;&lt;/tt&gt;&lt;/td&gt;
+            &lt;td class=&quot;left_align&quot;&gt;&lt;%= code_coverage_html(fileinfo.total_coverage_for_report) %&gt;&lt;/td&gt;
+            &lt;td class=&quot;left_align&quot;&gt;&lt;%= code_coverage_html(fileinfo.code_coverage_for_report) %&gt;&lt;/td&gt;
+          &lt;/tr&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+
+    &lt;h3&gt;Key&lt;/h3&gt;
+
+    &lt;div class=&quot;key&quot;&gt;&lt;pre&gt;&lt;span class='marked'&gt;Code reported as executed by Ruby looks like this...&lt;/span&gt;&lt;span class='marked1'&gt;and this: this line is also marked as covered.&lt;/span&gt;&lt;span class='inferred'&gt;Lines considered as run by rcov, but not reported by Ruby, look like this,&lt;/span&gt;&lt;span class='inferred1'&gt;and this: these lines were inferred by rcov (using simple heuristics).&lt;/span&gt;&lt;span class='uncovered'&gt;Finally, here's a line marked as not executed.&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;
+
+    &lt;h3&gt;Coverage Details&lt;/h3&gt;
+
+    &lt;table class=&quot;details&quot;&gt;
+      &lt;tbody&gt;
+        &lt;% fileinfo.num_lines.times do |i| %&gt;
+          &lt;% line = fileinfo.lines[i].chomp %&gt;
+          &lt;% count = fileinfo.counts[i] %&gt;
+          &lt;tr class=&quot;&lt;%= line_css(i) %&gt;&quot;&gt;
+            &lt;td&gt;&lt;pre&gt;&lt;a name=&quot;line&lt;%= i.next %&gt;&quot;&gt;&lt;%= i.next %&gt;&lt;/a&gt; &lt;%= CGI::escapeHTML(line) %&gt;&lt;/pre&gt;&lt;/td&gt;
+          &lt;/tr&gt;
+        &lt;% end %&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+
+    &lt;p&gt;Generated on &lt;%= generated_on %&gt; with &lt;a href=&quot;&lt;%= rcov::UPSTREAM_URL %&gt;&quot;&gt;rcov &lt;%= rcov::VERSION %&gt;&lt;/a&gt;&lt;/p&gt;
+
+  &lt;/body&gt;
+</pre>
+<p>
+</html>
+</p>
+
+    </div>
+    
+
+    
+
+    
+    
+
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+    </div>
+  </body>
+</html>

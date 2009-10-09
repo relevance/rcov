@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Rcov::RcovTask</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="../../css/reset.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="../../css/main.css" type="text/css" media="screen" />
+    <script src="../../js/jquery-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../js/jquery-effect.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../js/main.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body>     
+    <div class="banner">
+        <h1>
+            <span class="type">Class</span> 
+            Rcov::RcovTask 
+            
+                <span class="parent">&lt; 
+                    
+                    Rake::TaskLib
+                    
+                </span>
+            
+        </h1>
+        <ul class="files">
+            
+            <li><a href="../../files/lib/rcov/rcovtask_rb.html">lib/rcov/rcovtask.rb</a></li>
+            
+        </ul>
+    </div>
+    <div id="bodyContent">
+        <div id="content">
+    
+    <div class="description">
+        <p>
+Create a task that runs a set of tests through rcov, generating code
+coverage reports.
+</p>
+<p>
+Example:
+</p>
+<pre>
+  require 'rcov/rcovtask'
+
+  Rcov::RcovTask.new do |t|
+    t.libs &lt;&lt; &quot;test&quot;
+    t.test_files = FileList['test/test*.rb']
+    t.verbose = true
+  end
+</pre>
+<p>
+If rake is invoked with a &#8220;TEST=filename&#8221; command line option,
+then the list of test files will be overridden to include only the filename
+specified on the command line. This provides an easy way to run just one
+test.
+</p>
+<p>
+If rake is invoked with a &#8220;RCOVOPTS=options&#8221; command line
+option, then the given options are passed to rcov.
+</p>
+<p>
+If rake is invoked with a &#8220;RCOVPATH=path/to/rcov&#8220; command line
+option, then the given rcov executable will be used; otherwise the one in
+your PATH will be used.
+</p>
+<p>
+Examples:
+</p>
+<pre>
+  rake rcov                           # run tests normally
+  rake rcov TEST=just_one_file.rb     # run just one test file.
+  rake rcov RCOVOPTS=&quot;-p&quot;             # run in profile mode
+  rake rcov RCOVOPTS=&quot;-T&quot;             # generate text report
+</pre>
+
+    </div>
+    
+
+    
+
+    
+    
+
+    
+    
+    <div class="sectiontitle">Methods</div>
+    <dl class="methods">
+    
+        <dt>D</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000100">define</a></li>
+                
+            </ul>
+        </dd>
+    
+        <dt>N</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000099">new</a></li>
+                
+            </ul>
+        </dd>
+    
+        <dt>T</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000098">test_files=</a></li>
+                
+            </ul>
+        </dd>
+    
+    </dl>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="sectiontitle">Attributes</div>
+    <table border='0' cellpadding='5'>
+        
+        <tr valign='top'>
+            <td class='attr-rw'>
+                [RW]
+            </td>
+            <td class='attr-name'>name</td>
+            <td class='attr-desc'><p>
+Name of test task. (default is :rcov)
+</p></td>
+        </tr>
+        
+        <tr valign='top'>
+            <td class='attr-rw'>
+                [RW]
+            </td>
+            <td class='attr-name'>libs</td>
+            <td class='attr-desc'><p>
+List of directories to added to $LOAD_PATH before running the tests.
+(default is &#8216;lib&#8217;)
+</p></td>
+        </tr>
+        
+        <tr valign='top'>
+            <td class='attr-rw'>
+                [RW]
+            </td>
+            <td class='attr-name'>verbose</td>
+            <td class='attr-desc'><p>
+True if verbose test output desired. (default is false)
+</p></td>
+        </tr>
+        
+        <tr valign='top'>
+            <td class='attr-rw'>
+                [RW]
+            </td>
+            <td class='attr-name'>warning</td>
+            <td class='attr-desc'><p>
+Request that the tests be run with the warning flag set. E.g. warning=true
+implies &#8220;ruby -w&#8221; used to run the tests.
+</p></td>
+        </tr>
+        
+        <tr valign='top'>
+            <td class='attr-rw'>
+                [RW]
+            </td>
+            <td class='attr-name'>pattern</td>
+            <td class='attr-desc'><p>
+Glob pattern to match test files. (default is &#8216;test/test*.rb&#8217;)
+</p></td>
+        </tr>
+        
+        <tr valign='top'>
+            <td class='attr-rw'>
+                [RW]
+            </td>
+            <td class='attr-name'>ruby_opts</td>
+            <td class='attr-desc'><p>
+Array of commandline options to pass to ruby when running the rcov loader.
+</p></td>
+        </tr>
+        
+        <tr valign='top'>
+            <td class='attr-rw'>
+                [RW]
+            </td>
+            <td class='attr-name'>rcov_opts</td>
+            <td class='attr-desc'><p>
+Array of commandline options to pass to rcov. An explicit RCOVOPTS=opts on
+the command line will override this. (default is
+<tt>[&quot;--text-report&quot;]</tt>)
+</p></td>
+        </tr>
+        
+        <tr valign='top'>
+            <td class='attr-rw'>
+                [RW]
+            </td>
+            <td class='attr-name'>output_dir</td>
+            <td class='attr-desc'><p>
+Output directory for the XHTML report.
+</p></td>
+        </tr>
+        
+    </table>
+    
+
+    
+            <div class="sectiontitle">Class Public methods</div>
+            
+            <div class="method">
+                <div class="title" id="M000099">
+                    
+                    <a name="M000099"></a><b>new</b>(name=:rcov)
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Create a testing task.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000099_source')" id="l_M000099_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/6c4d27fafa54c2e7ceef39b133d77c4f6506d9cc/lib/rcov/rcovtask.rb#L82" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000099_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/rcovtask.rb, line 82</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">name</span>=<span class="ruby-identifier">:rcov</span>)
+      <span class="ruby-ivar">@name</span> = <span class="ruby-identifier">name</span>
+      <span class="ruby-ivar">@libs</span> = [<span class="ruby-value str">&quot;lib&quot;</span>]
+      <span class="ruby-ivar">@pattern</span> = <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-ivar">@test_files</span> = <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-ivar">@verbose</span> = <span class="ruby-keyword kw">false</span>
+      <span class="ruby-ivar">@warning</span> = <span class="ruby-keyword kw">false</span>
+      <span class="ruby-ivar">@rcov_opts</span> = [<span class="ruby-value str">&quot;--text-report&quot;</span>]
+      <span class="ruby-ivar">@ruby_opts</span> = []
+      <span class="ruby-ivar">@output_dir</span> = <span class="ruby-value str">&quot;coverage&quot;</span>
+      <span class="ruby-keyword kw">yield</span> <span class="ruby-keyword kw">self</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>
+      <span class="ruby-ivar">@pattern</span> = <span class="ruby-value str">'test/test*.rb'</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@pattern</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@test_files</span>.<span class="ruby-identifier">nil?</span>
+      <span class="ruby-identifier">define</span>
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="sectiontitle">Instance Public methods</div>
+            
+            <div class="method">
+                <div class="title" id="M000100">
+                    
+                    <a name="M000100"></a><b>define</b>()
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Create the tasks defined by this task lib.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000100_source')" id="l_M000100_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/6c4d27fafa54c2e7ceef39b133d77c4f6506d9cc/lib/rcov/rcovtask.rb#L98" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000100_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/rcovtask.rb, line 98</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">define</span>
+      <span class="ruby-identifier">lib_path</span> = <span class="ruby-ivar">@libs</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">File</span><span class="ruby-operator">::</span><span class="ruby-constant">PATH_SEPARATOR</span>)
+      <span class="ruby-identifier">actual_name</span> = <span class="ruby-constant">Hash</span> <span class="ruby-operator">===</span> <span class="ruby-identifier">name</span> <span class="ruby-value">? </span><span class="ruby-identifier">name</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">name</span>
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Rake</span>.<span class="ruby-identifier">application</span>.<span class="ruby-identifier">last_comment</span>
+        <span class="ruby-identifier">desc</span> <span class="ruby-value str">&quot;Analyze code coverage with tests&quot;</span> <span class="ruby-operator">+</span> 
+          (<span class="ruby-ivar">@name</span><span class="ruby-operator">==</span><span class="ruby-identifier">:rcov</span> <span class="ruby-operator">?</span> <span class="ruby-value str">&quot;&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot; for #{actual_name}&quot;</span>)
+      <span class="ruby-keyword kw">end</span>
+      <span class="ruby-identifier">task</span> <span class="ruby-ivar">@name</span> <span class="ruby-keyword kw">do</span>
+        <span class="ruby-identifier">run_code</span> = <span class="ruby-value str">''</span>
+        <span class="ruby-constant">RakeFileUtils</span>.<span class="ruby-identifier">verbose</span>(<span class="ruby-ivar">@verbose</span>) <span class="ruby-keyword kw">do</span>
+          <span class="ruby-identifier">run_code</span> =
+          <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">rcov_path</span>
+          <span class="ruby-keyword kw">when</span> <span class="ruby-keyword kw">nil</span>, <span class="ruby-value str">''</span>
+            <span class="ruby-value str">&quot;-S rcov&quot;</span>
+          <span class="ruby-keyword kw">else</span> <span class="ruby-node">%!&quot;#{rcov_path}&quot;!</span>
+          <span class="ruby-keyword kw">end</span>
+          <span class="ruby-identifier">ruby_opts</span> = <span class="ruby-ivar">@ruby_opts</span>.<span class="ruby-identifier">clone</span>
+          <span class="ruby-identifier">ruby_opts</span>.<span class="ruby-identifier">push</span>( <span class="ruby-node">&quot;-I#{lib_path}&quot;</span> )
+          <span class="ruby-identifier">ruby_opts</span>.<span class="ruby-identifier">push</span> <span class="ruby-identifier">run_code</span>
+          <span class="ruby-identifier">ruby_opts</span>.<span class="ruby-identifier">push</span>( <span class="ruby-value str">&quot;-w&quot;</span> ) <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@warning</span>
+          <span class="ruby-identifier">ruby</span> <span class="ruby-identifier">ruby_opts</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot; &quot;</span>) <span class="ruby-operator">+</span> <span class="ruby-value str">&quot; &quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">option_list</span> <span class="ruby-operator">+</span>
+          <span class="ruby-node">%[ -o &quot;#{@output_dir}&quot; ]</span> <span class="ruby-operator">+</span>
+          <span class="ruby-identifier">file_list</span>.<span class="ruby-identifier">collect</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">fn</span><span class="ruby-operator">|</span> <span class="ruby-node">%[&quot;#{fn}&quot;]</span> }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">' '</span>)
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">desc</span> <span class="ruby-node">&quot;Remove rcov products for #{actual_name}&quot;</span>
+      <span class="ruby-identifier">task</span> <span class="ruby-identifier">paste</span>(<span class="ruby-value str">&quot;clobber_&quot;</span>, <span class="ruby-identifier">actual_name</span>) <span class="ruby-keyword kw">do</span>
+        <span class="ruby-identifier">rm_r</span> <span class="ruby-ivar">@output_dir</span> <span class="ruby-keyword kw">rescue</span> <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">clobber_task</span> = <span class="ruby-identifier">paste</span>(<span class="ruby-value str">&quot;clobber_&quot;</span>, <span class="ruby-identifier">actual_name</span>)
+      <span class="ruby-identifier">task</span> <span class="ruby-identifier">:clobber</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-identifier">clobber_task</span>]
+
+      <span class="ruby-identifier">task</span> <span class="ruby-identifier">actual_name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">clobber_task</span>
+      <span class="ruby-keyword kw">self</span>
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="method">
+                <div class="title" id="M000098">
+                    
+                    <a name="M000098"></a><b>test_files=</b>(list)
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Explicitly define the list of test files to be included in a test.
+<tt>list</tt> is expected to be an array of file names (a FileList is
+acceptable). If both <tt>pattern</tt> and <tt>test_files</tt> are used,
+then the list of test files is the union of the two.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000098_source')" id="l_M000098_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/6c4d27fafa54c2e7ceef39b133d77c4f6506d9cc/lib/rcov/rcovtask.rb#L77" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000098_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/rcovtask.rb, line 77</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">test_files=</span>(<span class="ruby-identifier">list</span>)
+      <span class="ruby-ivar">@test_files</span> = <span class="ruby-identifier">list</span>
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+</div>
+    </div>
+  </body>
+</html>    

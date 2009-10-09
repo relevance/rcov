@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Rcov::CodeCoverageAnalyzer</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="../../css/reset.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="../../css/main.css" type="text/css" media="screen" />
+    <script src="../../js/jquery-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../js/jquery-effect.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../js/main.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body>     
+    <div class="banner">
+        <h1>
+            <span class="type">Class</span> 
+            Rcov::CodeCoverageAnalyzer 
+            
+                <span class="parent">&lt; 
+                    
+                    DifferentialAnalyzer
+                    
+                </span>
+            
+        </h1>
+        <ul class="files">
+            
+            <li><a href="../../files/lib/rcov/code_coverage_analyzer_rb.html">lib/rcov/code_coverage_analyzer.rb</a></li>
+            
+        </ul>
+    </div>
+    <div id="bodyContent">
+        <div id="content">
+    
+    <div class="description">
+        <p>
+A <a href="CodeCoverageAnalyzer.html">CodeCoverageAnalyzer</a> is
+responsible for tracing code execution and returning code coverage and
+execution count information.
+</p>
+<p>
+Note that you must <tt>require 'rcov'</tt> before the code you want to
+analyze is parsed (i.e. before it gets loaded or required). You can do that
+by either invoking ruby with the <tt>-rrcov</tt> command-line option or
+just:
+</p>
+<pre>
+ require 'rcov'
+ require 'mycode'
+ # ....
+</pre>
+<h2>Example</h2>
+<pre>
+ analyzer = Rcov::CodeCoverageAnalyzer.new
+ analyzer.run_hooked do
+   do_foo
+   # all the code executed as a result of this method call is traced
+ end
+ # ....
+
+ analyzer.run_hooked do
+   do_bar
+   # the code coverage information generated in this run is aggregated
+   # to the previously recorded one
+ end
+
+ analyzer.analyzed_files   # =&gt; [&quot;foo.rb&quot;, &quot;bar.rb&quot;, ... ]
+ lines, marked_info, count_info = analyzer.data(&quot;foo.rb&quot;)
+</pre>
+<p>
+In this example, two pieces of code are monitored, and the data generated
+in both runs are aggregated. <tt>lines</tt> is an array of strings
+representing the source code of <tt>foo.rb</tt>. <tt>marked_info</tt> is an
+array holding false, true values indicating whether the corresponding lines
+of code were reported as executed by Ruby. <tt>count_info</tt> is an array
+of integers representing how many times each line of code has been executed
+(more precisely, how many events where reported by Ruby &#8212; a single
+line might correspond to several events, e.g. many method calls).
+</p>
+<p>
+You can have several <a
+href="CodeCoverageAnalyzer.html">CodeCoverageAnalyzer</a> objects at a
+time, and it is possible to nest the <a
+href="CodeCoverageAnalyzer.html#M000018">run_hooked</a> / <a
+href="CodeCoverageAnalyzer.html#M000019">install_hook</a>/<a
+href="CodeCoverageAnalyzer.html#M000022">remove_hook</a> blocks: each
+analyzer will manage its data separately. Note however that no special
+provision is taken to ignore code executed &#8220;inside&#8221; the <a
+href="CodeCoverageAnalyzer.html">CodeCoverageAnalyzer</a> class. At any
+rate this will not pose a problem since it&#8217;s easy to ignore it
+manually: just don&#8217;t do
+</p>
+<pre>
+  lines, coverage, counts = analyzer.data(&quot;/path/to/lib/rcov.rb&quot;)
+</pre>
+<p>
+if you&#8217;re not interested in that information.
+</p>
+
+    </div>
+    
+
+    
+
+    
+    
+
+    
+    
+    <div class="sectiontitle">Methods</div>
+    <dl class="methods">
+    
+        <dt>A</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000013">analyzed_files</a></li>
+                
+            </ul>
+        </dd>
+    
+        <dt>D</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000014">data</a>,</li>
+                
+                <li><a href="#M000017">data_matching</a></li>
+                
+            </ul>
+        </dd>
+    
+        <dt>I</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000019">install_hook</a></li>
+                
+            </ul>
+        </dd>
+    
+        <dt>N</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000007">new</a></li>
+                
+            </ul>
+        </dd>
+    
+        <dt>R</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000022">remove_hook</a>,</li>
+                
+                <li><a href="#M000023">reset</a>,</li>
+                
+                <li><a href="#M000018">run_hooked</a></li>
+                
+            </ul>
+        </dd>
+    
+    </dl>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+            <div class="sectiontitle">Class Public methods</div>
+            
+            <div class="method">
+                <div class="title" id="M000007">
+                    
+                    <a name="M000007"></a><b>new</b>()
+                    
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000007_source')" id="l_M000007_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L59" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000007_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 59</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
+      <span class="ruby-ivar">@script_lines__</span> = <span class="ruby-constant">SCRIPT_LINES__</span>
+      <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">:install_coverage_hook</span>, <span class="ruby-identifier">:remove_coverage_hook</span>,
+            <span class="ruby-identifier">:reset_coverage</span>)
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="sectiontitle">Instance Public methods</div>
+            
+            <div class="method">
+                <div class="title" id="M000013">
+                    
+                    <a name="M000013"></a><b>analyzed_files</b>()
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Return an array with the names of the files whose code was executed inside
+the block given to <a
+href="CodeCoverageAnalyzer.html#M000018">run_hooked</a> or between <a
+href="CodeCoverageAnalyzer.html#M000019">install_hook</a> and <a
+href="CodeCoverageAnalyzer.html#M000022">remove_hook</a>.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000013_source')" id="l_M000013_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L67" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000013_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 67</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">analyzed_files</span>
+      <span class="ruby-identifier">update_script_lines__</span>
+      <span class="ruby-identifier">raw_data_relative</span>.<span class="ruby-identifier">select</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span>, <span class="ruby-identifier">lines</span><span class="ruby-operator">|</span>
+        <span class="ruby-ivar">@script_lines__</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">file</span>)
+      <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">fname</span>,<span class="ruby-operator">|</span> <span class="ruby-identifier">fname</span>}
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="method">
+                <div class="title" id="M000014">
+                    
+                    <a name="M000014"></a><b>data</b>(filename)
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Return the available data about the requested file, or nil if none of its
+code was executed or it cannot be found. The return value is an array with
+three elements:
+</p>
+<pre>
+ lines, marked_info, count_info = analyzer.data(&quot;foo.rb&quot;)
+</pre>
+<p>
+<tt>lines</tt> is an array of strings representing the source code of
+<tt>foo.rb</tt>. <tt>marked_info</tt> is an array holding false, true
+values indicating whether the corresponding lines of code were reported as
+executed by Ruby. <tt>count_info</tt> is an array of integers representing
+how many times each line of code has been executed (more precisely, how
+many events where reported by Ruby &#8212; a single line might correspond
+to several events, e.g. many method calls).
+</p>
+<p>
+The returned data corresponds to the aggregation of all the statistics
+collected in each <a
+href="CodeCoverageAnalyzer.html#M000018">run_hooked</a> or <a
+href="CodeCoverageAnalyzer.html#M000019">install_hook</a>/<a
+href="CodeCoverageAnalyzer.html#M000022">remove_hook</a> runs. You can
+reset the data at any time with <a
+href="CodeCoverageAnalyzer.html#M000023">reset</a> to start from scratch.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000014_source')" id="l_M000014_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L89" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000014_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 89</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">data</span>(<span class="ruby-identifier">filename</span>)
+      <span class="ruby-identifier">raw_data</span> = <span class="ruby-identifier">raw_data_relative</span>
+      <span class="ruby-identifier">update_script_lines__</span>
+      <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@script_lines__</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">filename</span>) <span class="ruby-operator">&amp;&amp;</span> 
+             <span class="ruby-identifier">raw_data</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">filename</span>)
+        <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> 
+      <span class="ruby-keyword kw">end</span>
+      <span class="ruby-identifier">refine_coverage_info</span>(<span class="ruby-ivar">@script_lines__</span>[<span class="ruby-identifier">filename</span>], <span class="ruby-identifier">raw_data</span>[<span class="ruby-identifier">filename</span>])
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="method">
+                <div class="title" id="M000017">
+                    
+                    <a name="M000017"></a><b>data_matching</b>(filename_re)
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Data for the first file matching the given regexp. See <a
+href="CodeCoverageAnalyzer.html#M000014">data</a>.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000017_source')" id="l_M000017_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L101" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000017_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 101</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">data_matching</span>(<span class="ruby-identifier">filename_re</span>)
+      <span class="ruby-identifier">raw_data</span> = <span class="ruby-identifier">raw_data_relative</span>
+      <span class="ruby-identifier">update_script_lines__</span>
+
+      <span class="ruby-identifier">match</span> = <span class="ruby-identifier">raw_data</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">grep</span>(<span class="ruby-identifier">filename_re</span>).<span class="ruby-identifier">first</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">match</span>
+
+      <span class="ruby-identifier">refine_coverage_info</span>(<span class="ruby-ivar">@script_lines__</span>[<span class="ruby-identifier">match</span>], <span class="ruby-identifier">raw_data</span>[<span class="ruby-identifier">match</span>])
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="method">
+                <div class="title" id="M000019">
+                    
+                    <a name="M000019"></a><b>install_hook</b>()
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Start monitoring execution to gather code coverage and execution count
+information. Such data will be collected until <a
+href="CodeCoverageAnalyzer.html#M000022">remove_hook</a> is called.
+</p>
+<p>
+Use <a href="CodeCoverageAnalyzer.html#M000018">run_hooked</a> instead if
+possible.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000019_source')" id="l_M000019_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L119" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000019_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 119</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">install_hook</span>; <span class="ruby-keyword kw">super</span> <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="method">
+                <div class="title" id="M000022">
+                    
+                    <a name="M000022"></a><b>remove_hook</b>()
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Stop collecting code coverage and execution count information. <a
+href="CodeCoverageAnalyzer.html#M000022">remove_hook</a> will also stop
+collecting info if it is run inside a <a
+href="CodeCoverageAnalyzer.html#M000018">run_hooked</a> block.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000022_source')" id="l_M000022_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L124" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000022_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 124</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">remove_hook</span>; <span class="ruby-keyword kw">super</span> <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="method">
+                <div class="title" id="M000023">
+                    
+                    <a name="M000023"></a><b>reset</b>()
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Remove the data collected so far. The coverage and execution count
+&#8220;history&#8221; will be erased, and further collection will start
+from scratch: no code is considered executed, and therefore all execution
+counts are 0. Right after <a
+href="CodeCoverageAnalyzer.html#M000023">reset</a>, <a
+href="CodeCoverageAnalyzer.html#M000013">analyzed_files</a> will return an
+empty array, and data(filename) will return nil.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000023_source')" id="l_M000023_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L131" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000023_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 131</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">reset</span>; <span class="ruby-keyword kw">super</span> <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="method">
+                <div class="title" id="M000018">
+                    
+                    <a name="M000018"></a><b>run_hooked</b>()
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Execute the code in the given block, monitoring it in order to gather
+information about which code was executed.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000018_source')" id="l_M000018_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L113" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000018_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 113</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">run_hooked</span>; <span class="ruby-keyword kw">super</span> <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+</div>
+    </div>
+  </body>
+</html>    

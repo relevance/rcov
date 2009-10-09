@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Rcov::RCOV__</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="../../css/reset.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="../../css/main.css" type="text/css" media="screen" />
+    <script src="../../js/jquery-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../js/jquery-effect.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../js/main.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body>     
+    <div class="banner">
+        <h1>
+            <span class="type">Module</span> 
+            Rcov::RCOV__ 
+            
+        </h1>
+        <ul class="files">
+            
+            <li><a href="../../files/lib/rcov/lowlevel_rb.html">lib/rcov/lowlevel.rb</a></li>
+            
+        </ul>
+    </div>
+    <div id="bodyContent">
+        <div id="content">
+    
+    <div class="description">
+        <p>
+<a href="RCOV__.html">RCOV__</a> performs the low-level tracing of the
+execution, gathering code coverage information in the process. The C core
+made available through the rcovrt extension will be used if possible.
+Otherwise the functionality will be emulated using set_trace_func, but this
+is very expensive and will fail if other libraries (e.g. breakpoint) change
+the trace_func.
+</p>
+<p>
+Do not use this module; it is very low-level and subject to frequent
+changes. <a href="CodeCoverageAnalyzer.html">Rcov::CodeCoverageAnalyzer</a>
+offers a much more convenient and stable interface.
+</p>
+
+    </div>
+    
+
+    
+
+    
+    
+
+    
+    
+    <div class="sectiontitle">Methods</div>
+    <dl class="methods">
+    
+        <dt>F</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000103">format_backtrace_array</a></li>
+                
+            </ul>
+        </dd>
+    
+    </dl>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="sectiontitle">Constants</div>
+    <table border='0' cellpadding='5'>
+        
+        <tr valign='top'>
+            <td class="attr-name">COVER</td>
+            <td>=</td>
+            <td class="attr-value">{}</td>
+        </tr>
+        
+        
+        <tr valign='top'>
+            <td class="attr-name">CALLSITES</td>
+            <td>=</td>
+            <td class="attr-value">{}</td>
+        </tr>
+        
+        
+        <tr valign='top'>
+            <td class="attr-name">DEFSITES</td>
+            <td>=</td>
+            <td class="attr-value">{}</td>
+        </tr>
+        
+        
+    </table>
+    
+
+    
+
+    
+            <div class="sectiontitle">Class Public methods</div>
+            
+            <div class="method">
+                <div class="title" id="M000103">
+                    
+                    <a name="M000103"></a><b>format_backtrace_array</b>(backtrace)
+                    
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000103_source')" id="l_M000103_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/6c4d27fafa54c2e7ceef39b133d77c4f6506d9cc/lib/rcov/lowlevel.rb#L138" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000103_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/lowlevel.rb, line 138</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">format_backtrace_array</span>(<span class="ruby-identifier">backtrace</span>)
+      <span class="ruby-identifier">backtrace</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">line</span><span class="ruby-operator">|</span>
+        <span class="ruby-identifier">md</span> = <span class="ruby-regexp re">/^([^:]*)(?::(\d+)(?::in `(.*)'))?/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">line</span>)
+        <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;Bad backtrace format&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">md</span>
+        [<span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">md</span>[<span class="ruby-value">3</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">md</span>[<span class="ruby-value">3</span>].<span class="ruby-identifier">to_sym</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">md</span>[<span class="ruby-value">1</span>], (<span class="ruby-identifier">md</span>[<span class="ruby-value">2</span>] <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>).<span class="ruby-identifier">to_i</span>]
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+</div>
+    </div>
+  </body>
+</html>    

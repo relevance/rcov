@@ -1,0 +1,16 @@
+.config
+test/actual_coverage
+test/coverage.info
+test/sample_05.rb
+ext/rcovrt/Makefile
+ext/rcovrt/callsite.o
+ext/rcovrt/rcovrt.bundle
+ext/rcovrt/rcovrt.o
+InstalledFiles
+TAGS
+coverage
+pkg
+.DS_Store
+*.gem
+tags
+ext/rcovrt/rcovrt.so

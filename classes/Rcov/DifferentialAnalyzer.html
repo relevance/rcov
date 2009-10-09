@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Rcov::DifferentialAnalyzer</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="../../css/reset.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="../../css/main.css" type="text/css" media="screen" />
+    <script src="../../js/jquery-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../js/jquery-effect.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../js/main.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body>     
+    <div class="banner">
+        <h1>
+            <span class="type">Class</span> 
+            Rcov::DifferentialAnalyzer 
+            
+                <span class="parent">&lt; 
+                    
+                    Object
+                    
+                </span>
+            
+        </h1>
+        <ul class="files">
+            
+            <li><a href="../../files/lib/rcov/differential_analyzer_rb.html">lib/rcov/differential_analyzer.rb</a></li>
+            
+        </ul>
+    </div>
+    <div id="bodyContent">
+        <div id="content">
+    
+
+    
+
+    
+    
+
+    
+    
+    <div class="sectiontitle">Methods</div>
+    <dl class="methods">
+    
+        <dt>A</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000052">aggregate_data</a></li>
+                
+            </ul>
+        </dd>
+    
+        <dt>C</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000053">compute_raw_data_difference</a></li>
+                
+            </ul>
+        </dd>
+    
+        <dt>D</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000049">data_default</a></li>
+                
+            </ul>
+        </dd>
+    
+        <dt>H</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000050">hook_level</a></li>
+                
+            </ul>
+        </dd>
+    
+        <dt>I</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000046">install_hook</a></li>
+                
+            </ul>
+        </dd>
+    
+        <dt>N</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000044">new</a></li>
+                
+            </ul>
+        </dd>
+    
+        <dt>R</dt>
+        <dd>
+            <ul>
+                
+                <li><a href="#M000051">raw_data_absolute</a>,</li>
+                
+                <li><a href="#M000047">remove_hook</a>,</li>
+                
+                <li><a href="#M000048">reset</a>,</li>
+                
+                <li><a href="#M000045">run_hooked</a></li>
+                
+            </ul>
+        </dd>
+    
+    </dl>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+            <div class="sectiontitle">Class Public methods</div>
+            
+            <div class="method">
+                <div class="title" id="M000044">
+                    
+                    <a name="M000044"></a><b>new</b>(install_hook_meth, remove_hook_meth, reset_meth)
+                    
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000044_source')" id="l_M000044_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/differential_analyzer.rb#L6" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000044_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/differential_analyzer.rb, line 6</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">install_hook_meth</span>, <span class="ruby-identifier">remove_hook_meth</span>, <span class="ruby-identifier">reset_meth</span>)
+      <span class="ruby-ivar">@cache_state</span> = <span class="ruby-identifier">:wait</span>
+      <span class="ruby-ivar">@start_raw_data</span> = <span class="ruby-identifier">data_default</span>
+      <span class="ruby-ivar">@end_raw_data</span> = <span class="ruby-identifier">data_default</span>
+      <span class="ruby-ivar">@aggregated_data</span> = <span class="ruby-identifier">data_default</span>
+      <span class="ruby-ivar">@install_hook_meth</span> = <span class="ruby-identifier">install_hook_meth</span>
+      <span class="ruby-ivar">@remove_hook_meth</span>= <span class="ruby-identifier">remove_hook_meth</span>
+      <span class="ruby-ivar">@reset_meth</span>= <span class="ruby-identifier">reset_meth</span>
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="sectiontitle">Class Protected methods</div>
+            
+            <div class="method">
+                <div class="title" id="M000050">
+                    
+                    <a name="M000050"></a><b>hook_level</b>()
+                    
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000050_source')" id="l_M000050_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/differential_analyzer.rb#L80" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000050_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/differential_analyzer.rb, line 80</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">hook_level</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;must be implemented by the subclass&quot;</span>
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="sectiontitle">Instance Public methods</div>
+            
+            <div class="method">
+                <div class="title" id="M000046">
+                    
+                    <a name="M000046"></a><b>install_hook</b>()
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Start monitoring execution to gather information. Such data will be
+collected until <a href="DifferentialAnalyzer.html#M000047">remove_hook</a>
+is called.
+</p>
+<p>
+Use <a href="DifferentialAnalyzer.html#M000045">run_hooked</a> instead if
+possible.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000046_source')" id="l_M000046_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/differential_analyzer.rb#L29" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000046_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/differential_analyzer.rb, line 29</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">install_hook</span>
+      <span class="ruby-ivar">@start_raw_data</span> = <span class="ruby-identifier">raw_data_absolute</span>
+      <span class="ruby-constant">Rcov</span><span class="ruby-operator">::</span><span class="ruby-constant">RCOV__</span>.<span class="ruby-identifier">send</span>(<span class="ruby-ivar">@install_hook_meth</span>)
+      <span class="ruby-ivar">@cache_state</span> = <span class="ruby-identifier">:hooked</span>
+      <span class="ruby-ivar">@@mutex</span>.<span class="ruby-identifier">synchronize</span>{ <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">hook_level</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span> }
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="method">
+                <div class="title" id="M000047">
+                    
+                    <a name="M000047"></a><b>remove_hook</b>()
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Stop collecting information. <a
+href="DifferentialAnalyzer.html#M000047">remove_hook</a> will also stop
+collecting info if it is run inside a <a
+href="DifferentialAnalyzer.html#M000045">run_hooked</a> block.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000047_source')" id="l_M000047_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/differential_analyzer.rb#L39" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000047_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/differential_analyzer.rb, line 39</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">remove_hook</span>
+      <span class="ruby-ivar">@@mutex</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword kw">do</span> 
+        <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">hook_level</span> <span class="ruby-operator">-=</span> <span class="ruby-value">1</span>
+        <span class="ruby-constant">Rcov</span><span class="ruby-operator">::</span><span class="ruby-constant">RCOV__</span>.<span class="ruby-identifier">send</span>(<span class="ruby-ivar">@remove_hook_meth</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">hook_level</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>
+      <span class="ruby-keyword kw">end</span>
+      <span class="ruby-ivar">@end_raw_data</span> = <span class="ruby-identifier">raw_data_absolute</span>
+      <span class="ruby-ivar">@cache_state</span> = <span class="ruby-identifier">:done</span>
+      <span class="ruby-comment cmt"># force computation of the stats for the traced code in this run;</span>
+      <span class="ruby-comment cmt"># we cannot simply let it be if self.class.hook_level == 0 because </span>
+      <span class="ruby-comment cmt"># some other analyzer could install a hook, causing the raw_data_absolute</span>
+      <span class="ruby-comment cmt"># to change again.</span>
+      <span class="ruby-comment cmt"># TODO: lazy computation of raw_data_relative, only when the hook gets</span>
+      <span class="ruby-comment cmt"># activated again.</span>
+      <span class="ruby-identifier">raw_data_relative</span>
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="method">
+                <div class="title" id="M000048">
+                    
+                    <a name="M000048"></a><b>reset</b>()
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Remove the data collected so far. Further collection will start from
+scratch.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000048_source')" id="l_M000048_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/differential_analyzer.rb#L57" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000048_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/differential_analyzer.rb, line 57</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">reset</span>
+      <span class="ruby-ivar">@@mutex</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword kw">do</span>
+        <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">hook_level</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>
+          <span class="ruby-comment cmt"># Unfortunately there's no way to report this as covered with rcov:</span>
+          <span class="ruby-comment cmt"># if we run the tests under rcov self.class.hook_level will be &gt;= 1 !</span>
+          <span class="ruby-comment cmt"># It is however executed when we run the tests normally.</span>
+          <span class="ruby-constant">Rcov</span><span class="ruby-operator">::</span><span class="ruby-constant">RCOV__</span>.<span class="ruby-identifier">send</span>(<span class="ruby-ivar">@reset_meth</span>)
+          <span class="ruby-ivar">@start_raw_data</span> = <span class="ruby-identifier">data_default</span>
+          <span class="ruby-ivar">@end_raw_data</span> = <span class="ruby-identifier">data_default</span>
+        <span class="ruby-keyword kw">else</span>
+          <span class="ruby-ivar">@start_raw_data</span> = <span class="ruby-ivar">@end_raw_data</span> = <span class="ruby-identifier">raw_data_absolute</span>
+        <span class="ruby-keyword kw">end</span>
+        <span class="ruby-ivar">@raw_data_relative</span> = <span class="ruby-identifier">data_default</span>
+        <span class="ruby-ivar">@aggregated_data</span> = <span class="ruby-identifier">data_default</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="method">
+                <div class="title" id="M000045">
+                    
+                    <a name="M000045"></a><b>run_hooked</b>()
+                    
+                </div>
+                
+                <div class="description">
+                  <p>
+Execute the code in the given block, monitoring it in order to gather
+information about which code was executed.
+</p>
+
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000045_source')" id="l_M000045_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/differential_analyzer.rb#L18" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000045_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/differential_analyzer.rb, line 18</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">run_hooked</span>
+      <span class="ruby-identifier">install_hook</span>
+      <span class="ruby-keyword kw">yield</span>
+    <span class="ruby-keyword kw">ensure</span>
+      <span class="ruby-identifier">remove_hook</span>
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="sectiontitle">Instance Protected methods</div>
+            
+            <div class="method">
+                <div class="title" id="M000052">
+                    
+                    <a name="M000052"></a><b>aggregate_data</b>(aggregated_data, delta)
+                    
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000052_source')" id="l_M000052_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/differential_analyzer.rb#L88" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000052_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/differential_analyzer.rb, line 88</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">aggregate_data</span>(<span class="ruby-identifier">aggregated_data</span>, <span class="ruby-identifier">delta</span>)
+      <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;must be implemented by the subclass&quot;</span>
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="method">
+                <div class="title" id="M000053">
+                    
+                    <a name="M000053"></a><b>compute_raw_data_difference</b>(first, last)
+                    
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000053_source')" id="l_M000053_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/differential_analyzer.rb#L92" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000053_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/differential_analyzer.rb, line 92</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">compute_raw_data_difference</span>(<span class="ruby-identifier">first</span>, <span class="ruby-identifier">last</span>)
+      <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;must be implemented by the subclass&quot;</span>
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="method">
+                <div class="title" id="M000049">
+                    
+                    <a name="M000049"></a><b>data_default</b>()
+                    
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000049_source')" id="l_M000049_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/differential_analyzer.rb#L76" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000049_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/differential_analyzer.rb, line 76</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">data_default</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;must be implemented by the subclass&quot;</span>
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="method">
+                <div class="title" id="M000051">
+                    
+                    <a name="M000051"></a><b>raw_data_absolute</b>()
+                    
+                </div>
+                
+                
+                
+                
+                <div class="sourcecode">
+                    <p class="source-link">
+                        Source: <a href="javascript:toggleSource('M000051_source')" id="l_M000051_source">show</a>
+                        
+                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/differential_analyzer.rb#L84" target="_blank" class="github_url">on GitHub</a>
+                        
+                    </p>
+                    <div id="M000051_source" class="dyn-source">
+                        <pre><span class="ruby-comment cmt"># File lib/rcov/differential_analyzer.rb, line 84</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">raw_data_absolute</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-value str">&quot;must be implemented by the subclass&quot;</span>
+    <span class="ruby-keyword kw">end</span></pre>
+                    </div>
+                </div>
+                
+            </div>
+            
+</div>
+    </div>
+  </body>
+</html>    

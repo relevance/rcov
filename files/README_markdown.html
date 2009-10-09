@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>README.markdown</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="../css/reset.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen" />
+    <script src="../js/jquery-1.3.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/jquery-effect.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/main.js" type="text/javascript" charset="utf-8"></script>
+</head>
+
+<body>     
+    <div class="banner">
+        <h1>
+            README.markdown
+        </h1>
+        <ul class="files">
+            <li>README.markdown</li>
+            <li>Last modified: Fri Oct 09 13:31:28 -0400 2009</li>
+        </ul>
+    </div>
+
+    <div id="bodyContent">
+        <div id="content">
+    
+    <div class="description">
+        <h1>RCov - Code Coverage for Ruby</h1>
+
+<h2>Why? What?</h2>
+
+<p>This is our fork of Mauricio Fernandez's RCov (maintained by <a href="http://thinkrelevance.com" title="Relevance">Relevance</a>).</p>
+
+<h2>Why does this fork exist?</h2>
+
+<ul>
+<li>Ruby 1.9.1 Compatibility (in progress)</li>
+<li>Removal of REXML Dependency (the source of most of the RCov bugs, done)</li>
+</ul>
+
+
+<h2>Install</h2>
+
+<pre><code>gem install relevance-rcov --source http://gems.github.com
+</code></pre>
+
+<h2>Bugs and Issues</h2>
+
+<p><a href="http://github.com/relevance/rcov/issues/" title="RCov Issues">RCov Issues on GitHub</a></p>
+
+<h2>Continuous Integration Status</h2>
+
+<p><a href="http://runcoderun.com/relevance/rcov/" title="RCov Build Status">RCov at RunCodeRun</a></p>
+
+<h2>More Info</h2>
+
+<p>rcov  copyright (c) 2004-2006 Mauricio Fernandez <a href="&#x6d;&#x61;&#x69;&#108;&#116;&#x6f;&#x3a;&#x6d;&#x66;&#x70;&#x40;&#97;&#99;&#109;&#x2e;&#x6f;&#114;&#103;">&#109;&#x66;&#x70;&#x40;&#x61;&#99;&#109;&#x2e;&#x6f;&#x72;&#103;</a></p>
+
+<h2>rcov README</h2>
+
+<p>Rcov is a code coverage tool for Ruby. It is commonly used for viewing overall test coverage of target code. It features:</p>
+
+<ul>
+<li>fast execution: 20-300 times faster than previous tools</li>
+<li>multiple analysis modes: standard, bogo-profile, "intentional testing",  dependency analysis...</li>
+<li>detection of uncovered code introduced since the last run ("differential code coverage")</li>
+<li>fairly accurate coverage information through code linkage inference using simple heuristics</li>
+<li>cross-referenced XHTML and several kinds of text reports</li>
+<li>support for easy automation with Rake</li>
+<li>colorblind-friendliness</li>
+</ul>
+
+
+<h2>Requirements</h2>
+
+<ul>
+<li>Ruby 1.8.6</li>
+<li>(recommended) C compiler: you can also use rcov without the rcovrt extension but rcov will be two orders of magnitude slower. The extension requires Ruby 1.8.6 or later.</li>
+</ul>
+
+
+<h2>Normal install</h2>
+
+<p>De-compress the archive and enter its top directory.
+Then type:</p>
+
+<pre><code>($ su)
+ # ruby setup.rb
+</code></pre>
+
+<p>This simple step installs rcov under the default location for Ruby libraries.  You can also customize the installation by supplying some options to setup.rb.  Try "ruby setup.rb --help".</p>
+
+<p>A normal (rcovrt-enabled) install requires Ruby >= 1.8.6 and a working C toolchain; if you cannot compile Ruby extensions proceed as described below.</p>
+
+<p>You might have to install a "development package" (often named ruby-dev or ruby1.8-dev), or alternatively build ruby from the sources, if the compiler cannot find the headers (ruby.h and friends).</p>
+
+<h2>Install without the rcovrt extension</h2>
+
+<pre><code>($su )
+# ruby setup.rb all --without-ext
+</code></pre>
+
+<p>will install rcov without building the rcovrt extension.</p>
+
+<h2>Usage</h2>
+
+<p>In the common scenario, your tests are under test/ and the target code (whose coverage you want) is in lib/. In that case, all you have to do is use rcov to run the tests (instead of testrb), and a number of XHTML files with the code coverage information will be generated, e.g.</p>
+
+<pre><code>rcov -Ilib test/*.rb
+</code></pre>
+
+<p>will execute all the .rb files under test/ and generate the code coverage report for the target code (i.e. for the files in lib/) under coverage/. The target code needs not be under lib/; rcov will detect is as long as it is
+require()d by the tests. rcov is smart enough to ignore "uninteresting" files: the tests themselves, files installed in Ruby's standard locations, etc.  See  rcov --help  for the list of regexps rcov matches filenames against.</p>
+
+<p>rcov can also be used from Rake; see readme_for_rake or the RDoc documentation for more information.  The Rakefile included in rcov's sources holds a few tasks that run rcov on itself, producing a number of reports. You can try</p>
+
+<pre><code>rake rcov
+</code></pre>
+
+<p>  preferably after a full install or</p>
+
+<pre><code>ruby setup.rb config
+ruby setup.rb setup
+</code></pre>
+
+<p>so that the rcovrt extension can be used to speed up the process. This will generate a cross-referenced XHTML report under coverage/.</p>
+
+<p>rcov can output information in several formats, and perform different kinds of analyses in addition to plain code coverage.  See  rcov --help  for a description of the available options.</p>
+
+<h2>License</h2>
+
+<p>rcov is licensed under the same terms as Ruby. See LICENSE.</p>
+
+<p>Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:</p>
+
+<ol>
+<li>Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.</li>
+<li>Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.</li>
+<li>Neither the name of ePark Labs nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.</li>
+</ol>
+
+
+<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+
+<p>Relevace OSS swat team <a href="&#109;&#x61;&#x69;&#108;&#116;&#111;&#58;&#x6f;&#x70;&#x65;&#110;&#x73;&#111;&#x75;&#x72;&#99;&#101;&#64;&#x74;&#104;&#105;&#110;&#x6b;&#114;&#x65;&#108;&#101;&#118;&#x61;&#110;&#x63;&#101;&#x2e;&#99;&#111;&#x6d;">&#111;&#112;&#101;&#110;&#x73;&#x6f;&#x75;&#114;&#99;&#101;&#64;&#116;&#104;&#x69;&#x6e;&#107;&#x72;&#101;&#108;&#x65;&#118;&#x61;&#x6e;&#99;&#x65;&#46;&#99;&#111;&#x6d;</a></p>
+<script type="text/javascript">$(function() {
+  $('a').each(function() { $(this).attr('target', '_blank') })
+})</script>
+
+    </div>
+    
+
+    
+
+    
+    
+
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</div>
+    </div>
+  </body>
+</html>
