@@ -83,9 +83,9 @@ line might correspond to several events, e.g. many method calls).
 You can have several <a
 href="CodeCoverageAnalyzer.html">CodeCoverageAnalyzer</a> objects at a
 time, and it is possible to nest the <a
-href="CodeCoverageAnalyzer.html#M000018">run_hooked</a> / <a
-href="CodeCoverageAnalyzer.html#M000019">install_hook</a>/<a
-href="CodeCoverageAnalyzer.html#M000022">remove_hook</a> blocks: each
+href="CodeCoverageAnalyzer.html#M000011">run_hooked</a> / <a
+href="CodeCoverageAnalyzer.html#M000012">install_hook</a>/<a
+href="CodeCoverageAnalyzer.html#M000013">remove_hook</a> blocks: each
 analyzer will manage its data separately. Note however that no special
 provision is taken to ignore code executed &#8220;inside&#8221; the <a
 href="CodeCoverageAnalyzer.html">CodeCoverageAnalyzer</a> class. At any
@@ -116,7 +116,7 @@ if you&#8217;re not interested in that information.
         <dd>
             <ul>
                 
-                <li><a href="#M000013">analyzed_files</a></li>
+                <li><a href="#M000003">analyzed_files</a></li>
                 
             </ul>
         </dd>
@@ -125,9 +125,9 @@ if you&#8217;re not interested in that information.
         <dd>
             <ul>
                 
-                <li><a href="#M000014">data</a>,</li>
+                <li><a href="#M000004">data</a>,</li>
                 
-                <li><a href="#M000017">data_matching</a></li>
+                <li><a href="#M000005">data_matching</a></li>
                 
             </ul>
         </dd>
@@ -136,7 +136,7 @@ if you&#8217;re not interested in that information.
         <dd>
             <ul>
                 
-                <li><a href="#M000019">install_hook</a></li>
+                <li><a href="#M000012">install_hook</a></li>
                 
             </ul>
         </dd>
@@ -145,7 +145,7 @@ if you&#8217;re not interested in that information.
         <dd>
             <ul>
                 
-                <li><a href="#M000007">new</a></li>
+                <li><a href="#M000002">new</a></li>
                 
             </ul>
         </dd>
@@ -154,11 +154,11 @@ if you&#8217;re not interested in that information.
         <dd>
             <ul>
                 
-                <li><a href="#M000022">remove_hook</a>,</li>
+                <li><a href="#M000013">remove_hook</a>,</li>
                 
-                <li><a href="#M000023">reset</a>,</li>
+                <li><a href="#M000014">reset</a>,</li>
                 
-                <li><a href="#M000018">run_hooked</a></li>
+                <li><a href="#M000011">run_hooked</a></li>
                 
             </ul>
         </dd>
@@ -180,9 +180,9 @@ if you&#8217;re not interested in that information.
             <div class="sectiontitle">Class Public methods</div>
             
             <div class="method">
-                <div class="title" id="M000007">
+                <div class="title" id="M000002">
                     
-                    <a name="M000007"></a><b>new</b>()
+                    <a name="M000002"></a><b>new</b>()
                     
                 </div>
                 
@@ -191,12 +191,12 @@ if you&#8217;re not interested in that information.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000007_source')" id="l_M000007_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000002_source')" id="l_M000002_source">show</a>
                         
                         | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L59" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000007_source" class="dyn-source">
+                    <div id="M000002_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 59</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
       <span class="ruby-ivar">@script_lines__</span> = <span class="ruby-constant">SCRIPT_LINES__</span>
@@ -211,9 +211,9 @@ if you&#8217;re not interested in that information.
             <div class="sectiontitle">Instance Public methods</div>
             
             <div class="method">
-                <div class="title" id="M000013">
+                <div class="title" id="M000003">
                     
-                    <a name="M000013"></a><b>analyzed_files</b>()
+                    <a name="M000003"></a><b>analyzed_files</b>()
                     
                 </div>
                 
@@ -221,9 +221,9 @@ if you&#8217;re not interested in that information.
                   <p>
 Return an array with the names of the files whose code was executed inside
 the block given to <a
-href="CodeCoverageAnalyzer.html#M000018">run_hooked</a> or between <a
-href="CodeCoverageAnalyzer.html#M000019">install_hook</a> and <a
-href="CodeCoverageAnalyzer.html#M000022">remove_hook</a>.
+href="CodeCoverageAnalyzer.html#M000011">run_hooked</a> or between <a
+href="CodeCoverageAnalyzer.html#M000012">install_hook</a> and <a
+href="CodeCoverageAnalyzer.html#M000013">remove_hook</a>.
 </p>
 
                 </div>
@@ -233,12 +233,12 @@ href="CodeCoverageAnalyzer.html#M000022">remove_hook</a>.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000013_source')" id="l_M000013_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000003_source')" id="l_M000003_source">show</a>
                         
                         | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L67" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000013_source" class="dyn-source">
+                    <div id="M000003_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 67</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">analyzed_files</span>
       <span class="ruby-identifier">update_script_lines__</span>
@@ -252,9 +252,9 @@ href="CodeCoverageAnalyzer.html#M000022">remove_hook</a>.
             </div>
             
             <div class="method">
-                <div class="title" id="M000014">
+                <div class="title" id="M000004">
                     
-                    <a name="M000014"></a><b>data</b>(filename)
+                    <a name="M000004"></a><b>data</b>(filename)
                     
                 </div>
                 
@@ -279,11 +279,11 @@ to several events, e.g. many method calls).
 <p>
 The returned data corresponds to the aggregation of all the statistics
 collected in each <a
-href="CodeCoverageAnalyzer.html#M000018">run_hooked</a> or <a
-href="CodeCoverageAnalyzer.html#M000019">install_hook</a>/<a
-href="CodeCoverageAnalyzer.html#M000022">remove_hook</a> runs. You can
+href="CodeCoverageAnalyzer.html#M000011">run_hooked</a> or <a
+href="CodeCoverageAnalyzer.html#M000012">install_hook</a>/<a
+href="CodeCoverageAnalyzer.html#M000013">remove_hook</a> runs. You can
 reset the data at any time with <a
-href="CodeCoverageAnalyzer.html#M000023">reset</a> to start from scratch.
+href="CodeCoverageAnalyzer.html#M000014">reset</a> to start from scratch.
 </p>
 
                 </div>
@@ -293,12 +293,12 @@ href="CodeCoverageAnalyzer.html#M000023">reset</a> to start from scratch.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000014_source')" id="l_M000014_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000004_source')" id="l_M000004_source">show</a>
                         
                         | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L89" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000014_source" class="dyn-source">
+                    <div id="M000004_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 89</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">data</span>(<span class="ruby-identifier">filename</span>)
       <span class="ruby-identifier">raw_data</span> = <span class="ruby-identifier">raw_data_relative</span>
@@ -315,16 +315,16 @@ href="CodeCoverageAnalyzer.html#M000023">reset</a> to start from scratch.
             </div>
             
             <div class="method">
-                <div class="title" id="M000017">
+                <div class="title" id="M000005">
                     
-                    <a name="M000017"></a><b>data_matching</b>(filename_re)
+                    <a name="M000005"></a><b>data_matching</b>(filename_re)
                     
                 </div>
                 
                 <div class="description">
                   <p>
 Data for the first file matching the given regexp. See <a
-href="CodeCoverageAnalyzer.html#M000014">data</a>.
+href="CodeCoverageAnalyzer.html#M000004">data</a>.
 </p>
 
                 </div>
@@ -334,12 +334,12 @@ href="CodeCoverageAnalyzer.html#M000014">data</a>.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000017_source')" id="l_M000017_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000005_source')" id="l_M000005_source">show</a>
                         
                         | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L101" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000017_source" class="dyn-source">
+                    <div id="M000005_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 101</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">data_matching</span>(<span class="ruby-identifier">filename_re</span>)
       <span class="ruby-identifier">raw_data</span> = <span class="ruby-identifier">raw_data_relative</span>
@@ -356,9 +356,9 @@ href="CodeCoverageAnalyzer.html#M000014">data</a>.
             </div>
             
             <div class="method">
-                <div class="title" id="M000019">
+                <div class="title" id="M000012">
                     
-                    <a name="M000019"></a><b>install_hook</b>()
+                    <a name="M000012"></a><b>install_hook</b>()
                     
                 </div>
                 
@@ -366,10 +366,10 @@ href="CodeCoverageAnalyzer.html#M000014">data</a>.
                   <p>
 Start monitoring execution to gather code coverage and execution count
 information. Such data will be collected until <a
-href="CodeCoverageAnalyzer.html#M000022">remove_hook</a> is called.
+href="CodeCoverageAnalyzer.html#M000013">remove_hook</a> is called.
 </p>
 <p>
-Use <a href="CodeCoverageAnalyzer.html#M000018">run_hooked</a> instead if
+Use <a href="CodeCoverageAnalyzer.html#M000011">run_hooked</a> instead if
 possible.
 </p>
 
@@ -380,12 +380,12 @@ possible.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000019_source')" id="l_M000019_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000012_source')" id="l_M000012_source">show</a>
                         
                         | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L119" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000019_source" class="dyn-source">
+                    <div id="M000012_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 119</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">install_hook</span>; <span class="ruby-keyword kw">super</span> <span class="ruby-keyword kw">end</span></pre>
                     </div>
@@ -394,18 +394,18 @@ possible.
             </div>
             
             <div class="method">
-                <div class="title" id="M000022">
+                <div class="title" id="M000013">
                     
-                    <a name="M000022"></a><b>remove_hook</b>()
+                    <a name="M000013"></a><b>remove_hook</b>()
                     
                 </div>
                 
                 <div class="description">
                   <p>
 Stop collecting code coverage and execution count information. <a
-href="CodeCoverageAnalyzer.html#M000022">remove_hook</a> will also stop
+href="CodeCoverageAnalyzer.html#M000013">remove_hook</a> will also stop
 collecting info if it is run inside a <a
-href="CodeCoverageAnalyzer.html#M000018">run_hooked</a> block.
+href="CodeCoverageAnalyzer.html#M000011">run_hooked</a> block.
 </p>
 
                 </div>
@@ -415,12 +415,12 @@ href="CodeCoverageAnalyzer.html#M000018">run_hooked</a> block.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000022_source')" id="l_M000022_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000013_source')" id="l_M000013_source">show</a>
                         
                         | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L124" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000022_source" class="dyn-source">
+                    <div id="M000013_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 124</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">remove_hook</span>; <span class="ruby-keyword kw">super</span> <span class="ruby-keyword kw">end</span></pre>
                     </div>
@@ -429,9 +429,9 @@ href="CodeCoverageAnalyzer.html#M000018">run_hooked</a> block.
             </div>
             
             <div class="method">
-                <div class="title" id="M000023">
+                <div class="title" id="M000014">
                     
-                    <a name="M000023"></a><b>reset</b>()
+                    <a name="M000014"></a><b>reset</b>()
                     
                 </div>
                 
@@ -441,8 +441,8 @@ Remove the data collected so far. The coverage and execution count
 &#8220;history&#8221; will be erased, and further collection will start
 from scratch: no code is considered executed, and therefore all execution
 counts are 0. Right after <a
-href="CodeCoverageAnalyzer.html#M000023">reset</a>, <a
-href="CodeCoverageAnalyzer.html#M000013">analyzed_files</a> will return an
+href="CodeCoverageAnalyzer.html#M000014">reset</a>, <a
+href="CodeCoverageAnalyzer.html#M000003">analyzed_files</a> will return an
 empty array, and data(filename) will return nil.
 </p>
 
@@ -453,12 +453,12 @@ empty array, and data(filename) will return nil.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000023_source')" id="l_M000023_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000014_source')" id="l_M000014_source">show</a>
                         
                         | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L131" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000023_source" class="dyn-source">
+                    <div id="M000014_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 131</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">reset</span>; <span class="ruby-keyword kw">super</span> <span class="ruby-keyword kw">end</span></pre>
                     </div>
@@ -467,9 +467,9 @@ empty array, and data(filename) will return nil.
             </div>
             
             <div class="method">
-                <div class="title" id="M000018">
+                <div class="title" id="M000011">
                     
-                    <a name="M000018"></a><b>run_hooked</b>()
+                    <a name="M000011"></a><b>run_hooked</b>()
                     
                 </div>
                 
@@ -486,12 +486,12 @@ information about which code was executed.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000018_source')" id="l_M000018_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000011_source')" id="l_M000011_source">show</a>
                         
                         | <a href="http://github.com/relevance/rcov/blob/0d4ae40cd184ba7cc21ad2163b644945aa0682e0/lib/rcov/code_coverage_analyzer.rb#L113" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000018_source" class="dyn-source">
+                    <div id="M000011_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/code_coverage_analyzer.rb, line 113</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">run_hooked</span>; <span class="ruby-keyword kw">super</span> <span class="ruby-keyword kw">end</span></pre>
                     </div>
