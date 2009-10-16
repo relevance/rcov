@@ -126,8 +126,7 @@ module Rcov
           end
         end
       end
-      @lines[lineno] && !@is_begin_comment[lineno] && 
-        @lines[lineno] !~ /^\s*(#|$)/ 
+      @lines[lineno] && !@is_begin_comment[lineno] && @lines[lineno] !~ /^\s*(#|$)/ 
     end
 
     private
@@ -163,6 +162,20 @@ module Rcov
         end
       end
     end
+    
+    def is_nocov?(line)
+      line =~ /#:nocov:/
+    end
+    
+    def mark_nocov_regions(nocov_line_numbers, coverage)
+      while nocov_line_numbers.size > 0
+        begin_line, end_line = nocov_line_numbers.shift, nocov_line_numbers.shift
+        next unless begin_line && end_line
+        (begin_line..end_line).each do |line_num|
+          coverage[line_num] ||= :inferred
+        end
+      end
+    end
 
     def precompute_coverage(comments_run_by_default = true)
       changed = false
@@ -175,7 +188,11 @@ module Rcov
           @coverage[i] ||= :inferred
         end
       end
+      nocov_line_numbers = []
+      
       (0...lines.size).each do |i|
+        nocov_line_numbers << i if is_nocov?(@lines[i])
+
         next if @coverage[i]
         line = @lines[i]
         if /^\s*(begin|ensure|else|case)\s*(?:#.*)?$/ =~ line && next_expr_marked?(i) or
@@ -190,7 +207,11 @@ module Rcov
           @coverage[i] ||= :inferred
           changed = true
         end
+        
       end
+
+      mark_nocov_regions(nocov_line_numbers, @coverage)
+      
       (@lines.size-1).downto(0) do |i|
         next if @coverage[i]
         if !is_code?(i) and @coverage[i+1] 
