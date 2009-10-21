@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html lang='en' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'>
   <head>
-    <title><%= page_title %></title>
+    <title><%= rcov_page_title %></title>
     <link href="screen.css" media="all" rel="stylesheet" type="text/css" />
     <link href="print.css" media="print" rel="stylesheet" type="text/css" />
     <% if css %><link href="custom.css" media="all" rel="stylesheet" type="text/css" /><% end %>
@@ -10,7 +10,7 @@
   </head>
   <body>
     <h1><%= "#{project_name} C0 Coverage Information - RCov" %></h1>
-    <h2><%= page_title %></h2>
+    <h2><%= rcov_page_title %></h2>
 
     <% if output_threshold != 101 %>
       <!-- Note: 101 is the default threshold if you don't enter one -->
