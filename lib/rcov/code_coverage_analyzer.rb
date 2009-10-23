@@ -157,7 +157,10 @@ module Rcov
     def aggregate_data(aggregated_data, delta)
       delta.each_pair do |file, cov_arr|
         dest = (aggregated_data[file] ||= Array.new(cov_arr.size, 0))
-        cov_arr.each_with_index{|x,i| dest[i] += x.to_i}
+        cov_arr.each_with_index do |x,i| 
+          dest[i] ||= 0
+          dest[i] += x.to_i
+        end
       end
     end
 

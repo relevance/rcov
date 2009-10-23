@@ -3,8 +3,8 @@
 # See LICENSE for licensing information.
 
 module Rcov
-  VERSION = "0.9.5"
-  RELEASE_DATE = "2009-10-16"
+  VERSION = "0.9.6"
+  RELEASE_DATE = "2009-10-23"
   RCOVRT_ABI = [2,0,0]
   UPSTREAM_URL = "http://github.com/relevance/rcov"
 end
