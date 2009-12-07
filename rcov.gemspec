@@ -20,7 +20,11 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/versio
              "test/file_statistics_test.rb", "test/assets/sample_03.rb", "test/assets/sample_05-new.rb", 
              "test/code_coverage_analyzer_test.rb", "test/assets/sample_04.rb", "test/assets/sample_02.rb", 
              "test/assets/sample_05-old.rb", "test/assets/sample_01.rb", "test/turn_off_rcovrt.rb", 
-             "test/call_site_analyzer_test.rb", "test/assets/sample_05.rb", "editor-extensions/rcov.vim", 
+             "test/call_site_analyzer_test.rb", "test/assets/sample_05.rb", "test/assets/sample_06.rb", "editor-extensions/rcov.vim", 
+             "test/test_helper.rb", 
+             "test/expected_coverage/diff-gcc-all.out", "test/expected_coverage/diff-gcc-diff.out", "test/expected_coverage/diff-gcc-original.out", 
+             "test/expected_coverage/diff-no-color.out", "test/expected_coverage/diff.out", "test/expected_coverage/gcc-text.out", 
+             "test/expected_coverage/sample_03_rb.html", "test/expected_coverage/sample_03_rb.rb", "test/expected_coverage/sample_04_rb.html", 
              "editor-extensions/rcov.el", "setup.rb", "BLURB"]
 
 Gem::Specification.new do |s|
