@@ -29,12 +29,12 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/versio
 
 Gem::Specification.new do |s|
   s.name = %q{rcov}
-  s.version = "0.9.7"
+  s.version = "0.9.7.1"
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
   s.authors = ["Relevance", "Chad Humphries (spicycode)", "Aaron Bedra (abedra)", "Jay McGaffigan", "Mauricio Fernandez"]
   s.cert_chain = nil
-  s.date = %q{2009-12-27}
+  s.date = %q{2009-12-29}
   s.default_executable = %q{rcov}
   s.description = %q{rcov is a code coverage tool for Ruby. It is commonly used for viewing overall test unit coverage of target code.  It features fast execution (20-300 times faster than previous tools), multiple analysis modes, XHTML and several kinds of text reports, easy automation with Rake via a RcovTask, fairly accurate coverage information through code linkage inference using simple heuristics, colorblind-friendliness...}
   s.email = %q{opensource@thinkrelevance.com}
