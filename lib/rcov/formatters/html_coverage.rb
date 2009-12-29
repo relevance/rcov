@@ -100,7 +100,7 @@ module Rcov
     def create_file(destfile, fileinfo)
       doc = Rcov::Formatters::HtmlErbTemplate.new('detail.html.erb',
         :project_name => project_name,
-        :page_title => fileinfo.name, 
+        :rcov_page_title => fileinfo.name, 
         :css => @css,
         :generated_on => Time.now,
         :rcov => Rcov,
