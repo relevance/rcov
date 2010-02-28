@@ -55,7 +55,7 @@ if RUBY_PLATFORM == 'java'
     sh "jar cf #{t.name} -C pkg/classes ."
   end
 else
-    Rake::TestTask.new(:test_rcovrt => ["ext/rcovrt/rcovrt.so"]) do |t|
+  Rake::TestTask.new(:test_rcovrt => ["ext/rcovrt/rcovrt.so"]) do |t|
     system("cd ext/rcovrt && make clean && rm Makefile")
     t.libs << "ext/rcovrt"
     t.test_files = FileList['test/*_test.rb']

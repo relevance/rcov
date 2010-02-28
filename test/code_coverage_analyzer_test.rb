@@ -48,8 +48,6 @@ EOF
     assert_equal(lines, line_info)
     assert_equal([true, true, false, false, true, false, true], cov_info)
     assert_equal([1, 2, 0, 0, 1, 0, 11], count_info) unless RUBY_PLATFORM =~ /java/
-    # JRUBY reports an if x==blah as hitting this type of line once, JRUBY also optimizes this stuff so you'd have to run with --debug to get "extra" information.  MRI hits it twice.
-    assert_equal([1, 3, 0, 0, 1, 0, 33], count_info) if RUBY_PLATFORM =~ /java/
     analyzer.reset
     assert_equal(nil, analyzer.data(sample_file))
     assert_equal([], analyzer.analyzed_files)
