@@ -51,8 +51,15 @@ static struct cov_array * coverage_increase_counter_uncached(char *sourcefile, u
   }
 
   if(mark_only) {
-    if(!carray->ptr[sourceline])
-      carray->ptr[sourceline] = 1;
+    if (carray && carray->len > sourceline) {
+      if(!carray->ptr[sourceline])
+        carray->ptr[sourceline] = 1;
+    } else {
+      #if COVERAGE_DEBUG_EVENTS
+        printf("DEBUG: %s carray->len:%d sourceline:%d\n",
+               sourcefile, carray->len, sourceline);
+      #endif
+    }
   } else {
     if (carray && carray->len > sourceline) {
       carray->ptr[sourceline]++;
