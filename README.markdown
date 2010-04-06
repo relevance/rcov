@@ -11,7 +11,7 @@ This is our fork of Mauricio Fernandez's RCov (maintained by [Relevance] [3]).
 
 ## Install
 
-    gem install relevance-rcov --source http://gems.github.com
+    gem install rcov
 
 ## Bugs and Issues
 
