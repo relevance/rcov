@@ -49,7 +49,7 @@ EOF
     assert_equal([true, true, false, false, true, false, true], cov_info)
     assert_equal([1, 2, 0, 0, 1, 0, 11], count_info) unless RUBY_PLATFORM =~ /java/
     # JRUBY reports an if x==blah as hitting this type of line once, JRUBY also optimizes this stuff so you'd have to run with --debug to get "extra" information.  MRI hits it twice.
-    assert_equal([1, 3, 0, 0, 1, 0, 33], count_info) if RUBY_PLATFORM =~ /java/
+    assert_equal([1, 3, 0, 0, 1, 0, 13], count_info) if RUBY_PLATFORM =~ /java/
     analyzer.reset
     assert_equal(nil, analyzer.data(sample_file))
     assert_equal([], analyzer.analyzed_files)
@@ -190,6 +190,18 @@ EOF
       assert_equal([0, 221, 221, 221, 0], counts1)
       assert_equal([0, 121, 121, 121, 0], counts2)
     end
+  end
+  
+  def test_erb_patterns
+    sample_file = File.join(File.dirname(__FILE__), "assets/sample_07.rb.erb")
+    sample_file2 = File.join(File.dirname(__FILE__), "assets/sample_07.rb")
+    a1 = Rcov::CodeCoverageAnalyzer.new
+    a1.run_hooked do 
+      load sample_file
+      load sample_file2
+    end
+    p "erb test. [#{a1.data(sample_file)[2].join(',')}]"
+    p "erb test. [#{a1.data(sample_file2)[2].join(',')}]"
   end
 
   def test_reset
