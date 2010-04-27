@@ -404,6 +404,11 @@ if textual_formatters[options.textmode]
   formatters << make_formatter[textual_formatters[options.textmode]]
 end
 
+
+if options.failure_threshold.nil? == false && options.textmode != :failure_report
+  formatters << make_formatter[textual_formatters[:failure_report]]
+end
+
 formatters << make_formatter[Rcov::TextCoverageDiff] if options.coverage_diff_save
 
 if options.aggregate_file
