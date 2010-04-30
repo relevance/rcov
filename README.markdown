@@ -2,7 +2,7 @@
 
 ## Why? What?
 
-This is our fork of Mauricio Fernandez's RCov (maintained by [Relevance] [3]).
+This is our fork of Mauricio Fernandez's RCov (maintained by [Relevance] [2]).
 
 ## Why does this fork exist?
 
@@ -17,13 +17,8 @@ This is our fork of Mauricio Fernandez's RCov (maintained by [Relevance] [3]).
 
 [RCov Issues on GitHub] [1]
 
-## Continuous Integration Status
-
-[RCov at RunCodeRun] [2]
-
   [1]: http://github.com/relevance/rcov/issues/ "RCov Issues"
-  [2]: http://runcoderun.com/relevance/rcov/ "RCov Build Status"
-  [3]: http://thinkrelevance.com "Relevance"
+  [2]: http://thinkrelevance.com "Relevance"
 
 ## More Info
 
