@@ -60,7 +60,7 @@
         <tbody>
           <% files.each_with_index do |f,i| %>
             <tr class="all_files all_coverage <%= coverage_threshold_classes(f.code_coverage_for_report) %> <%= file_filter_classes(f.name) %> <%= i % 2 == 0 ? 'even' : 'odd' %>">
-              <td class="left_align"><a href="<%= relative_filename(f.name) %>"><%= f.name %></a></td>
+              <td class="left_align"><a href="<%= CGI::escapeHTML(relative_filename(f.name)) %>"><%= CGI::escapeHTML(f.name) %></a></td>
               <td class='right_align'><tt><%= f.num_lines %></tt></td>
               <td class='right_align'><tt><%= f.num_code_lines %></tt></td>
               <td class="left_align"><%= code_coverage_html(f.total_coverage_for_report) %></td>
