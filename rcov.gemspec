@@ -29,10 +29,10 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/versio
 
 Gem::Specification.new do |s|
   s.name = %q{rcov}
-  s.version = "0.9.8"
+  s.version = "0.9.9"
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
-  s.authors = ["Relevance", "Chad Humphries (spicycode)", "Aaron Bedra (abedra)", "Jay McGaffigan", "Mauricio Fernandez"]
+  s.authors = ["Relevance", "Chad Humphries (spicycode)", "Aaron Bedra (abedra)", "Jay McGaffigan(hooligan495)", "Mauricio Fernandez"]
   s.cert_chain = nil
   s.date = %q{2009-12-29}
   s.default_executable = %q{rcov}

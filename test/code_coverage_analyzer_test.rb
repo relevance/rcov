@@ -192,17 +192,6 @@ EOF
     end
   end
   
-  def test_erb_patterns
-    sample_file = File.join(File.dirname(__FILE__), "assets/sample_07.rb.erb")
-    sample_file2 = File.join(File.dirname(__FILE__), "assets/sample_07.rb")
-    a1 = Rcov::CodeCoverageAnalyzer.new
-    a1.run_hooked do 
-      load sample_file
-      load sample_file2
-    end
-    p "erb test. [#{a1.data(sample_file)[2].join(',')}]"
-    p "erb test. [#{a1.data(sample_file2)[2].join(',')}]"
-  end
 
   def test_reset
     a1 = Rcov::CodeCoverageAnalyzer.new
