@@ -131,6 +131,7 @@ module Rcov
     def reset; super end
 
     def dump_coverage_info(formatters) # :nodoc:
+      correct_script_lines__
       update_script_lines__
       raw_data_relative.each do |file, lines|
         next if @script_lines__.has_key?(file) == false
@@ -251,6 +252,18 @@ module Rcov
 
     def update_script_lines__
       @script_lines__ = @script_lines__.merge(SCRIPT_LINES__)
+    end
+
+    def correct_script_lines__
+      return unless JRUBY_VERSION && JRUBY_VERSION < "1.5.3"
+      SCRIPT_LINES__.each_key do |file|
+        next unless File.exists? file
+        lines = []
+        File.open(file).each do |line|
+          lines << line
+        end
+        SCRIPT_LINES__[file] = lines
+      end
     end
 
     public
