@@ -180,6 +180,10 @@ EOF
     options.textmode = :coverage
   end
 
+  opts.on("--require LIB", "Require an additional lib before running") do |file|
+	require file
+  end
+
   opts.on("--custom-formatter EXPR", "Generate additional output using a",
           "custom formatter class. The expression",
 		  "is evaluated as Ruby code and should",
