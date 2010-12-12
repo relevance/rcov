@@ -264,6 +264,7 @@ module Rcov
         end
         SCRIPT_LINES__[file] = lines
       end
+    rescue NameError
     end
 
     public
