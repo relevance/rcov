@@ -4,11 +4,6 @@
 
 This is our fork of Mauricio Fernandez's RCov (maintained by [Relevance] [2]).
 
-## Why does this fork exist?
-
-* Ruby 1.9.1 Compatibility (in progress)
-* Removal of REXML Dependency (the source of most of the RCov bugs, done)
-
 ## Install
 
     gem install rcov
