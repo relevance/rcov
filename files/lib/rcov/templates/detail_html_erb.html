@@ -19,7 +19,7 @@
         </h1>
         <ul class="files">
             <li>lib/rcov/templates/detail.html.erb</li>
-            <li>Last modified: Sat Sep 05 11:57:19 -0400 2009</li>
+            <li>Last modified: Tue Dec 29 22:11:26 -0500 2009</li>
         </ul>
     </div>
 
@@ -36,7 +36,7 @@ href="http://www.w3.org/1999/xhtml">www.w3.org/1999/xhtml</a>&#8217;>
 </p>
 <pre>
   &lt;head&gt;
-    &lt;title&gt;&lt;%= page_title %&gt;&lt;/title&gt;
+    &lt;title&gt;&lt;%= rcov_page_title %&gt;&lt;/title&gt;
     &lt;link href=&quot;screen.css&quot; media=&quot;all&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
     &lt;link href=&quot;print.css&quot; media=&quot;print&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
     &lt;% if css %&gt;&lt;link href=&quot;custom.css&quot; media=&quot;all&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;&lt;% end %&gt;
@@ -45,7 +45,7 @@ href="http://www.w3.org/1999/xhtml">www.w3.org/1999/xhtml</a>&#8217;>
   &lt;/head&gt;
   &lt;body&gt;
     &lt;h1&gt;&lt;%= &quot;#{project_name} C0 Coverage Information - RCov&quot; %&gt;&lt;/h1&gt;
-    &lt;h2&gt;&lt;%= page_title %&gt;&lt;/h2&gt;
+    &lt;h2&gt;&lt;%= rcov_page_title %&gt;&lt;/h2&gt;
 
     &lt;% if output_threshold != 101 %&gt;
       &lt;!-- Note: 101 is the default threshold if you don't enter one --&gt;

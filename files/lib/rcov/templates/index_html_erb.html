@@ -19,7 +19,7 @@
         </h1>
         <ul class="files">
             <li>lib/rcov/templates/index.html.erb</li>
-            <li>Last modified: Sun Sep 27 15:28:55 -0400 2009</li>
+            <li>Last modified: Mon Jun 21 17:58:50 -0400 2010</li>
         </ul>
     </div>
 
@@ -95,7 +95,7 @@ href="http://www.w3.org/1999/xhtml">www.w3.org/1999/xhtml</a>&#8217;>
         &lt;tbody&gt;
           &lt;% files.each_with_index do |f,i| %&gt;
             &lt;tr class=&quot;all_files all_coverage &lt;%= coverage_threshold_classes(f.code_coverage_for_report) %&gt; &lt;%= file_filter_classes(f.name) %&gt; &lt;%= i % 2 == 0 ? 'even' : 'odd' %&gt;&quot;&gt;
-              &lt;td class=&quot;left_align&quot;&gt;&lt;a href=&quot;&lt;%= relative_filename(f.name) %&gt;&quot;&gt;&lt;%= f.name %&gt;&lt;/a&gt;&lt;/td&gt;
+              &lt;td class=&quot;left_align&quot;&gt;&lt;a href=&quot;&lt;%= CGI::escapeHTML(relative_filename(f.name)) %&gt;&quot;&gt;&lt;%= CGI::escapeHTML(f.name) %&gt;&lt;/a&gt;&lt;/td&gt;
               &lt;td class='right_align'&gt;&lt;tt&gt;&lt;%= f.num_lines %&gt;&lt;/tt&gt;&lt;/td&gt;
               &lt;td class='right_align'&gt;&lt;tt&gt;&lt;%= f.num_code_lines %&gt;&lt;/tt&gt;&lt;/td&gt;
               &lt;td class=&quot;left_align&quot;&gt;&lt;%= code_coverage_html(f.total_coverage_for_report) %&gt;&lt;/td&gt;

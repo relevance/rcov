@@ -98,9 +98,9 @@ href="CodeCoverageAnalyzer.html">Rcov::CodeCoverageAnalyzer</a>.
         <dd>
             <ul>
                 
-                <li><a href="#M000058">code_coverage</a>,</li>
+                <li><a href="#M000059">code_coverage</a>,</li>
                 
-                <li><a href="#M000059">code_coverage_for_report</a></li>
+                <li><a href="#M000060">code_coverage_for_report</a></li>
                 
             </ul>
         </dd>
@@ -109,7 +109,7 @@ href="CodeCoverageAnalyzer.html">Rcov::CodeCoverageAnalyzer</a>.
         <dd>
             <ul>
                 
-                <li><a href="#M000063">is_code?</a></li>
+                <li><a href="#M000064">is_code?</a></li>
                 
             </ul>
         </dd>
@@ -118,7 +118,7 @@ href="CodeCoverageAnalyzer.html">Rcov::CodeCoverageAnalyzer</a>.
         <dd>
             <ul>
                 
-                <li><a href="#M000056">merge</a></li>
+                <li><a href="#M000057">merge</a></li>
                 
             </ul>
         </dd>
@@ -127,11 +127,11 @@ href="CodeCoverageAnalyzer.html">Rcov::CodeCoverageAnalyzer</a>.
         <dd>
             <ul>
                 
-                <li><a href="#M000055">new</a>,</li>
+                <li><a href="#M000056">new</a>,</li>
                 
-                <li><a href="#M000061">num_code_lines</a>,</li>
+                <li><a href="#M000062">num_code_lines</a>,</li>
                 
-                <li><a href="#M000062">num_lines</a></li>
+                <li><a href="#M000063">num_lines</a></li>
                 
             </ul>
         </dd>
@@ -140,9 +140,9 @@ href="CodeCoverageAnalyzer.html">Rcov::CodeCoverageAnalyzer</a>.
         <dd>
             <ul>
                 
-                <li><a href="#M000057">total_coverage</a>,</li>
+                <li><a href="#M000058">total_coverage</a>,</li>
                 
-                <li><a href="#M000060">total_coverage_for_report</a></li>
+                <li><a href="#M000061">total_coverage_for_report</a></li>
                 
             </ul>
         </dd>
@@ -201,9 +201,9 @@ href="CodeCoverageAnalyzer.html">Rcov::CodeCoverageAnalyzer</a>.
             <div class="sectiontitle">Class Public methods</div>
             
             <div class="method">
-                <div class="title" id="M000055">
+                <div class="title" id="M000056">
                     
-                    <a name="M000055"></a><b>new</b>(name, lines, counts, comments_run_by_default = false)
+                    <a name="M000056"></a><b>new</b>(name, lines, counts, comments_run_by_default = false)
                     
                 </div>
                 
@@ -212,12 +212,12 @@ href="CodeCoverageAnalyzer.html">Rcov::CodeCoverageAnalyzer</a>.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000055_source')" id="l_M000055_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000056_source')" id="l_M000056_source">show</a>
                         
-                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/file_statistics.rb#L29" target="_blank" class="github_url">on GitHub</a>
+                        | <a href="http://github.com/relevance/rcov/blob/48914ba67a2cbac2790be57f78ea7a8e972193f2/lib/rcov/file_statistics.rb#L29" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000055_source" class="dyn-source">
+                    <div id="M000056_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/file_statistics.rb, line 29</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">lines</span>, <span class="ruby-identifier">counts</span>, <span class="ruby-identifier">comments_run_by_default</span> = <span class="ruby-keyword kw">false</span>)
       <span class="ruby-ivar">@name</span> = <span class="ruby-identifier">name</span>
@@ -242,9 +242,9 @@ href="CodeCoverageAnalyzer.html">Rcov::CodeCoverageAnalyzer</a>.
             <div class="sectiontitle">Instance Public methods</div>
             
             <div class="method">
-                <div class="title" id="M000058">
+                <div class="title" id="M000059">
                     
-                    <a name="M000058"></a><b>code_coverage</b>()
+                    <a name="M000059"></a><b>code_coverage</b>()
                     
                 </div>
                 
@@ -261,12 +261,12 @@ total amount of lines of code (loc). Returns a float from 0 to 1.0.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000058_source')" id="l_M000058_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000059_source')" id="l_M000059_source">show</a>
                         
-                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/file_statistics.rb#L79" target="_blank" class="github_url">on GitHub</a>
+                        | <a href="http://github.com/relevance/rcov/blob/48914ba67a2cbac2790be57f78ea7a8e972193f2/lib/rcov/file_statistics.rb#L79" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000058_source" class="dyn-source">
+                    <div id="M000059_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/file_statistics.rb, line 79</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">code_coverage</span>
       <span class="ruby-identifier">indices</span> = (<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-ivar">@lines</span>.<span class="ruby-identifier">size</span>).<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">is_code?</span> <span class="ruby-identifier">i</span> }
@@ -281,9 +281,9 @@ total amount of lines of code (loc). Returns a float from 0 to 1.0.
             </div>
             
             <div class="method">
-                <div class="title" id="M000059">
+                <div class="title" id="M000060">
                     
-                    <a name="M000059"></a><b>code_coverage_for_report</b>()
+                    <a name="M000060"></a><b>code_coverage_for_report</b>()
                     
                 </div>
                 
@@ -292,12 +292,12 @@ total amount of lines of code (loc). Returns a float from 0 to 1.0.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000059_source')" id="l_M000059_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000060_source')" id="l_M000060_source">show</a>
                         
-                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/file_statistics.rb#L87" target="_blank" class="github_url">on GitHub</a>
+                        | <a href="http://github.com/relevance/rcov/blob/48914ba67a2cbac2790be57f78ea7a8e972193f2/lib/rcov/file_statistics.rb#L87" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000059_source" class="dyn-source">
+                    <div id="M000060_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/file_statistics.rb, line 87</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">code_coverage_for_report</span>
       <span class="ruby-identifier">code_coverage</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>
@@ -308,9 +308,9 @@ total amount of lines of code (loc). Returns a float from 0 to 1.0.
             </div>
             
             <div class="method">
-                <div class="title" id="M000063">
+                <div class="title" id="M000064">
                     
-                    <a name="M000063"></a><b>is_code?</b>(lineno)
+                    <a name="M000064"></a><b>is_code?</b>(lineno)
                     
                 </div>
                 
@@ -327,12 +327,12 @@ comment (either # or =begin/=end blocks).
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000063_source')" id="l_M000063_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000064_source')" id="l_M000064_source">show</a>
                         
-                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/file_statistics.rb#L107" target="_blank" class="github_url">on GitHub</a>
+                        | <a href="http://github.com/relevance/rcov/blob/48914ba67a2cbac2790be57f78ea7a8e972193f2/lib/rcov/file_statistics.rb#L107" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000063_source" class="dyn-source">
+                    <div id="M000064_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/file_statistics.rb, line 107</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">is_code?</span>(<span class="ruby-identifier">lineno</span>)
       <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@is_begin_comment</span>
@@ -340,6 +340,7 @@ comment (either # or =begin/=end blocks).
         <span class="ruby-identifier">pending</span> = []
         <span class="ruby-identifier">state</span> = <span class="ruby-identifier">:code</span>
         <span class="ruby-ivar">@lines</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">line</span>, <span class="ruby-identifier">index</span><span class="ruby-operator">|</span>
+          <span class="ruby-identifier">line</span>.<span class="ruby-identifier">force_encoding</span>(<span class="ruby-value str">&quot;utf-8&quot;</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">line</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">:force_encoding</span>)
           <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">state</span>
           <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:code</span>
             <span class="ruby-keyword kw">if</span> <span class="ruby-regexp re">/^=begin\b/</span> <span class="ruby-operator">=~</span> <span class="ruby-identifier">line</span>
@@ -356,8 +357,7 @@ comment (either # or =begin/=end blocks).
           <span class="ruby-keyword kw">end</span>
         <span class="ruby-keyword kw">end</span>
       <span class="ruby-keyword kw">end</span>
-      <span class="ruby-ivar">@lines</span>[<span class="ruby-identifier">lineno</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@is_begin_comment</span>[<span class="ruby-identifier">lineno</span>] <span class="ruby-operator">&amp;&amp;</span> 
-        <span class="ruby-ivar">@lines</span>[<span class="ruby-identifier">lineno</span>] <span class="ruby-operator">!~</span> <span class="ruby-regexp re">/^\s*(#|$)/</span> 
+      <span class="ruby-ivar">@lines</span>[<span class="ruby-identifier">lineno</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@is_begin_comment</span>[<span class="ruby-identifier">lineno</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@lines</span>[<span class="ruby-identifier">lineno</span>] <span class="ruby-operator">!~</span> <span class="ruby-regexp re">/^\s*(#|$)/</span> 
     <span class="ruby-keyword kw">end</span></pre>
                     </div>
                 </div>
@@ -365,9 +365,9 @@ comment (either # or =begin/=end blocks).
             </div>
             
             <div class="method">
-                <div class="title" id="M000056">
+                <div class="title" id="M000057">
                     
-                    <a name="M000056"></a><b>merge</b>(lines, coverage, counts)
+                    <a name="M000057"></a><b>merge</b>(lines, coverage, counts)
                     
                 </div>
                 
@@ -401,12 +401,12 @@ Execution counts are just summated on a per-line basis.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000056_source')" id="l_M000056_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000057_source')" id="l_M000057_source">show</a>
                         
-                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/file_statistics.rb#L55" target="_blank" class="github_url">on GitHub</a>
+                        | <a href="http://github.com/relevance/rcov/blob/48914ba67a2cbac2790be57f78ea7a8e972193f2/lib/rcov/file_statistics.rb#L55" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000056_source" class="dyn-source">
+                    <div id="M000057_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/file_statistics.rb, line 55</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">merge</span>(<span class="ruby-identifier">lines</span>, <span class="ruby-identifier">coverage</span>, <span class="ruby-identifier">counts</span>)
       <span class="ruby-identifier">coverage</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span>, <span class="ruby-identifier">idx</span><span class="ruby-operator">|</span>
@@ -426,9 +426,9 @@ Execution counts are just summated on a per-line basis.
             </div>
             
             <div class="method">
-                <div class="title" id="M000061">
+                <div class="title" id="M000062">
                     
-                    <a name="M000061"></a><b>num_code_lines</b>()
+                    <a name="M000062"></a><b>num_code_lines</b>()
                     
                 </div>
                 
@@ -444,12 +444,12 @@ Number of lines of code (loc).
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000061_source')" id="l_M000061_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000062_source')" id="l_M000062_source">show</a>
                         
-                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/file_statistics.rb#L96" target="_blank" class="github_url">on GitHub</a>
+                        | <a href="http://github.com/relevance/rcov/blob/48914ba67a2cbac2790be57f78ea7a8e972193f2/lib/rcov/file_statistics.rb#L96" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000061_source" class="dyn-source">
+                    <div id="M000062_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/file_statistics.rb, line 96</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">num_code_lines</span>
       (<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-ivar">@lines</span>.<span class="ruby-identifier">size</span>).<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">is_code?</span> <span class="ruby-identifier">i</span>}.<span class="ruby-identifier">size</span>
@@ -460,9 +460,9 @@ Number of lines of code (loc).
             </div>
             
             <div class="method">
-                <div class="title" id="M000062">
+                <div class="title" id="M000063">
                     
-                    <a name="M000062"></a><b>num_lines</b>()
+                    <a name="M000063"></a><b>num_lines</b>()
                     
                 </div>
                 
@@ -478,12 +478,12 @@ Total number of lines.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000062_source')" id="l_M000062_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000063_source')" id="l_M000063_source">show</a>
                         
-                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/file_statistics.rb#L101" target="_blank" class="github_url">on GitHub</a>
+                        | <a href="http://github.com/relevance/rcov/blob/48914ba67a2cbac2790be57f78ea7a8e972193f2/lib/rcov/file_statistics.rb#L101" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000062_source" class="dyn-source">
+                    <div id="M000063_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/file_statistics.rb, line 101</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">num_lines</span>
       <span class="ruby-ivar">@lines</span>.<span class="ruby-identifier">size</span>
@@ -494,9 +494,9 @@ Total number of lines.
             </div>
             
             <div class="method">
-                <div class="title" id="M000057">
+                <div class="title" id="M000058">
                     
-                    <a name="M000057"></a><b>total_coverage</b>()
+                    <a name="M000058"></a><b>total_coverage</b>()
                     
                 </div>
                 
@@ -515,12 +515,12 @@ considered executed if the the next statement was executed.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000057_source')" id="l_M000057_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000058_source')" id="l_M000058_source">show</a>
                         
-                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/file_statistics.rb#L72" target="_blank" class="github_url">on GitHub</a>
+                        | <a href="http://github.com/relevance/rcov/blob/48914ba67a2cbac2790be57f78ea7a8e972193f2/lib/rcov/file_statistics.rb#L72" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000057_source" class="dyn-source">
+                    <div id="M000058_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/file_statistics.rb, line 72</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">total_coverage</span>
       <span class="ruby-keyword kw">return</span> <span class="ruby-value">0</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@coverage</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>
@@ -532,9 +532,9 @@ considered executed if the the next statement was executed.
             </div>
             
             <div class="method">
-                <div class="title" id="M000060">
+                <div class="title" id="M000061">
                     
-                    <a name="M000060"></a><b>total_coverage_for_report</b>()
+                    <a name="M000061"></a><b>total_coverage_for_report</b>()
                     
                 </div>
                 
@@ -543,12 +543,12 @@ considered executed if the the next statement was executed.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000060_source')" id="l_M000060_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000061_source')" id="l_M000061_source">show</a>
                         
-                        | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/file_statistics.rb#L91" target="_blank" class="github_url">on GitHub</a>
+                        | <a href="http://github.com/relevance/rcov/blob/48914ba67a2cbac2790be57f78ea7a8e972193f2/lib/rcov/file_statistics.rb#L91" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000060_source" class="dyn-source">
+                    <div id="M000061_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/file_statistics.rb, line 91</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">total_coverage_for_report</span>
       <span class="ruby-identifier">total_coverage</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>

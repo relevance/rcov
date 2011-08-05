@@ -57,9 +57,9 @@ callstack starting from the context that called the method.
         <dd>
             <ul>
                 
-                <li><a href="#M000010">calling_class</a>,</li>
+                <li><a href="#M000009">calling_class</a>,</li>
                 
-                <li><a href="#M000009">calling_method</a></li>
+                <li><a href="#M000008">calling_method</a></li>
                 
             </ul>
         </dd>
@@ -68,7 +68,7 @@ callstack starting from the context that called the method.
         <dd>
             <ul>
                 
-                <li><a href="#M000006">depth</a></li>
+                <li><a href="#M000003">depth</a></li>
                 
             </ul>
         </dd>
@@ -77,7 +77,7 @@ callstack starting from the context that called the method.
         <dd>
             <ul>
                 
-                <li><a href="#M000007">file</a></li>
+                <li><a href="#M000004">file</a></li>
                 
             </ul>
         </dd>
@@ -86,7 +86,7 @@ callstack starting from the context that called the method.
         <dd>
             <ul>
                 
-                <li><a href="#M000008">line</a></li>
+                <li><a href="#M000007">line</a></li>
                 
             </ul>
         </dd>
@@ -108,9 +108,9 @@ callstack starting from the context that called the method.
             <div class="sectiontitle">Instance Public methods</div>
             
             <div class="method">
-                <div class="title" id="M000010">
+                <div class="title" id="M000009">
                     
-                    <a name="M000010"></a><b>calling_class</b>(level = 0)
+                    <a name="M000009"></a><b>calling_class</b>(level = 0)
                     
                 </div>
                 
@@ -127,12 +127,12 @@ return <tt>nil</tt> if it could not be determined.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000010_source')" id="l_M000010_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000009_source')" id="l_M000009_source">show</a>
                         
                         | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/call_site_analyzer.rb#L85" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000010_source" class="dyn-source">
+                    <div id="M000009_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/call_site_analyzer.rb, line 85</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">calling_class</span>(<span class="ruby-identifier">level</span> = <span class="ruby-value">0</span>)
         <span class="ruby-identifier">stack_frame</span> = <span class="ruby-identifier">backtrace</span>[<span class="ruby-identifier">level</span>]
@@ -144,9 +144,9 @@ return <tt>nil</tt> if it could not be determined.
             </div>
             
             <div class="method">
-                <div class="title" id="M000009">
+                <div class="title" id="M000008">
                     
-                    <a name="M000009"></a><b>calling_method</b>(level = 0)
+                    <a name="M000008"></a><b>calling_method</b>(level = 0)
                     
                 </div>
                 
@@ -164,12 +164,12 @@ not be determined.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000009_source')" id="l_M000009_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000008_source')" id="l_M000008_source">show</a>
                         
                         | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/call_site_analyzer.rb#L78" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000009_source" class="dyn-source">
+                    <div id="M000008_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/call_site_analyzer.rb, line 78</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">calling_method</span>(<span class="ruby-identifier">level</span> = <span class="ruby-value">0</span>)
         <span class="ruby-identifier">stack_frame</span> = <span class="ruby-identifier">backtrace</span>[<span class="ruby-identifier">level</span>]
@@ -181,9 +181,9 @@ not be determined.
             </div>
             
             <div class="method">
-                <div class="title" id="M000006">
+                <div class="title" id="M000003">
                     
-                    <a name="M000006"></a><b>depth</b>()
+                    <a name="M000003"></a><b>depth</b>()
                     
                 </div>
                 
@@ -200,12 +200,12 @@ object.
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000006_source')" id="l_M000006_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000003_source')" id="l_M000003_source">show</a>
                         
                         | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/call_site_analyzer.rb#L57" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000006_source" class="dyn-source">
+                    <div id="M000003_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/call_site_analyzer.rb, line 57</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">depth</span>
         <span class="ruby-identifier">backtrace</span>.<span class="ruby-identifier">size</span>
@@ -216,9 +216,9 @@ object.
             </div>
             
             <div class="method">
-                <div class="title" id="M000007">
+                <div class="title" id="M000004">
                     
-                    <a name="M000007"></a><b>file</b>(level = 0)
+                    <a name="M000004"></a><b>file</b>(level = 0)
                     
                 </div>
                 
@@ -235,12 +235,12 @@ File where the method call originated. Might return <tt>nil</tt> or
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000007_source')" id="l_M000007_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000004_source')" id="l_M000004_source">show</a>
                         
                         | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/call_site_analyzer.rb#L63" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000007_source" class="dyn-source">
+                    <div id="M000004_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/call_site_analyzer.rb, line 63</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">file</span>(<span class="ruby-identifier">level</span> = <span class="ruby-value">0</span>)
         <span class="ruby-identifier">stack_frame</span> = <span class="ruby-identifier">backtrace</span>[<span class="ruby-identifier">level</span>]
@@ -252,9 +252,9 @@ File where the method call originated. Might return <tt>nil</tt> or
             </div>
             
             <div class="method">
-                <div class="title" id="M000008">
+                <div class="title" id="M000007">
                     
-                    <a name="M000008"></a><b>line</b>(level = 0)
+                    <a name="M000007"></a><b>line</b>(level = 0)
                     
                 </div>
                 
@@ -271,12 +271,12 @@ is not meaningful (C extensions, etc).
                 
                 <div class="sourcecode">
                     <p class="source-link">
-                        Source: <a href="javascript:toggleSource('M000008_source')" id="l_M000008_source">show</a>
+                        Source: <a href="javascript:toggleSource('M000007_source')" id="l_M000007_source">show</a>
                         
                         | <a href="http://github.com/relevance/rcov/blob/72921dc54346b4c920b4650b550f98900189cf49/lib/rcov/call_site_analyzer.rb#L70" target="_blank" class="github_url">on GitHub</a>
                         
                     </p>
-                    <div id="M000008_source" class="dyn-source">
+                    <div id="M000007_source" class="dyn-source">
                         <pre><span class="ruby-comment cmt"># File lib/rcov/call_site_analyzer.rb, line 70</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">line</span>(<span class="ruby-identifier">level</span> = <span class="ruby-value">0</span>)
         <span class="ruby-identifier">stack_frame</span> = <span class="ruby-identifier">backtrace</span>[<span class="ruby-identifier">level</span>]
