@@ -255,7 +255,7 @@ module Rcov
     end
 
     def correct_script_lines__
-      return unless JRUBY_VERSION && JRUBY_VERSION < "1.5.3"
+      return unless Object.const_defined?("JRUBY_VERSION") && JRUBY_VERSION < "1.5.3"
       SCRIPT_LINES__.each_key do |file|
         next unless File.exists? file
         lines = []
