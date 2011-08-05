@@ -35,13 +35,11 @@ Gem::Specification.new do |s|
   s.authors = ["Relevance", "Chad Humphries (spicycode)", "Aaron Bedra (abedra)", "Jay McGaffigan(hooligan495)", "Mauricio Fernandez"]
   s.cert_chain = nil
   s.date = %q{2009-12-29}
-  s.default_executable = %q{rcov}
   s.description = %q{rcov is a code coverage tool for Ruby. It is commonly used for viewing overall test unit coverage of target code.  It features fast execution (20-300 times faster than previous tools), multiple analysis modes, XHTML and several kinds of text reports, easy automation with Rake via a RcovTask, fairly accurate coverage information through code linkage inference using simple heuristics, colorblind-friendliness...}
   s.email = %q{opensource@thinkrelevance.com}
   s.executables = ["rcov"]
   s.extensions = ["ext/rcovrt/extconf.rb"]
   s.files = PKG_FILES
-  s.has_rdoc = true
   s.homepage = %q{http://github.com/relevance/rcov}
   s.rdoc_options = ["--title", "rcov code coverage tool"]
   s.require_paths = ["lib"]
