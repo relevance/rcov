@@ -110,6 +110,7 @@ module Rcov
         pending = []
         state = :code
         @lines.each_with_index do |line, index|
+          line.force_encoding("utf-8")
           case state
           when :code
             if /^=begin\b/ =~ line
