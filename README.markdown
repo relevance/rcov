@@ -3,6 +3,7 @@
 ## Why? What?
 
 This is our fork of Mauricio Fernandez's RCov (maintained by [Relevance] [2]).
+This fork *does not* work on Ruby 1.9.x.  For coverage on Ruby 1.9 look at [SimpleCov] [3].
 
 ## Install
 
@@ -14,6 +15,7 @@ This is our fork of Mauricio Fernandez's RCov (maintained by [Relevance] [2]).
 
   [1]: http://github.com/relevance/rcov/issues/ "RCov Issues"
   [2]: http://thinkrelevance.com "Relevance"
+  [3]: https://github.com/colszowka/simplecov
 
 ## More Info
 
