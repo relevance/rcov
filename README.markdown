@@ -3,7 +3,8 @@
 ## Why? What?
 
 This is our fork of Mauricio Fernandez's RCov (maintained by [Relevance] [2]).
-This fork *does not* work on Ruby 1.9.x.  For coverage on Ruby 1.9 look at [SimpleCov] [3].
+
+__NOTE:__ This fork __does not__ work on Ruby 1.9.x.  For coverage on Ruby 1.9 look at [SimpleCov] [3].  Even if you get results on 1.9 they will probably be inaccurate.  Ruby 1.9 has call detection built in for faster, more accurate results.
 
 ## Install
 
