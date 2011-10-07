@@ -85,8 +85,8 @@ EOF
     options.destdir = dir
   end
   
-  opts.on("-I", "--include PATHS", "Prepend PATHS to $: (colon separated list)") do |paths|
-    options.loadpaths = paths.split(/:/)
+  opts.on("-I", "--include PATHS", "Prepend PATHS to the load-path variable ($:) (#{File::PATH_SEPARATOR} separated list)") do |paths|
+    options.loadpaths = paths.split(File::PATH_SEPARATOR)
   end
   
   opts.on("--[no-]comments", "Mark all comments by default.", "(default: --no-comments)") do |comments_run_p|
