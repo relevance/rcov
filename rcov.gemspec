@@ -1,3 +1,6 @@
+$:.push File.expand_path("../lib", __FILE__)
+require "rcov/version"
+
 PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/version.rb", 
              "lib/rcov/rcovtask.rb", "lib/rcov/formatters.rb", "lib/rcov/call_site_analyzer.rb",
              "lib/rcov/code_coverage_analyzer.rb", "lib/rcov/coverage_info.rb", "lib/rcov/differential_analyzer.rb",
@@ -29,7 +32,7 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/versio
 
 Gem::Specification.new do |s|
   s.name = %q{rcov}
-  s.version = "0.9.10"
+  s.version = Rcov::VERSION
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
   s.authors = ["Relevance", "Chad Humphries (spicycode)", "Aaron Bedra (abedra)", "Jay McGaffigan(hooligan495)", "Mauricio Fernandez"]
