@@ -152,5 +152,28 @@ module Rcov
         FileList[result]
       end
     end
+
+    # It finds output dir with coverage results
+    # and opens index.html file.
+    # So far the task is created in case of using for MAC platform.
+    def display_results
+      path_to_output_dir = "./#{@output_dir}"
+      path_to_file = "#{path_to_output_dir}/index.html"
+      # It works only for MAC
+      return false if !RUBY_PLATFORM.downcase.include?("darwin")
+      desc "Display coverage results for #{name}"
+      task "#{name}:display" do
+        puts "Opening, please wait..."
+        if !File.directory?(path_to_output_dir)
+         puts "Rcov hasn't been run yet. Folder #{path_to_output_dir} doesn't exist."
+         return false
+        end
+        if File.exist?(path_to_file)
+          system("open #{path_to_file}")
+        else
+          puts "Couldn't find #{path_to_file}."
+        end
+      end
+    end
   end
 end
