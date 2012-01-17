@@ -16,8 +16,8 @@ PKG_FILES = ["bin/rcov", "lib/rcov.rb", "lib/rcov/lowlevel.rb", "lib/rcov/versio
              "lib/rcov/templates/rcov.js",
              "lib/rcov/templates/jquery-1.3.2.min.js",
              "lib/rcov/templates/jquery.tablesorter.min.js",
-             "ext/rcovrt/extconf.rb", "ext/rcovrt/1.8/rcovrt.c", "ext/rcovrt/1.9/rcovrt.c", 
-             "ext/rcovrt/1.8/callsite.c", "ext/rcovrt/1.9/callsite.c", "LICENSE", 
+             "ext/rcovrt/extconf.rb", "ext/rcovrt/1.8/rcovrt.c", 
+             "ext/rcovrt/1.8/callsite.c", "LICENSE", 
              "Rakefile", "doc/readme_for_rake.markdown", "doc/readme_for_vim.markdown", "doc/readme_for_emacs.markdown", 
              "doc/readme_for_api.markdown", "THANKS", "test/functional_test.rb", 
              "test/file_statistics_test.rb", "test/assets/sample_03.rb", "test/assets/sample_05-new.rb", 
@@ -36,7 +36,6 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = nil if s.respond_to? :required_rubygems_version=
   s.authors = ["Relevance", "Chad Humphries (spicycode)", "Aaron Bedra (abedra)", "Jay McGaffigan(hooligan495)", "Mauricio Fernandez"]
-  s.cert_chain = nil
   s.date = %q{2009-12-29}
   s.description = %q{rcov is a code coverage tool for Ruby. It is commonly used for viewing overall test unit coverage of target code.  It features fast execution (20-300 times faster than previous tools), multiple analysis modes, XHTML and several kinds of text reports, easy automation with Rake via a RcovTask, fairly accurate coverage information through code linkage inference using simple heuristics, colorblind-friendliness...}
   s.email = %q{opensource@thinkrelevance.com}
