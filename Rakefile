@@ -20,6 +20,7 @@ Rcov::RcovTask.new do |t|
   t.ruby_opts << "-Ilib:ext/rcovrt" # in order to use this rcov
   t.rcov_opts << "--xrefs"  # comment to disable cross-references
   t.verbose = true
+  t.display_results
 end
 
 desc "Analyze code coverage for the FileStatistics class."
