@@ -1,3 +1,8 @@
+if RUBY_VERSION =~ /1.9/
+  puts "**** Ruby 1.9 is not supported. Please switch to simplecov ****"
+  Kernel.exit 1
+end
+
 require 'mkmf'
 
 dir_config("gcov")

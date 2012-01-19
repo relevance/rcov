@@ -10,6 +10,12 @@
 #
 # See LEGAL and LICENSE for additional licensing information.
 #
+if RUBY_VERSION =~ /1.9/
+  puts "** Ruby 1.9 is not supported. Please switch to simplecov **"
+  exit 1
+end
+
+
 require 'cgi'
 require 'rbconfig'
 require 'optparse'
@@ -503,9 +509,6 @@ $rcov_code_coverage_analyzer.install_hook
 
 #{{{ Load scripts
 begin
-  if RUBY_VERSION =~ /1.9/
-    puts "** WARNING: Ruby 1.9 Support is experimental at best. Don't expect correct results! **"
-  end
   pending_scripts = ARGV.clone
   ARGV.replace extra_args
   until pending_scripts.empty?
