@@ -33,6 +33,7 @@ options.profiling = false
 options.destdir = nil
 options.loadpaths = []
 options.textmode = false
+options.custom_formatters = []
 options.skip = Rcov::BaseFormatter::DEFAULT_OPTS[:ignore]
 options.include = []
 options.html = true
@@ -183,6 +184,21 @@ EOF
   
   opts.on("--text-coverage", "Dump coverage info to stdout, using", "ANSI color sequences unless -n.") do
     options.textmode = :coverage
+  end
+
+  opts.on("--require LIB", "Require an additional lib before running") do |file|
+	require file
+  end
+
+  opts.on("--custom-formatter EXPR", "Generate additional output using a",
+          "custom formatter class. The expression",
+		  "is evaluated as Ruby code and should",
+          "return a Class object") do |class_expr|
+    formatter = instance_eval class_expr
+    unless formatter.is_a? Class
+      raise "--custom-formatter expression must return a Class object. Got a #{formatter.class.name}"
+    end
+    options.custom_formatters << formatter
   end
   
   opts.on("--gcc", "Dump uncovered line in GCC error format.") do
@@ -399,6 +415,10 @@ if options.html
   else
     formatters << make_formatter[Rcov::HTMLCoverage]
   end
+end
+
+options.custom_formatters.each do |formatter|
+  formatters << make_formatter[formatter]
 end
 
 textual_formatters = { :counts => Rcov::FullTextReport, :coverage => Rcov::FullTextReport,
