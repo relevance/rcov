@@ -19,10 +19,10 @@ module Rcov
       end
 
       def coverage_threshold_classes(percentage)
-        return 110 if percentage == 100
-        return (1..10).find_all{|i| i * 10 > percentage}.map{|i| i.to_i * 10} * " " 
+        return '_110' if percentage == 100
+        return (1..10).find_all{|i| i * 10 > percentage}.map{|i| "_#{i*10}"} * " "
       end
-      
+
       def code_coverage_html(code_coverage_percentage, is_total=false)
         %{<div class="percent_graph_legend"><tt class='#{ is_total ? 'coverage_total' : ''}'>#{ "%3.2f" % code_coverage_percentage }%</tt></div>
           <div class="percent_graph">
@@ -34,11 +34,11 @@ module Rcov
       def file_filter_classes(file_path)
         file_path.split('/')[0..-2] * " "
       end
-      
+
       def relative_filename(path)
         @path_relativizer[path]
       end
-    
+
       def line_css(line_number)
         case fileinfo.coverage[line_number]
         when true
@@ -55,7 +55,7 @@ module Rcov
       end
 
       def get_binding
-        binding 
+        binding
       end
     end
   end
