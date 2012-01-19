@@ -31,12 +31,12 @@
         <label>Code Coverage Threshold:</label>
         <select id="coverage_filter" class="filter">
           <option value="all_coverage">Show All</option>
-          <% (1..10).each do |i| %><option value="<%= i * 10 %>">&lt; <%= i * 10 %>% Coverage</option><% end %>
-          <option value="110">= 100% Coverage</option>
+          <% (1..10).each do |i| %><option value="_<%= i * 10 %>">&lt; <%= i * 10 %>% Coverage</option><% end %>
+          <option value="_110">= 100% Coverage</option>
         </select>
       </fieldset>
     </div>
-    
+
     <div class="report_table_wrapper">
       <table class='report' id='report_table'>
         <thead>
@@ -70,22 +70,26 @@
         </tbody>
       </table>
     </div>
-    
+
     <p>Generated on <%= generated_on %> with <a href="<%= rcov::UPSTREAM_URL %>">rcov <%= rcov::VERSION %></a></p>
 
     <script type="text/javascript">
-      $(document).ready(function(){$("#report_table").tablesorter({widgets: ['zebra'], textExtraction: 'complex'});});
+      $(document).ready(function(){
+          $("#report_table").tablesorter({widgets: ['zebra'], textExtraction: 'complex'});
+        }
+      );
       $('.filter').change(function(){
-        ff = $('#file_filter').val();
-        cf = $('#coverage_filter').val();
-        $('table#report_table tbody tr').each(function(i){ 
-          if ((this.className.split(" ").indexOf(ff) > -1) && (this.className.split(" ").indexOf(cf) > -1)) {
-            this.style.display = "";
-          } else {
-            this.style.display = "none";
-          };
+        ff = '.' + $('#file_filter').val();
+        cf = '.' + $('#coverage_filter').val();
+        rows = 'table#report_table tbody tr';
+        // Hide all rows that don't match the filters
+        $(rows).not(cf).map(function() { $(this).hide(); });
+        $(rows).not(ff).map(function() { $(this).hide(); });
+        // Show and restripe all rows that match both filters
+        $(rows).filter(cf).filter(ff).each(function() {
+          $(this).show();
           restripe();
-        })
+        });
       })
     </script>
 
