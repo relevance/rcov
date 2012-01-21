@@ -1,6 +1,0 @@
-test_diff under functional_tests does not pass for jruby.  It looks like Jruby is reporting on MORE information than 
-regular ruby.  I don't understand why this is yet.  I am certain I can "remove" the extra data from the jruby run by
-putting more stuff in the "ignore" list.  But I would like to understand "why" before we do.  This will more than
-likely involve talking with the JRuby guys.
-
-Figure out how to have the right rcov.gem created by github 
