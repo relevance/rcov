@@ -19,4 +19,5 @@ Gem::Specification.new do |s|
   s.executables = ["rcov"]
   s.require_paths = ["lib"]
   s.rdoc_options = ["--title", "rcov code coverage tool"]
+  s.add_development_dependency 'rake', '~> 0.9.2'
 end
