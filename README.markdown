@@ -6,6 +6,8 @@ This is our fork of Mauricio Fernandez's RCov (maintained by [Relevance] [2]).
 
 __NOTE:__ This fork __does not__ work on Ruby 1.9.x.  For coverage on Ruby 1.9 look at [SimpleCov] [3].
 
+[![Build Status](https://secure.travis-ci.org/relevance/rcov.png?branch=master)](http://travis-ci.org/relevance/rcov)
+
 ## Install
 
     gem install rcov
@@ -61,7 +63,7 @@ described below.
 	# ruby setup.rb all --without-ext
 
 will install rcov without building the rcovrt extension.
-  
+
 ## Usage
 
 In the common scenario, your tests are under `test/` and the target code
