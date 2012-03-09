@@ -39,9 +39,9 @@
         </tbody>
       </table>
     </div>
-    
+
     <h3>Key</h3>
-    
+
     <div class="key"><pre><span class='marked'>Code reported as executed by Ruby looks like this...</span><span class='marked1'>and this: this line is also marked as covered.</span><span class='inferred'>Lines considered as run by rcov, but not reported by Ruby, look like this,</span><span class='inferred1'>and this: these lines were inferred by rcov (using simple heuristics).</span><span class='uncovered'>Finally, here's a line marked as not executed.</span></pre></div>
 
     <h3>Coverage Details</h3>
@@ -51,8 +51,9 @@
         <% fileinfo.num_lines.times do |i| %>
           <% line = fileinfo.lines[i].chomp %>
           <% count = fileinfo.counts[i] %>
+          <% width = fileinfo.num_lines.to_s.length %>
           <tr class="<%= line_css(i) %>">
-            <td><pre><a name="line<%= i.next %>"><%= i.next %></a> <%= CGI::escapeHTML(line) %></pre></td>
+            <td><pre><a name="line<%= i.next %>"><%= i.next.to_s.rjust(width) %></a> <%= CGI::escapeHTML(line) %></pre></td>
           </tr>
         <% end %>
       </tbody>
